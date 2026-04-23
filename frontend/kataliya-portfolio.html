@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kataliya</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:      #1A1A1A;
+  --white:      #FFFFFF;
+  --gray-bg:    #D9D9D9;
+  --gray-mid:   #8A8A8A;
+  --gray-dark:  #3A3A3A;
+  --blue:       #1A6BFF;
+  --border:     1px solid #E2E2E2;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--black);
+  color: var(--black);
+  min-height: 100vh;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 42px;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  z-index: 1000;
+}
+
+.page-label {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--gray-mid);
+  letter-spacing: 0.01em;
+  transition: opacity 0.3s;
+}
+
+/* ── SITE WRAPPER ── */
+.site-wrapper {
+  margin-top: 42px;
+  background: var(--white);
+  min-height: calc(100vh - 42px);
+  border: 1px solid #2a2a2a;
+  position: relative;
+  overflow: hidden;
+}
+
+/* play page blue left border */
+.site-wrapper.play-active {
+  border-left: 3px solid var(--blue);
+}
+
+/* ── NAV ── */
+.main-nav {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  border-bottom: var(--border);
+  gap: 1rem;
+}
+
+.nav-center {
+  display: flex;
+  gap: 5rem;
+  flex: 1;
+  justify-content: center;
+  padding-top: 0.15rem;
+}
+
+.nav-center a, .nav-social a {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--gray-mid);
+  text-decoration: none;
+  transition: color 0.18s;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.nav-center a:hover, .nav-social a:hover,
+.nav-center a.active { color: var(--black); }
+
+.nav-social {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.12rem;
+  min-width: 80px;
+}
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ════════════════════════════════════════
+   WORK PAGE
+════════════════════════════════════════ */
+
+/* Hero — cat lives here */
+#hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 42px - 50px);
+  padding: 4rem 2.5rem 4rem 3rem;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  cursor: none;
+}
+
+.hero-text h1 {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 1.4rem;
+  color: var(--black);
+}
+
+.hero-text p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--gray-dark);
+  max-width: 400px;
+}
+
+.hero-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-circle {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: var(--gray-bg);
+}
+
+/* Work sections */
+.work-sections { padding-bottom: 5rem; }
+
+.work-category {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  border-top: var(--border);
+  padding: 2rem 0;
+}
+
+.cat-label {
+  padding: 0.3rem 0 0 2.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: var(--gray-mid);
+  white-space: nowrap;
+}
+
+.cat-content {
+  padding-right: 2.5rem;
+}
+
+/* Sugar featured */
+.sugar-wrap {
+  background: var(--gray-bg);
+  border-radius: 6px;
+  padding: 1rem 1.2rem 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.sugar-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 0.6rem;
+}
+
+.sugar-img {
+  background: var(--white);
+  border-radius: 3px;
+  height: 200px;
+}
+
+/* Product grid — masonry-ish */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 160px 120px;
+  gap: 0.6rem;
+}
+
+.proj-card {
+  background: var(--gray-bg);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--black);
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s;
+}
+
+.proj-card:hover {
+  background: #c5c5c5;
+  transform: scale(0.99);
+}
+
+.proj-card.tall { grid-row: span 2; }
+
+/* Simple 3-col grid */
+.simple-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.simple-card {
+  background: var(--gray-bg);
+  border-radius: 6px;
+  aspect-ratio: 3/4;
+  transition: background 0.18s;
+  cursor: pointer;
+}
+
+.simple-card:hover { background: #c5c5c5; }
+
+/* Footer */
+.site-footer {
+  border-top: var(--border);
+  padding: 1.8rem 2rem;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: var(--gray-mid);
+  line-height: 1.6;
+}
+
+/* ════════════════════════════════════════
+   PLAY PAGE
+════════════════════════════════════════ */
+.play-inner {
+  min-height: calc(100vh - 42px);
+  position: relative;
+  padding-bottom: 3rem;
+}
+
+.play-heading {
+  padding: 3.5rem 2.5rem 2rem;
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.2rem, 5.5vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--black);
+}
+
+.sandbox-card {
+  margin: 0 2.5rem;
+  background: var(--gray-bg);
+  border-radius: 6px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: var(--gray-mid);
+}
+
+/* ── KS Monogram ── */
+.ks {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(7rem, 14vw, 11rem);
+  font-weight: 800;
+  color: var(--black);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+.ks-bottom-right {
+  position: absolute;
+  bottom: 3rem;
+  right: 2rem;
+}
+
+/* ════════════════════════════════════════
+   ABOUT PAGE
+════════════════════════════════════════ */
+.about-top {
+  display: grid;
+  grid-template-columns: 80px 1fr 300px;
+  gap: 2rem;
+  padding: 3rem 2.5rem 3rem 2rem;
+  border-bottom: var(--border);
+}
+
+.years-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5rem;
+  padding-top: 0.2rem;
+}
+
+.yr {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--gray-mid);
+  text-transform: uppercase;
+}
+
+.bio-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+.bio-block {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--black);
+  font-weight: 300;
+}
+
+.bio-block strong {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.about-photo {
+  background: var(--gray-bg);
+  border-radius: 10px;
+  height: 360px;
+  align-self: start;
+}
+
+/* Timeline */
+.about-bottom {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  padding: 3rem 2.5rem 3rem 2rem;
+  gap: 2rem;
+  border-bottom: var(--border);
+}
+
+.tl-sidebar {
+  background: var(--gray-bg);
+  border-radius: 6px;
+  min-height: 400px;
+}
+
+.tl-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.tl-entry {
+  display: grid;
+  grid-template-columns: 60px 90px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.tl-year {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--gray-mid);
+  text-transform: uppercase;
+  padding-top: 0.15rem;
+}
+
+.tl-thumb {
+  background: var(--gray-bg);
+  border-radius: 4px;
+  aspect-ratio: 4/3;
+}
+
+.tl-text {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--black);
+  font-weight: 300;
+}
+
+.tl-text strong {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+/* Stars */
+.stars-row {
+  display: flex;
+  gap: 1.2rem;
+  padding: 2rem 2rem;
+  border-bottom: var(--border);
+}
+
+/* About KS overflow strip */
+.about-ks-strip {
+  position: relative;
+  height: 140px;
+  overflow: hidden;
+}
+
+.about-ks-strip .ks {
+  position: absolute;
+  bottom: -1.5rem;
+  right: 2rem;
+  font-size: clamp(8rem, 16vw, 12rem);
+}
+
+/* ════════════════════════════════════════
+   CONTACT PAGE
+════════════════════════════════════════ */
+.contact-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 5rem 3rem;
+  min-height: calc(100vh - 42px - 52px);
+  align-items: center;
+}
+
+.contact-left h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: var(--black);
+}
+
+.contact-left p {
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--gray-dark);
+  font-weight: 300;
+  max-width: 340px;
+}
+
+.contact-right {
+  background: var(--gray-bg);
+  border-radius: 8px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  color: var(--gray-mid);
+}
+
+/* ════════════════════════════════════════
+   CAT + MOUSE CURSOR
+════════════════════════════════════════ */
+#cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+#cat {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  display: none;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+  transition: opacity 0.25s;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ TOP BAR ═══════════ -->
+<div class="top-bar">
+  <span class="page-label" id="topLabel">work</span>
+</div>
+
+<!-- ═══════════ SITE WRAPPER ═══════════ -->
+<div class="site-wrapper" id="siteWrapper">
+
+  <!-- ── GLOBAL NAV ── -->
+  <nav class="main-nav" id="mainNav">
+    <div class="nav-center">
+      <a onclick="goTo('work')" class="active" id="nav-work">work</a>
+      <a onclick="goTo('play')" id="nav-play">play</a>
+      <a onclick="goTo('about')" id="nav-about">about</a>
+      <a onclick="goTo('contact')" id="nav-contact">contact</a>
+    </div>
+    <div class="nav-social" id="navSocial">
+      <a href="#">linkedin</a>
+      <a href="#">github</a>
+      <a href="#">mail</a>
+      <a href="#">tiktok</a>
+    </div>
+  </nav>
+
+  <!-- ════════════ WORK PAGE ════════════ -->
+  <div class="page active" id="page-work">
+
+    <!-- Hero — cat zone -->
+    <section id="hero">
+      <div class="hero-text">
+        <h1>Hi, I'm Kataliya!<br>
+        I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.</h1>
+        <p>Currently studying computer science and business marketing at the San Francisco State University. Dabbling in product design on the side as well.</p>
+      </div>
+      <div class="hero-photo">
+        <div class="photo-circle"></div>
+      </div>
+    </section>
+
+    <!-- Work sections -->
+    <div class="work-sections">
+
+      <!-- Product + Design -->
+      <div class="work-category">
+        <div class="cat-label">product + design</div>
+        <div class="cat-content">
+          <!-- Sugar featured -->
+          <div class="sugar-wrap">
+            <div class="sugar-label">sugar</div>
+            <div class="sugar-img"></div>
+          </div>
+          <!-- Grid: maisonid, steady (tall), greenwatch / gatoraid, _, online db -->
+          <div class="product-grid">
+            <div class="proj-card">maisonid</div>
+            <div class="proj-card tall">steady</div>
+            <div class="proj-card">greenwatch</div>
+            <div class="proj-card">gatoraid</div>
+            <div class="proj-card">online db</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="work-category">
+        <div class="cat-label">content</div>
+        <div class="cat-content">
+          <div class="simple-grid">
+            <div class="simple-card"></div>
+            <div class="simple-card"></div>
+            <div class="simple-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphics -->
+      <div class="work-category">
+        <div class="cat-label">graphics</div>
+        <div class="cat-content">
+          <div class="simple-grid">
+            <div class="simple-card"></div>
+            <div class="simple-card"></div>
+            <div class="simple-card"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /work-sections -->
+
+    <footer class="site-footer">
+      <div>@footer stuff 2026</div>
+      <div>footer footer footer</div>
+    </footer>
+  </div>
+
+  <!-- ════════════ PLAY PAGE ════════════ -->
+  <div class="page" id="page-play">
+    <div class="play-inner">
+      <h1 class="play-heading">what's in my sandbox</h1>
+      <div class="sandbox-card">sandbox</div>
+      <footer class="site-footer" style="margin-top: 3rem;">
+        <div>@footer stuff 2026</div>
+        <div>footer footer footer</div>
+      </footer>
+      <div class="ks ks-bottom-right">KS</div>
+    </div>
+  </div>
+
+  <!-- ════════════ ABOUT PAGE ════════════ -->
+  <div class="page" id="page-about">
+
+    <!-- Top: years + bio + photo -->
+    <div class="about-top">
+      <div class="years-col">
+        <span class="yr">year</span>
+        <span class="yr">year</span>
+        <span class="yr">year</span>
+      </div>
+      <div class="bio-col">
+        <div class="bio-block">
+          <strong>Hi, I'm Kataliya!</strong>
+          I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.
+        </div>
+        <div class="bio-block">
+          Currently studying computer science and business marketing at the San Francisco State University. Dabbling in product design on the side as well.
+        </div>
+        <div class="bio-block">
+          I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.
+        </div>
+      </div>
+      <div class="about-photo"></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="about-bottom">
+      <div class="tl-sidebar"></div>
+      <div class="tl-entries">
+        <div class="tl-entry">
+          <span class="tl-year">year</span>
+          <div class="tl-thumb"></div>
+          <div class="tl-text"><strong>Hi, I'm Kataliya!</strong>I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.</div>
+        </div>
+        <div class="tl-entry">
+          <span class="tl-year">year</span>
+          <div class="tl-thumb"></div>
+          <div class="tl-text"><strong>Hi, I'm Kataliya!</strong>I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.</div>
+        </div>
+        <div class="tl-entry">
+          <span class="tl-year">year</span>
+          <div class="tl-thumb"></div>
+          <div class="tl-text"><strong>Hi, I'm Kataliya!</strong>I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.</div>
+        </div>
+        <div class="tl-entry">
+          <span class="tl-year">year</span>
+          <div class="tl-thumb"></div>
+          <div class="tl-text"><strong>Hi, I'm Kataliya!</strong>I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stars -->
+    <div class="stars-row">
+      <svg class="star" viewBox="0 0 51 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M25.5 2L31.7 18.3H49.1L35.2 28.2L41.5 44.5L25.5 35.2L9.5 44.5L15.8 28.2L1.9 18.3H19.3L25.5 2Z" fill="#1A1A1A" fill-opacity="0.15"/>
+      </svg>
+      <svg class="star" viewBox="0 0 51 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M25.5 2L31.7 18.3H49.1L35.2 28.2L41.5 44.5L25.5 35.2L9.5 44.5L15.8 28.2L1.9 18.3H19.3L25.5 2Z" fill="#1A1A1A" fill-opacity="0.15"/>
+      </svg>
+      <svg class="star" viewBox="0 0 51 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M25.5 2L31.7 18.3H49.1L35.2 28.2L41.5 44.5L25.5 35.2L9.5 44.5L15.8 28.2L1.9 18.3H19.3L25.5 2Z" fill="#1A1A1A" fill-opacity="0.15"/>
+      </svg>
+      <svg class="star" viewBox="0 0 51 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M25.5 2L31.7 18.3H49.1L35.2 28.2L41.5 44.5L25.5 35.2L9.5 44.5L15.8 28.2L1.9 18.3H19.3L25.5 2Z" fill="#1A1A1A" fill-opacity="0.15"/>
+      </svg>
+    </div>
+
+    <!-- KS strip -->
+    <div class="about-ks-strip">
+      <footer class="site-footer" style="border-top: none; text-align: center;">
+        <div>@footer stuff 2026</div>
+        <div>footer footer footer</div>
+      </footer>
+      <div class="ks">KS</div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ CONTACT PAGE ════════════ -->
+  <div class="page" id="page-contact">
+    <div class="contact-body">
+      <div class="contact-left">
+        <h2>contact me</h2>
+        <p>I'm always open to new projects, collaborations, and conversations. Whether you have a question or just want to say hi — my inbox is always open.</p>
+      </div>
+      <div class="contact-right">form / image placeholder</div>
+    </div>
+    <footer class="site-footer">
+      <div>@footer stuff 2026</div>
+      <div>footer footer footer</div>
+    </footer>
+  </div>
+
+</div><!-- /site-wrapper -->
+
+<!-- ═══════════ MOUSE CURSOR ═══════════ -->
+<div id="cursor">
+  <svg width="32" height="38" viewBox="0 0 32 38" fill="none">
+    <!-- ears -->
+    <ellipse cx="7" cy="9"  rx="6.5" ry="6.5" fill="#C8B4A4"/>
+    <ellipse cx="25" cy="9" rx="6.5" ry="6.5" fill="#C8B4A4"/>
+    <ellipse cx="7" cy="9"  rx="3.8" ry="3.8" fill="#E8A0A0"/>
+    <ellipse cx="25" cy="9" rx="3.8" ry="3.8" fill="#E8A0A0"/>
+    <!-- body -->
+    <ellipse cx="16" cy="25" rx="11" ry="10" fill="#C8B4A4"/>
+    <!-- eyes -->
+    <circle cx="12" cy="20" r="2.3" fill="#1A1A1A"/>
+    <circle cx="20" cy="20" r="2.3" fill="#1A1A1A"/>
+    <circle cx="12.7" cy="19.4" r="0.7" fill="white"/>
+    <circle cx="20.7" cy="19.4" r="0.7" fill="white"/>
+    <!-- nose -->
+    <ellipse cx="16" cy="23.5" rx="1.4" ry="1" fill="#B07060"/>
+    <!-- tail -->
+    <path d="M16 34 Q26 38 30 32 Q34 26 28 24" stroke="#C8B4A4" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  </svg>
+</div>
+
+<!-- ═══════════ CAT ═══════════ -->
+<div id="cat">
+  <svg id="catSvg" width="58" height="58" viewBox="-29 -29 58 58" fill="none">
+    <!-- tail -->
+    <path id="catTail" d="M0 10 Q16 20 18 10 Q20 2 13 0" stroke="#B07060" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <!-- body -->
+    <ellipse cx="0" cy="8" rx="13" ry="11" fill="#E0C49A"/>
+    <!-- head -->
+    <circle cx="0" cy="-8" r="12" fill="#E0C49A"/>
+    <!-- ears -->
+    <polygon points="-12,-17 -6,-8 -17,-8" fill="#E0C49A"/>
+    <polygon points="12,-17 6,-8 17,-8" fill="#E0C49A"/>
+    <polygon points="-11,-16 -7,-10 -14,-10" fill="#E8A0A0"/>
+    <polygon points="11,-16 7,-10 14,-10" fill="#E8A0A0"/>
+    <!-- eyes -->
+    <ellipse cx="-4.5" cy="-9" rx="3" ry="3" fill="#1A1A1A"/>
+    <ellipse cx="4.5"  cy="-9" rx="3" ry="3" fill="#1A1A1A"/>
+    <circle cx="-3.8" cy="-9.8" r="1" fill="white"/>
+    <circle cx="5.2"  cy="-9.8" r="1" fill="white"/>
+    <!-- nose -->
+    <polygon points="0,-4 -1.8,-2.2 1.8,-2.2" fill="#B07060"/>
+    <!-- mouth -->
+    <path d="M-2.5 -1 Q0 0.8 2.5 -1" stroke="#B07060" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <!-- whiskers -->
+    <line x1="-13" y1="-6" x2="-5" y2="-5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
+    <line x1="-13" y1="-3.5" x2="-5" y2="-3.5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
+    <line x1="13"  y1="-6" x2="5"  y2="-5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
+    <line x1="13"  y1="-3.5" x2="5"  y2="-3.5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
+  </svg>
+</div>
+
+<script>
+/* ── PAGE ROUTING ── */
+const pages   = ['work','play','about','contact'];
+const labels  = { work:'work', play:'play', about:'about', contact:'contact' };
+const wrapper = document.getElementById('siteWrapper');
+
+function goTo(page) {
+  pages.forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p===page);
+    document.getElementById('nav-'+p).classList.toggle('active', p===page);
+  });
+  document.getElementById('topLabel').textContent = labels[page];
+  wrapper.classList.toggle('play-active', page==='play');
+  document.getElementById('navSocial').style.display = page==='work' ? 'flex' : 'none';
+  // Reset scroll
+  window.scrollTo(0,0);
+  wrapper.scrollTo && wrapper.scrollTo(0,0);
+  // Cat only on work
+  if (page !== 'work') {
+    cursor.style.display = 'none';
+    cat.style.display    = 'none';
+    inHero = false;
+  }
+}
+
+/* ── CAT CHASE ── */
+const hero   = document.getElementById('hero');
+const cursor = document.getElementById('cursor');
+const cat    = document.getElementById('cat');
+const catSvg = document.getElementById('catSvg');
+
+let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+let catX   = window.innerWidth/2 - 100, catY = window.innerHeight/2;
+let inHero = false, raf = null, wagAngle = 0;
+
+hero.addEventListener('mouseenter', () => {
+  // Only activate if on work page
+  if (!document.getElementById('page-work').classList.contains('active')) return;
+  inHero = true;
+  cursor.style.display = 'block';
+  cat.style.display    = 'block';
+  cat.style.opacity    = '1';
+  if (!raf) raf = requestAnimationFrame(tick);
+});
+
+hero.addEventListener('mouseleave', () => {
+  inHero = false;
+  cursor.style.display = 'none';
+  cat.style.opacity    = '0';
+  setTimeout(() => { if(!inHero) cat.style.display = 'none'; }, 280);
+});
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  if (inHero) {
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top  = mouseY + 'px';
+  }
+});
+
+// Hide when scrolled past hero
+window.addEventListener('scroll', () => {
+  const heroBottom = hero.getBoundingClientRect().bottom;
+  if (heroBottom < 0) {
+    inHero = false;
+    cursor.style.display = 'none';
+    cat.style.display    = 'none';
+  }
+});
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+function tick(){
+  raf = requestAnimationFrame(tick);
+  if (!inHero) return;
+
+  const dx   = mouseX - catX;
+  const dy   = mouseY - catY;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const spd  = Math.min(0.07 + dist*0.0005, 0.13);
+
+  catX = lerp(catX, mouseX, spd);
+  catY = lerp(catY, mouseY, spd);
+
+  const angle = Math.atan2(dy, dx) * (180/Math.PI) + 90;
+
+  wagAngle += dist < 55 ? 9 : 4;
+  const wag = Math.sin(wagAngle * Math.PI/180) * (dist < 55 ? 9 : 4);
+
+  cat.style.left = catX + 'px';
+  cat.style.top  = catY + 'px';
+  catSvg.style.transform = `rotate(${angle}deg)`;
+
+  document.getElementById('catTail').setAttribute('d',
+    `M0 10 Q${16+wag} 20 ${18+wag} 10 Q${20+wag} 2 13 0`
+  );
+}
+
+// Init cat position
+catX = window.innerWidth * 0.35;
+catY = window.innerHeight * 0.5;
+</script>
+</body>
+</html>
