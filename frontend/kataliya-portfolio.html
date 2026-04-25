@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kataliya</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -28,7 +28,7 @@ body {
 }
 
 /* ── TOP BAR ── */
-.top-bar {
+/* .top-bar {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 42px;
@@ -45,30 +45,39 @@ body {
   color: var(--gray-mid);
   letter-spacing: 0.01em;
   transition: opacity 0.3s;
-}
+} */
 
 /* ── SITE WRAPPER ── */
 .site-wrapper {
-  margin-top: 42px;
   background: var(--white);
-  min-height: calc(100vh - 42px);
+  min-height: 100vh;
   border: 1px solid #2a2a2a;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; breaks sticky nav bar */
+  overflow-x: clip; /* clip horizontal overflows only — overflow-y must stay unrestricted for page scroll */
 }
 
 /* play page blue left border */
-.site-wrapper.play-active {
+/* .site-wrapper.play-active {
   border-left: 3px solid var(--blue);
-}
+} */
 
 /* ── NAV ── */
 .main-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
-  align-items: flex-start;
-  padding: 1rem 1.5rem 1rem 1.5rem;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
   border-bottom: var(--border);
-  gap: 1rem;
+  background: var(--white);
+}
+
+.nav-logo {
+  height: 28px;
+  width: auto;
+  display: block;
 }
 
 .nav-center {
@@ -76,10 +85,9 @@ body {
   gap: 5rem;
   flex: 1;
   justify-content: center;
-  padding-top: 0.15rem;
 }
 
-.nav-center a, .nav-social a {
+.nav-center a {
   font-size: 0.82rem;
   font-weight: 400;
   color: var(--gray-mid);
@@ -89,155 +97,217 @@ body {
   cursor: pointer;
 }
 
-.nav-center a:hover, .nav-social a:hover,
+.nav-center a:hover,
 .nav-center a.active { color: var(--black); }
 
-.nav-social {
+/* ── SIDE SOCIAL ── */
+.side-social {
+  position: fixed;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 0.12rem;
-  min-width: 80px;
+  gap: 0.35rem;
+  z-index: 50;
 }
+
+.side-social a {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--gray-mid);
+  text-decoration: none;
+  transition: color 0.18s;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.side-social a:hover { color: var(--black); }
+
+.side-social.hidden { display: none; }
 
 /* ── PAGES ── */
 .page { display: none; }
 .page.active { display: block; }
 
 /* ════════════════════════════════════════
-   WORK PAGE
+   WORK PAGE — GLOBAL FLIP
 ════════════════════════════════════════ */
 
-/* Hero — cat lives here */
-#hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: calc(100vh - 42px - 50px);
-  padding: 4rem 2.5rem 4rem 3rem;
-  align-items: center;
+/* Scroll container drives the flip over 300vh */
+.flip-scroll-container {
+  height: 300vh;
   position: relative;
+}
+
+/* Sticky viewport: 100vh, clips both faces */
+.flip-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow: hidden;
-  cursor: none;
+  perspective: 2000px;
 }
 
-.hero-text h1 {
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5;
-  margin-bottom: 1.4rem;
-  color: var(--black);
+/* Rotating world */
+.flip-world {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
-.hero-text p {
-  font-size: 1rem;
-  font-weight: 300;
-  line-height: 1.75;
-  color: var(--gray-dark);
-  max-width: 400px;
+/* Each face fills the viewport */
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  overflow: hidden;
 }
 
-.hero-photo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.flip-face-back {
+  transform: rotateY(180deg);
+  overflow-y: auto;
 }
 
-.photo-circle {
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: var(--gray-bg);
+/* Hero text — same position as Figma */
+.face-hero {
+  position: absolute;
+  left: calc(25% + 20px);
+  top: 140px;
+  width: 680px;
 }
 
-/* Work sections */
-.work-sections { padding-bottom: 5rem; }
-
-.work-category {
-  display: grid;
-  grid-template-columns: 130px 1fr;
-  border-top: var(--border);
-  padding: 2rem 0;
-}
-
-.cat-label {
-  padding: 0.3rem 0 0 2.5rem;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.07em;
-  color: var(--gray-mid);
+.face-name {
+  font-family: 'Gelasio', serif;
+  font-size: 3.15rem;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: -0.31rem;
+  line-height: 1;
   white-space: nowrap;
 }
 
-.cat-content {
-  padding-right: 2.5rem;
+.face-name em {
+  font-family: 'Gelasio', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.55rem;
+  letter-spacing: -0.05rem;
+  margin-left: 0.25rem;
 }
 
-/* Sugar featured */
-.sugar-wrap {
-  background: var(--gray-bg);
-  border-radius: 6px;
-  padding: 1rem 1.2rem 1.2rem;
-  margin-bottom: 0.75rem;
+.face-pronun {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #000;
+  letter-spacing: -0.11rem;
+  margin: 0.3rem 0 0.55rem;
 }
 
-.sugar-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--black);
-  margin-bottom: 0.6rem;
+.face-rule {
+  border: none;
+  border-top: 0.5px solid #000;
+  margin: 0 0 0.8rem;
 }
 
-.sugar-img {
-  background: var(--white);
-  border-radius: 3px;
-  height: 200px;
+.face-bio {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.89rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: #000;
+  letter-spacing: -0.04rem;
 }
 
-/* Product grid — masonry-ish */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 160px 120px;
-  gap: 0.6rem;
-}
+.face-bio em { font-style: italic; }
 
-.proj-card {
-  background: var(--gray-bg);
-  border-radius: 6px;
+/* Absolutely positioned painting images */
+.abs-img {
+  position: absolute;
+  width: 378px;
+  overflow: hidden;
+}
+.abs-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.abs-img.wide { width: 776px; }
+
+/* Absolutely positioned project cards */
+.abs-card {
+  position: absolute;
+  width: 378px;
+  background: rgba(0,0,0,0.06);
+  padding: 18px;
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Syne', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--black);
-  cursor: pointer;
-  transition: background 0.18s, transform 0.18s;
+  flex-direction: column;
+  gap: 0.55rem;
+  overflow: hidden;
+}
+.abs-card.wide { width: 776px; }
+
+/* Column x-positions from Figma */
+.fc1 { left: 133px; }
+.fc2 { left: calc(37.5% - 9px); }
+.fc3 { left: calc(62.5% + 29px); }
+
+/* Card content typography */
+.card-mockup-img {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
+  flex-shrink: 0;
 }
 
-.proj-card:hover {
-  background: #c5c5c5;
-  transform: scale(0.99);
+.card-title {
+  font-family: 'Gelasio', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1d2129;
+  letter-spacing: -0.02rem;
 }
 
-.proj-card.tall { grid-row: span 2; }
-
-/* Simple 3-col grid */
-.simple-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
+.card-desc {
+  font-family: 'Gelasio', serif;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: #1d2129;
+  font-weight: 400;
+  flex: 1;
+  letter-spacing: -0.03rem;
 }
 
-.simple-card {
-  background: var(--gray-bg);
-  border-radius: 6px;
-  aspect-ratio: 3/4;
-  transition: background 0.18s;
-  cursor: pointer;
+.card-desc strong { font-weight: 700; }
+.card-desc em { font-style: italic; }
+
+.card-role {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 200;
+  color: rgba(29,33,41,0.62);
+  letter-spacing: -0.06rem;
 }
 
-.simple-card:hover { background: #c5c5c5; }
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.card-tags span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: rgba(127,127,127,0.8);
+  background: #d9d9d9;
+  padding: 0.1rem 0.35rem;
+  letter-spacing: -0.04rem;
+}
 
 /* Footer */
 .site-footer {
@@ -254,7 +324,7 @@ body {
    PLAY PAGE
 ════════════════════════════════════════ */
 .play-inner {
-  min-height: calc(100vh - 42px);
+  min-height: 100vh;
   position: relative;
   padding-bottom: 3rem;
 }
@@ -435,7 +505,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
   padding: 5rem 3rem;
-  min-height: calc(100vh - 42px - 52px);
+  min-height: calc(100vh - 52px);
   align-items: center;
 }
 
@@ -489,9 +559,12 @@ body {
 </head>
 <body>
 
-<!-- ═══════════ TOP BAR ═══════════ -->
-<div class="top-bar">
-  <span class="page-label" id="topLabel">work</span>
+<!-- ═══════════ SIDE SOCIAL (fixed, work page only) ═══════════ -->
+<div class="side-social" id="sideSocial">
+  <a href="#">linkedin</a>
+  <a href="#">github</a>
+  <a href="#">mail</a>
+  <a href="#">tiktok</a>
 </div>
 
 <!-- ═══════════ SITE WRAPPER ═══════════ -->
@@ -499,88 +572,156 @@ body {
 
   <!-- ── GLOBAL NAV ── -->
   <nav class="main-nav" id="mainNav">
+    <img src="b7e92d407a9a278e41a2054d1cf604eeb065496d.png" alt="แค่เส้า" class="nav-logo">
     <div class="nav-center">
       <a onclick="goTo('work')" class="active" id="nav-work">work</a>
       <a onclick="goTo('play')" id="nav-play">play</a>
       <a onclick="goTo('about')" id="nav-about">about</a>
       <a onclick="goTo('contact')" id="nav-contact">contact</a>
     </div>
-    <div class="nav-social" id="navSocial">
-      <a href="#">linkedin</a>
-      <a href="#">github</a>
-      <a href="#">mail</a>
-      <a href="#">tiktok</a>
-    </div>
   </nav>
 
   <!-- ════════════ WORK PAGE ════════════ -->
   <div class="page active" id="page-work">
 
-    <!-- Hero — cat zone -->
-    <section id="hero">
-      <div class="hero-text">
-        <h1>Hi, I'm Kataliya!<br>
-        I'm a multidisciplinary builder and aspiring generalist passionate about weaving mediums and creating interactive software.</h1>
-        <p>Currently studying computer science and business marketing at the San Francisco State University. Dabbling in product design on the side as well.</p>
-      </div>
-      <div class="hero-photo">
-        <div class="photo-circle"></div>
-      </div>
-    </section>
+    <!-- 300vh scroll container drives the global page flip -->
+    <div class="flip-scroll-container">
+      <div class="flip-sticky">
+        <div class="flip-world" id="flipWorld">
 
-    <!-- Work sections -->
-    <div class="work-sections">
-
-      <!-- Product + Design -->
-      <div class="work-category">
-        <div class="cat-label">product + design</div>
-        <div class="cat-content">
-          <!-- Sugar featured -->
-          <div class="sugar-wrap">
-            <div class="sugar-label">sugar</div>
-            <div class="sugar-img"></div>
+          <!-- ── FRONT FACE: paintings ── -->
+          <div class="flip-face">
+            <div class="face-hero">
+              <div class="face-name">kataliya <em>( thai, n.)</em></div>
+              <p class="face-pronun">/kah-tah-LEE-yah/</p>
+              <hr class="face-rule">
+              <p class="face-bio">(1) One who moves fluidly between code, design, and storytelling — currently studying computer science and business marketing at San Francisco State University<br>
+              (2) A systems thinker who arrives at the answer sideways; known to sketch three directions at once, talk through all of them out loud, and still make it work<br><br>
+              <em>See also: spontaneous, expressive, always making something</em></p>
+            </div>
+            <!-- row 1 -->
+            <div class="abs-img fc1" style="top:634px;height:498px;">
+              <img src="726626216e881a82215e5865c71186d4b2734e0d.png" alt="steady">
+            </div>
+            <div class="abs-img fc2" style="top:634px;height:380px;">
+              <img src="ca47c1810bbd531e3b6eef31129d1ede29fb7877.png" alt="greenwatch">
+            </div>
+            <div class="abs-img fc3" style="top:634px;height:494px;">
+              <img src="02c0857c546aa2ad689bfae30339fcfaefe591e8.png" alt="known">
+            </div>
+            <!-- row 2 -->
+            <div class="abs-img fc2" style="top:1031px;height:660px;">
+              <img src="9c5ab0034a06a19e27094e1752b07a13d77bf543.png" alt="bluecore ai">
+            </div>
+            <div class="abs-img fc1" style="top:1147px;height:544px;">
+              <img src="2361cf1d7e6eecbb7445e846cb6d99825491e72e.png" alt="maisonid">
+            </div>
+            <div class="abs-img fc3" style="top:1147px;height:672px;">
+              <img src="53dbeb2d961db69c8bf452bca2943792e05062e5.png" alt="gatoraid">
+            </div>
+            <!-- row 3 -->
+            <div class="abs-img fc1 wide" style="top:1710px;height:388px;">
+              <img src="bd373b2970450469c23e848695617baaf7b9b7ee.png" alt="katsaliya">
+            </div>
+            <div class="abs-img fc3" style="top:1838px;height:503px;">
+              <img src="1405c74b83fcb90de8c1f111aa01412e5653a526.png" alt="aidentity">
+            </div>
+            <div class="abs-img fc1" style="top:2118px;height:517px;">
+              <img src="b975ee0ae4c26820f860d08509f1738d1227943b.png" alt="hci">
+            </div>
           </div>
-          <!-- Grid: maisonid, steady (tall), greenwatch / gatoraid, _, online db -->
-          <div class="product-grid">
-            <div class="proj-card">maisonid</div>
-            <div class="proj-card tall">steady</div>
-            <div class="proj-card">greenwatch</div>
-            <div class="proj-card">gatoraid</div>
-            <div class="proj-card">online db</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Content -->
-      <div class="work-category">
-        <div class="cat-label">content</div>
-        <div class="cat-content">
-          <div class="simple-grid">
-            <div class="simple-card"></div>
-            <div class="simple-card"></div>
-            <div class="simple-card"></div>
+          <!-- ── BACK FACE: project cards ── -->
+          <div class="flip-face flip-face-back">
+            <div style="position:relative;min-height:2720px;">
+              <!-- row 1 -->
+              <div class="abs-card fc1 card card-steady" data-card="steady" style="top:634px;height:498px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">steady</div>
+                  <p class="card-desc" data-part="desc">Making <strong>stability</strong> <em>accessible</em> for <strong>aging</strong> <em>adults</em> through passive sensing, personalized insights, and quiet, dignified design.</p>
+                  <span class="card-role" data-part="role">Product Designer</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">Figma</span><span data-part="tag">UI/UX</span><span data-part="tag">Product</span><span data-part="tag">Mobile</span></div>
+                </div>
+              </div>
+              <div class="abs-card fc2 card card-greenwatch" data-card="greenwatch" style="top:634px;height:380px;">
+                <div class="card-inner" data-part="container">
+                  <img class="card-mockup-img" data-part="media" src="b29621e876d4935b2c41922e6df640521270ca2b.png" alt="greenwatch demo">
+                  <div class="card-title" data-part="title">greenwatch</div>
+                  <p class="card-desc" data-part="desc">Reimagining <strong>fatigue management</strong> to be <em>proactive</em>, <em>private</em>, and <em>protective</em> for <em>industrial workers.</em></p>
+                  <span class="card-role" data-part="role">Backend Engineer</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">JavaScript</span><span data-part="tag">PyTorch</span><span data-part="tag">Hackathon</span><span data-part="tag">Local</span></div>
+                </div>
+              </div>
+              <div class="abs-card fc3 card card-known" data-card="known" style="top:634px;height:494px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">known</div>
+                  <p class="card-desc" data-part="desc">A collection of <em>content, marketing materials, and graphics</em> for a Series A <strong>AI-matchmaking startup</strong> — prelaunch.</p>
+                  <span class="card-role" data-part="role">Growth Strategy</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">JavaScript</span><span data-part="tag">PyTorch</span><span data-part="tag">Hackathon</span><span data-part="tag">Local</span></div>
+                </div>
+              </div>
+              <!-- row 2 -->
+              <div class="abs-card fc2 card card-bluecore-ai" data-card="bluecore-ai" style="top:1031px;height:660px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">bluecore ai</div>
+                  <p class="card-desc" data-part="desc">Full-stack product development for an <strong>AI-powered analytics platform</strong> helping e-commerce brands predict customer behavior and reduce churn.</p>
+                  <span class="card-role" data-part="role">Full-stack Engineer</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">JavaScript</span><span data-part="tag">PyTorch</span><span data-part="tag">Hackathon</span><span data-part="tag">Local</span></div>
+                </div>
+              </div>
+              <div class="abs-card fc1 card card-maisonid" data-card="maisonid" style="top:1147px;height:544px;">
+                <div class="card-inner" data-part="container">
+                  <img class="card-mockup-img" data-part="media" src="20a9fa1513b005adf6ad5edfbee280bded92695c.png" alt="maisonid mockup">
+                  <div class="card-title" data-part="title">maisonid</div>
+                  <p class="card-desc" data-part="desc">Brand identity and <strong>digital experience design</strong> for a luxury real estate firm — connecting the right homes to the right people, the right way.</p>
+                  <span class="card-role" data-part="role">Product Designer</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">Figma</span><span data-part="tag">UI/UX</span><span data-part="tag">Brand</span></div>
+                </div>
+              </div>
+              <div class="abs-card fc3 card card-gatoraid" data-card="gatoraid" style="top:1147px;height:672px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">gatoraid</div>
+                  <p class="card-desc" data-part="desc">A peer-to-peer <strong>academic aid platform</strong> built for SFSU students — connecting tutors, study groups, and resources in one place.</p>
+                  <span class="card-role" data-part="role">Full-stack</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">React</span><span data-part="tag">Node</span><span data-part="tag">PostgreSQL</span></div>
+                </div>
+              </div>
+              <!-- row 3 -->
+              <div class="abs-card fc1 wide card card-katsaliya" data-card="katsaliya" style="top:1710px;height:388px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">katsaliya</div>
+                  <p class="card-desc" data-part="desc">Personal brand identity — <em>visual language, motion assets, and digital presence</em> built from scratch to reflect a multidisciplinary practice.</p>
+                  <span class="card-role" data-part="role">Brand Designer</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">Figma</span><span data-part="tag">Motion</span><span data-part="tag">Illustrator</span></div>
+                </div>
+              </div>
+              <div class="abs-card fc3 card card-aidentity" data-card="aidentity" style="top:1838px;height:503px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">aidentity</div>
+                  <p class="card-desc" data-part="desc">Visual identity, print materials, and <strong>digital graphics</strong> for a Series A AI startup — building a brand from zero to launch.</p>
+                  <span class="card-role" data-part="role">Graphic Designer</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">Illustrator</span><span data-part="tag">Photoshop</span><span data-part="tag">Figma</span></div>
+                </div>
+              </div>
+              <div class="abs-card fc1 card card-hci-research" data-card="hci-research" style="top:2118px;height:517px;">
+                <div class="card-inner" data-part="container">
+                  <div class="card-title" data-part="title">hci research</div>
+                  <p class="card-desc" data-part="desc">Human-computer interaction research on <strong>accessible interfaces</strong> for older adults — usability studies, prototyping, and design recommendations.</p>
+                  <span class="card-role" data-part="role">Researcher</span>
+                  <div class="card-tags" data-part="tags"><span data-part="tag">Figma</span><span data-part="tag">UI/UX</span><span data-part="tag">Research</span></div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Graphics -->
-      <div class="work-category">
-        <div class="cat-label">graphics</div>
-        <div class="cat-content">
-          <div class="simple-grid">
-            <div class="simple-card"></div>
-            <div class="simple-card"></div>
-            <div class="simple-card"></div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /work-sections -->
+        </div><!-- /flip-world -->
+      </div><!-- /flip-sticky -->
+    </div><!-- /flip-scroll-container -->
 
     <footer class="site-footer">
-      <div>@footer stuff 2026</div>
-      <div>footer footer footer</div>
+      <div>kataliya sungkamee · 2026</div>
     </footer>
+
   </div>
 
   <!-- ════════════ PLAY PAGE ════════════ -->
@@ -692,58 +833,58 @@ body {
 
 </div><!-- /site-wrapper -->
 
-<!-- ═══════════ MOUSE CURSOR ═══════════ -->
+<!-- ═══════════ MOUSE CURSOR ═══════════
 <div id="cursor">
   <svg width="32" height="38" viewBox="0 0 32 38" fill="none">
     <!-- ears -->
-    <ellipse cx="7" cy="9"  rx="6.5" ry="6.5" fill="#C8B4A4"/>
+    <!-- <ellipse cx="7" cy="9"  rx="6.5" ry="6.5" fill="#C8B4A4"/>
     <ellipse cx="25" cy="9" rx="6.5" ry="6.5" fill="#C8B4A4"/>
     <ellipse cx="7" cy="9"  rx="3.8" ry="3.8" fill="#E8A0A0"/>
-    <ellipse cx="25" cy="9" rx="3.8" ry="3.8" fill="#E8A0A0"/>
+    <ellipse cx="25" cy="9" rx="3.8" ry="3.8" fill="#E8A0A0"/> -->
     <!-- body -->
-    <ellipse cx="16" cy="25" rx="11" ry="10" fill="#C8B4A4"/>
+    <!-- <ellipse cx="16" cy="25" rx="11" ry="10" fill="#C8B4A4"/> -->
     <!-- eyes -->
-    <circle cx="12" cy="20" r="2.3" fill="#1A1A1A"/>
+    <!-- <circle cx="12" cy="20" r="2.3" fill="#1A1A1A"/>
     <circle cx="20" cy="20" r="2.3" fill="#1A1A1A"/>
     <circle cx="12.7" cy="19.4" r="0.7" fill="white"/>
-    <circle cx="20.7" cy="19.4" r="0.7" fill="white"/>
+    <circle cx="20.7" cy="19.4" r="0.7" fill="white"/> -->
     <!-- nose -->
-    <ellipse cx="16" cy="23.5" rx="1.4" ry="1" fill="#B07060"/>
+    <!-- <ellipse cx="16" cy="23.5" rx="1.4" ry="1" fill="#B07060"/> -->
     <!-- tail -->
-    <path d="M16 34 Q26 38 30 32 Q34 26 28 24" stroke="#C8B4A4" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <!-- <path d="M16 34 Q26 38 30 32 Q34 26 28 24" stroke="#C8B4A4" stroke-width="2.2" stroke-linecap="round" fill="none"/>
   </svg>
-</div>
+</div> -->
 
 <!-- ═══════════ CAT ═══════════ -->
-<div id="cat">
-  <svg id="catSvg" width="58" height="58" viewBox="-29 -29 58 58" fill="none">
+<!-- <div id="cat"> -->
+  <!-- <svg id="catSvg" width="58" height="58" viewBox="-29 -29 58 58" fill="none"> -->
     <!-- tail -->
-    <path id="catTail" d="M0 10 Q16 20 18 10 Q20 2 13 0" stroke="#B07060" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <!-- <path id="catTail" d="M0 10 Q16 20 18 10 Q20 2 13 0" stroke="#B07060" stroke-width="3.5" stroke-linecap="round" fill="none"/> -->
     <!-- body -->
-    <ellipse cx="0" cy="8" rx="13" ry="11" fill="#E0C49A"/>
+    <!-- <ellipse cx="0" cy="8" rx="13" ry="11" fill="#E0C49A"/> -->
     <!-- head -->
-    <circle cx="0" cy="-8" r="12" fill="#E0C49A"/>
+    <!-- <circle cx="0" cy="-8" r="12" fill="#E0C49A"/> -->
     <!-- ears -->
-    <polygon points="-12,-17 -6,-8 -17,-8" fill="#E0C49A"/>
+    <!-- <polygon points="-12,-17 -6,-8 -17,-8" fill="#E0C49A"/>
     <polygon points="12,-17 6,-8 17,-8" fill="#E0C49A"/>
     <polygon points="-11,-16 -7,-10 -14,-10" fill="#E8A0A0"/>
-    <polygon points="11,-16 7,-10 14,-10" fill="#E8A0A0"/>
+    <polygon points="11,-16 7,-10 14,-10" fill="#E8A0A0"/> -->
     <!-- eyes -->
-    <ellipse cx="-4.5" cy="-9" rx="3" ry="3" fill="#1A1A1A"/>
+    <!-- <ellipse cx="-4.5" cy="-9" rx="3" ry="3" fill="#1A1A1A"/>
     <ellipse cx="4.5"  cy="-9" rx="3" ry="3" fill="#1A1A1A"/>
     <circle cx="-3.8" cy="-9.8" r="1" fill="white"/>
     <circle cx="5.2"  cy="-9.8" r="1" fill="white"/>
     <!-- nose -->
-    <polygon points="0,-4 -1.8,-2.2 1.8,-2.2" fill="#B07060"/>
+    <!-- <polygon points="0,-4 -1.8,-2.2 1.8,-2.2" fill="#B07060"/> -->
     <!-- mouth -->
-    <path d="M-2.5 -1 Q0 0.8 2.5 -1" stroke="#B07060" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <!-- <path d="M-2.5 -1 Q0 0.8 2.5 -1" stroke="#B07060" stroke-width="1" stroke-linecap="round" fill="none"/> --> -->
     <!-- whiskers -->
-    <line x1="-13" y1="-6" x2="-5" y2="-5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
+    <!-- <line x1="-13" y1="-6" x2="-5" y2="-5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
     <line x1="-13" y1="-3.5" x2="-5" y2="-3.5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
     <line x1="13"  y1="-6" x2="5"  y2="-5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
     <line x1="13"  y1="-3.5" x2="5"  y2="-3.5" stroke="#8A8A8A" stroke-width="0.7" opacity="0.5"/>
   </svg>
-</div>
+</div> --> 
 
 <script>
 /* ── PAGE ROUTING ── */
@@ -756,97 +897,28 @@ function goTo(page) {
     document.getElementById('page-'+p).classList.toggle('active', p===page);
     document.getElementById('nav-'+p).classList.toggle('active', p===page);
   });
-  document.getElementById('topLabel').textContent = labels[page];
   wrapper.classList.toggle('play-active', page==='play');
-  document.getElementById('navSocial').style.display = page==='work' ? 'flex' : 'none';
+  document.getElementById('sideSocial').classList.toggle('hidden', page !== 'work');
   // Reset scroll
   window.scrollTo(0,0);
   wrapper.scrollTo && wrapper.scrollTo(0,0);
-  // Cat only on work
-  if (page !== 'work') {
-    cursor.style.display = 'none';
-    cat.style.display    = 'none';
-    inHero = false;
-  }
 }
 
-/* ── CAT CHASE ── */
-const hero   = document.getElementById('hero');
-const cursor = document.getElementById('cursor');
-const cat    = document.getElementById('cat');
-const catSvg = document.getElementById('catSvg');
+/* ── GLOBAL PAGE FLIP (scroll-driven) ── */
+const flipWorld = document.getElementById('flipWorld');
+const flipContainer = flipWorld ? flipWorld.closest('.flip-scroll-container') : null;
 
-let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
-let catX   = window.innerWidth/2 - 100, catY = window.innerHeight/2;
-let inHero = false, raf = null, wagAngle = 0;
-
-hero.addEventListener('mouseenter', () => {
-  // Only activate if on work page
-  if (!document.getElementById('page-work').classList.contains('active')) return;
-  inHero = true;
-  cursor.style.display = 'block';
-  cat.style.display    = 'block';
-  cat.style.opacity    = '1';
-  if (!raf) raf = requestAnimationFrame(tick);
-});
-
-hero.addEventListener('mouseleave', () => {
-  inHero = false;
-  cursor.style.display = 'none';
-  cat.style.opacity    = '0';
-  setTimeout(() => { if(!inHero) cat.style.display = 'none'; }, 280);
-});
-
-document.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  if (inHero) {
-    cursor.style.left = mouseX + 'px';
-    cursor.style.top  = mouseY + 'px';
+if (flipContainer && flipWorld) {
+  function updateFlip() {
+    const scrolled = -flipContainer.getBoundingClientRect().top;
+    const maxScroll = flipContainer.offsetHeight - window.innerHeight;
+    const progress = Math.max(0, Math.min(1, scrolled / maxScroll));
+    flipWorld.style.transform = `rotateY(${progress * 180}deg)`;
   }
-});
-
-// Hide when scrolled past hero
-window.addEventListener('scroll', () => {
-  const heroBottom = hero.getBoundingClientRect().bottom;
-  if (heroBottom < 0) {
-    inHero = false;
-    cursor.style.display = 'none';
-    cat.style.display    = 'none';
-  }
-});
-
-function lerp(a,b,t){ return a+(b-a)*t; }
-
-function tick(){
-  raf = requestAnimationFrame(tick);
-  if (!inHero) return;
-
-  const dx   = mouseX - catX;
-  const dy   = mouseY - catY;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-  const spd  = Math.min(0.07 + dist*0.0005, 0.13);
-
-  catX = lerp(catX, mouseX, spd);
-  catY = lerp(catY, mouseY, spd);
-
-  const angle = Math.atan2(dy, dx) * (180/Math.PI) + 90;
-
-  wagAngle += dist < 55 ? 9 : 4;
-  const wag = Math.sin(wagAngle * Math.PI/180) * (dist < 55 ? 9 : 4);
-
-  cat.style.left = catX + 'px';
-  cat.style.top  = catY + 'px';
-  catSvg.style.transform = `rotate(${angle}deg)`;
-
-  document.getElementById('catTail').setAttribute('d',
-    `M0 10 Q${16+wag} 20 ${18+wag} 10 Q${20+wag} 2 13 0`
-  );
+  window.addEventListener('scroll', updateFlip, { passive: true });
+  updateFlip();
 }
 
-// Init cat position
-catX = window.innerWidth * 0.35;
-catY = window.innerHeight * 0.5;
 </script>
 </body>
 </html>
