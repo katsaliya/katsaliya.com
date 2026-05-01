@@ -1,6 +1,6 @@
 # katsaliya.com
 
-Personal portfolio — still in progress, not yet published. Built as a playground for UX/UI experimentation and animation work alongside real project showcases.
+Personal portfolio, still in progress and not yet published. Built as a playground for UX/UI experimentation and animation work alongside real project showcases.
 
 ---
 
@@ -17,25 +17,25 @@ Then open `http://localhost:8000/kataliya-portfolio.html` in your browser.
 
 ## What's Inside
 
-Single-page HTML portfolio with four sections: **Work**, **Play**, **About**, and **Contact**.
+Single-page HTML portfolio with four sections: **Work**, **About**, **Play**, and **Contact**.
 
-### Venetian Blind Interaction (Work page)
+### Current Design
 
-The main feature of the work page is a custom Venetian blind reveal system. Project cards sit in a masonry grid, each covered by a full-bleed image panel. A draggable cord on the right side of the screen pulls the covers open row by row — using 3D CSS transforms (`rotateX`, `translateY`, `translateZ`) with per-card perspective, cast shadows, and a specular light effect during the lift. Snaps to the nearest row boundary on release.
+The work page has been rebuilt from the Figma frames as an absolute-positioned 1440px desktop canvas. Project cards are fully open, use exported demo images, and no longer use the old Venetian blind reveal system. The animation pass is intentionally deferred.
 
 ### Pages
 
 | Page | Status |
 |---|---|
-| Work | Done — 9 project cards with Venetian blind animation |
-| Play | In progress — sandbox for UI/animation experiments |
-| About | In progress — layout scaffolded, content being filled |
+| Work | In progress — 7 Figma-positioned project cards |
+| About | In progress — text and photo collage restored from Figma |
+| Play | In progress — coming-soon sandbox frame restored from Figma |
 | Contact | In progress — layout done, form placeholder |
 
 ---
 
 ## Stack
 
-Vanilla HTML, CSS, and JavaScript — no framework, no build step.
+Vanilla HTML, CSS, and JavaScript. No framework or build step.
 
-**Fonts:** Gelasio · Nunito · Syne · DM Sans (Google Fonts)
+**Fonts:** Kapakana · Afacad Flux · 42dot Sans (Google Fonts) and Courier Prime Code (self-hosted in `frontend/fonts/`).
