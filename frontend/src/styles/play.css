@@ -1,0 +1,53 @@
+/* ══════════════════════════════════════════
+   PLAY PAGE
+   ══════════════════════════════════════════ */
+#page-play { background: var(--white); }
+.play-inner { position: relative; min-height: calc(100vh - 120px); }
+.play-intro { padding: 3rem 0 0; text-align: center; }
+.play-sandbox-label {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 4.5rem;
+  color: var(--black);
+  line-height: 1;
+  filter: blur(6px);
+  opacity: 0.35;
+  display: inline-block;
+  pointer-events: none;
+  user-select: none;
+  padding-bottom: 1rem;
+}
+.play-blush {
+  position: relative;
+  margin-top: -2rem;
+  min-height: 70vh;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 50%,
+    #F2C4CE 0%,
+    #F5D5DD 40%,
+    #F9E8ED 70%,
+    #FDF2F4 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+}
+.play-coming-soon {
+  font-family: 'Kapakana', cursive;
+  font-size: 7rem;
+  color: var(--teal);
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.page-play .site-footer {
+  font-weight: 700;
+  color: var(--black);
+}
+
+@media (max-width: 900px) {
+  .play-inner { min-height: calc(100vh - 120px); }
+  .play-sandbox-label { font-size: 2.5rem; }
+  .play-coming-soon { font-size: 4.5rem; }
+}

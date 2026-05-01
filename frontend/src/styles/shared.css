@@ -1,0 +1,149 @@
+/* Fonts served from /public/fonts/ */
+@font-face {
+  font-family: 'Courier Prime Code';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/CourierPrimeCode-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Courier Prime Code';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/CourierPrimeCode-Italic.ttf') format('truetype');
+}
+
+/* ─────────────────────────────────────────
+   RESET & BASE
+   ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: '42dot Sans', sans-serif;
+  background: var(--page-bg);
+  color: #1A1A1A;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+   ───────────────────────────────────────── */
+:root {
+  --black:     #1A1A1A;
+  --white:     #FFFFFF;
+  --teal:      #00A2C6;
+  --page-bg:   #F6F6F6;
+  --card-text: #1D2129;
+  --gray-mid:  #8A8A8A;
+  --gray-dark: #3A3A3A;
+  --border:    1px solid #E2E2E2;
+}
+
+.teal {
+  font-style: normal;
+  color: var(--teal);
+}
+
+/* ─────────────────────────────────────────
+   SHARED SITE CHROME
+   ───────────────────────────────────────── */
+.site-wrapper {
+  background: var(--page-bg);
+  min-height: 100vh;
+  width: 100%;
+  border: none;
+  position: relative;
+  overflow-x: clip;
+}
+.page-light-body,
+.page-light-body .site-wrapper { background: var(--white); }
+
+.main-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: inherit;
+  padding: 0 clamp(1rem, 7.4vw, 106px);
+}
+.nav-script {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  font-family: 'Kapakana', cursive;
+  font-size: 2.6rem;
+  color: var(--teal);
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.18s ease;
+}
+.nav-script.visible { opacity: 1; }
+.nav-links {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  justify-content: space-between;
+}
+.nav-links a {
+  font-family: 'Afacad Flux', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--black);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--teal); }
+
+.side-social {
+  position: fixed;
+  left: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  z-index: 50;
+}
+.side-social a {
+  font-family: 'Afacad Flux', sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  text-decoration: none;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+.side-social a:hover { color: var(--teal); }
+
+.site-footer {
+  border-top: var(--border);
+  padding: 1.8rem 2rem;
+  text-align: center;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: var(--gray-mid);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .main-nav { padding: 0 1rem; }
+  .nav-links { height: 48px; gap: 1rem; }
+  .nav-links a { font-size: 0.9rem; }
+  .nav-script { font-size: 1.9rem; top: 42%; }
+  .side-social {
+    position: absolute;
+    left: 1rem;
+    top: 4.5rem;
+    transform: none;
+    gap: 0.2rem;
+  }
+}

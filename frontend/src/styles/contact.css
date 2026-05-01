@@ -1,0 +1,42 @@
+/* ══════════════════════════════════════════
+   CONTACT PAGE
+   ══════════════════════════════════════════ */
+#page-contact { background: var(--white); }
+.contact-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 5rem 3rem;
+  min-height: calc(100vh - 52px);
+  align-items: center;
+}
+.contact-left h2 {
+  font-family: 'Afacad Flux', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+.contact-left p {
+  font-family: '42dot Sans', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--gray-dark);
+  font-weight: 300;
+  max-width: 340px;
+}
+.contact-right {
+  background: #E2E2E2;
+  border-radius: 8px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  color: var(--gray-mid);
+}
+
+@media (max-width: 900px) {
+  .contact-body { display: block; padding: 2rem 1rem; }
+  .contact-left p { max-width: none; }
+  .contact-right { height: 260px; margin-top: 2rem; }
+}

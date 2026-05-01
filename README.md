@@ -17,7 +17,7 @@ Then open `http://localhost:8000/kataliya-portfolio.html` in your browser.
 
 ## What's Inside
 
-Single-page HTML portfolio with four sections: **Work**, **About**, **Play**, and **Contact**.
+Static HTML portfolio split into separate pages: **Work**, **About**, **Play**, and **Contact**.
 
 ### Current Design
 
@@ -31,6 +31,26 @@ The work page has been rebuilt from the Figma frames as an absolute-positioned 1
 | About | In progress — text and photo collage restored from Figma |
 | Play | In progress — coming-soon sandbox frame restored from Figma |
 | Contact | In progress — layout done, form placeholder |
+
+---
+
+## File Structure
+
+```text
+frontend/
+  kataliya-portfolio.html   # Work page
+  about.html                # About page
+  play.html                 # Play page
+  contact.html              # Contact page
+  styles/
+    shared.css              # Fonts, reset, nav, footer, shared layout
+    work.css                # Work page only
+    about.css               # About page only
+    play.css                # Play page only
+    contact.css             # Contact page only
+  scripts/
+    work.js                 # Work page scaling + nav script fade
+```
 
 ---
 

@@ -1,0 +1,58 @@
+/* ══════════════════════════════════════════
+   ABOUT PAGE
+   ══════════════════════════════════════════ */
+#page-about { background: var(--white); }
+.about-body {
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  position: relative;
+  overflow-x: hidden;
+}
+.about-text { padding: 3.5rem 3rem 3rem 7.5rem; max-width: 760px; }
+.about-section { margin-bottom: 3.5rem; }
+.about-section-heading {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--black);
+  margin-bottom: 1.2rem;
+}
+.about-section-body {
+  font-family: '42dot Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--black);
+}
+.about-section-body a { color: var(--teal); text-decoration: none; }
+.about-section-body a:hover { text-decoration: underline; }
+.about-photos { position: relative; min-height: 1300px; overflow: visible; }
+.about-photo-item { position: absolute; object-fit: cover; display: block; }
+.ph-a { width: 136px; height: 166px; top:  68px;  left:  74px; }
+.ph-b { width: 155px; height: 206px; top:  28px;  left: 316px; }
+.ph-c { width: 164px; height: 197px; top: 391px;  left: 345px; }
+.ph-d { width: 136px; height: 134px; top: 353px;  left:  20px; }
+.ph-e { width: 122px; height: 122px; top: 605px;  left:   0px; }
+.ph-f { width: 117px; height: 120px; top: 717px;  left: 268px; }
+.ph-g { width: 160px; height: 160px; top: 101px;  left: 405px; }
+.ph-h { width: 182px; height: 182px; top: 1037px; left: 369px; }
+.ph-i { width: 408px; height: 369px; top:  821px; left:-200px; }
+
+.page-about .site-footer {
+  font-weight: 700;
+  color: var(--black);
+}
+
+@media (max-width: 900px) {
+  .about-body { display: block; }
+  .about-text { padding: 2rem 1rem; }
+  .about-photos {
+    min-height: auto;
+    padding: 0 1rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .about-photo-item { position: static; width: 100% !important; height: auto !important; aspect-ratio: 1; }
+}
