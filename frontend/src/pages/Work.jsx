@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Nav from '../components/Nav'
 import SideSocial from '../components/SideSocial'
 import LogoOrb from '../components/LogoOrb'
@@ -11,6 +12,18 @@ export default function Work() {
   const heroPreRef    = useRef(null)
   const heroNameRef   = useRef(null)
   const heroBioRef    = useRef(null)
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupPos, setPopupPos] = useState({ x: 0, y: 0 })
+  const [visitorCount, setVisitorCount] = useState(null)
+
+  /* ── visitor counter ── */
+  useEffect(() => {
+    fetch('/api/visit')
+      .then(r => r.json())
+      .then(data => setVisitorCount(data.count))
+      .catch(() => {})
+  }, [])
+
   /* ── body background ── */
   useEffect(() => {
     document.body.className = 'page-work-body'
@@ -34,7 +47,6 @@ export default function Work() {
         const bottom = card.offsetTop + card.offsetHeight
         if (bottom > contentHeight) contentHeight = bottom
       })
-      contentHeight += 64
 
       document.documentElement.style.setProperty('--work-scale', scale)
       canvas.style.height    = `${contentHeight}px`
@@ -70,148 +82,12 @@ export default function Work() {
     return () => window.removeEventListener('scroll', updateNavScript)
   }, [])
 
-  /* ── hero typewriter ──
-     Types out face-pre → face-name → face-bio on mount.
-     Respects prefers-reduced-motion. */
-  /* useEffect(() => {
-    const heroLines = [heroPreRef.current, heroNameRef.current, heroBioRef.current].filter(Boolean)
-    if (!heroLines.length) return
-    if (heroLines.every((el) => el.dataset.typed === 'true')) return
-
-    // Save original HTML so StrictMode's cleanup→remount cycle starts clean.
-    // Without this, the second mount sees the already-modified DOM (empty text
-    // nodes) and the typewriter never finds characters to type.
-    const savedHTML = heroLines.map((el) => el.innerHTML)
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    function prepareTypingLayer(sourceEl) {
-      const isBio = sourceEl.classList.contains('face-bio')
-
-      const staticLayer = document.createElement('span')
-      staticLayer.className = 'face-type__static'
-      staticLayer.innerHTML = sourceEl.innerHTML
-
-      const typingLayer = document.createElement('span')
-      typingLayer.className = 'face-type__typing'
-      typingLayer.setAttribute('aria-hidden', 'true')
-      typingLayer.innerHTML = sourceEl.innerHTML
-      typingLayer.style.padding = getComputedStyle(sourceEl).padding
-      typingLayer.classList.add(isBio ? 'face-type__typing--bio' : 'face-type__typing--line')
-
-      const textNodes = []
-      const walker = document.createTreeWalker(typingLayer, NodeFilter.SHOW_TEXT)
-      while (walker.nextNode()) {
-        const node = walker.currentNode
-        const text = node.textContent.replace(/\s+/g, ' ')
-        if (!text.trim()) { node.remove(); continue }
-        node.textContent = ''
-        textNodes.push({ node, text })
-      }
-
-      sourceEl.innerHTML = ''
-
-      if (isBio) {
-        sourceEl.append(staticLayer, typingLayer)
-      } else {
-        // Wrap both layers in an inline-grid so they share the same grid cell.
-        // The cell is always sized by the static layer (full text), so the
-        // typing layer is pinned to the exact same left edge with no JS
-        // measurement. Font loading automatically repositions both together.
-        const wrapper = document.createElement('span')
-        wrapper.className = 'face-type__line-wrapper'
-        wrapper.append(staticLayer, typingLayer)
-        sourceEl.appendChild(wrapper)
-      }
-
-      return { sourceEl, staticLayer, typingLayer, textNodes }
-    }
-
-    const sequences = heroLines.map(prepareTypingLayer)
-
-    if (prefersReduced) {
-      sequences.forEach(({ typingLayer, staticLayer, sourceEl }) => {
-        typingLayer.remove()
-        staticLayer.style.visibility = 'visible'
-        sourceEl.dataset.typed = 'true'
-      })
-      return
-    }
-
-    const cursor = document.createElement('span')
-    cursor.className = 'type-cursor'
-    cursor.setAttribute('aria-hidden', 'true')
-
-    let lineIndex = 0
-    let nodeIndex = 0
-    let charIndex = 0
-    let currentLayer = null
-    const timeouts = []
-
-    function schedule(fn, ms) {
-      const id = window.setTimeout(fn, ms)
-      timeouts.push(id)
-      return id
-    }
-
-    function attachCursor(layer) {
-      if (!layer) return
-      if (cursor.parentNode) cursor.parentNode.removeChild(cursor)
-      layer.appendChild(cursor)
-      currentLayer = layer
-    }
-
-    function finishLine(sequence) {
-      if (cursor.parentNode === sequence.typingLayer) {
-        sequence.typingLayer.removeChild(cursor)
-      }
-      sequence.typingLayer.remove()
-      sequence.staticLayer.style.visibility = 'visible'
-      sequence.sourceEl.dataset.typed = 'true'
-    }
-
-    function step() {
-      const sequence = sequences[lineIndex]
-      if (!sequence) {
-        if (cursor.parentNode) cursor.parentNode.removeChild(cursor)
-        return
-      }
-
-      if (currentLayer !== sequence.typingLayer) attachCursor(sequence.typingLayer)
-
-      const current = sequence.textNodes[nodeIndex]
-      if (!current) {
-        finishLine(sequence)
-        lineIndex += 1
-        nodeIndex = 0
-        charIndex = 0
-        const next = sequences[lineIndex]
-        if (next) schedule(() => { attachCursor(next.typingLayer); step() }, 200)
-        return
-      }
-
-      current.node.textContent += current.text.charAt(charIndex)
-      const typedChar = current.text.charAt(charIndex)
-      charIndex += 1
-      if (charIndex >= current.text.length) { nodeIndex += 1; charIndex = 0 }
-
-      const delay = /[.,—:;!?]/.test(typedChar) ? 42 : /\s/.test(typedChar) ? 26 : 12
-      schedule(step, delay)
-    }
-
-    attachCursor(sequences[0].typingLayer)
-    schedule(step, 120)
-
-    return () => {
-      timeouts.forEach(window.clearTimeout)
-      // Restore original DOM so a remount (StrictMode or page revisit) starts clean
-      heroLines.forEach((el, i) => {
-        el.innerHTML = savedHTML[i]
-        delete el.dataset.typed
-      })
-    }
-  }, []) */
-
+  const handleCardClick = (e) => {
+    setPopupPos({ x: e.clientX, y: e.clientY })
+    setShowPopup(true)
+    setTimeout(() => setShowPopup(false), 1500)
+  }
+    
   return (
     <>
       <SideSocial />
@@ -220,6 +96,13 @@ export default function Work() {
         <Nav scriptRef={navScriptRef} />
 
         <main className="page page-work" id="page-work">
+          {showPopup && createPortal(
+            <div className="coming-soon-popup" style={{ left: popupPos.x, top: popupPos.y }}>
+              case study coming soon!!
+            </div>,
+            document.body
+          )}
+
           <div className="work-stage" ref={workStageRef}>
             <div className="work-canvas" ref={workCanvasRef}>
 
@@ -239,8 +122,10 @@ export default function Work() {
 
               {/* ── ROW 0 ── */}
 
+              <p className="row-label row-label--row0">some of my recent work</p>
+
               {/* BluecoreAI · canvas(255,694) → frame(129,661) · 775×538 */}
-              <div className="project-card project-card--bluecore">
+              <div className="project-card project-card--bluecore" onClick={handleCardClick}>
                 <div className="project-card__media project-card__media--bluecore">
                   <LogoOrb />
                 </div>
@@ -261,7 +146,7 @@ export default function Work() {
               </div>
 
               {/* Known · canvas(1053,694) → frame(927,661) · 373×498 */}
-              <div className="project-card project-card--known">
+              <div className="project-card project-card--known" onClick={handleCardClick}>
                 <div className="project-card__media">
                   <video
                     src="/images/cards/KnownTV.mp4"
@@ -287,7 +172,7 @@ export default function Work() {
               {/* ── ROW 1 ── */}
 
               {/* Steady · canvas(255,1258) → frame(129,1225) · 378×498 */}
-              <div className="project-card project-card--steady">
+              <div className="project-card project-card--steady" onClick={handleCardClick}>
                 <div className="project-card__media">
                   <img src="/images/cards/demo-steady.png" alt="Steady app demo" />
                 </div>
@@ -304,7 +189,7 @@ export default function Work() {
               </div>
 
               {/* MaisonId · canvas(653,1258) → frame(527,1225) · 378×498 */}
-              <div className="project-card project-card--maisonid">
+              <div className="project-card project-card--maisonid" onClick={handleCardClick}>
                 <div className="project-card__media">
                   <img src="/images/cards/demo-maisonid.png" alt="MaisonId demo" />
                 </div>
@@ -321,7 +206,7 @@ export default function Work() {
               </div>
 
               {/* AIdentity · canvas(1053,1221) → frame(927,1188) · 373×538 */}
-              <div className="project-card project-card--aidentity">
+              <div className="project-card project-card--aidentity" onClick={handleCardClick}>
                 <div className="project-card__media">
                   <img src="/images/cards/demo-aidentity.png" alt="AIdentity demo" />
                 </div>
@@ -341,8 +226,15 @@ export default function Work() {
             </div>{/* /work-canvas */}
           </div>{/* /work-stage */}
 
-          <footer className="site-footer">
-            <div>kataliya sungkamee · 2026</div>
+          <footer className="site-footer work-footer">
+            <p className="work-footer__headline">more on the way</p>
+            <div className="work-footer__meta">
+              <span>LAST UPDATED: 05 01 26</span>
+              <span className="teal">VISITOR # {visitorCount ?? '...'}</span>
+              <span>@katsaliya 's' 2026 stuff</span>
+              <span>footer footer footer</span>
+              <span>🐾</span>
+            </div>
           </footer>
         </main>
       </div>

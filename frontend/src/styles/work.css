@@ -7,6 +7,8 @@
 .work-stage {
   width: 100%;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 .work-canvas {
   position: relative;
@@ -113,6 +115,28 @@
   transform: scale(0.97);
   box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.08);
 }
+.coming-soon-popup {
+  position: fixed;
+  transform: translateY(calc(-100% - 14px));
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.45rem 1rem;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  animation: popup-fade 1.5s ease forwards;
+}
+@keyframes popup-fade {
+  0%   { opacity: 0; transform: translateY(calc(-100% - 20px)); }
+  12%  { opacity: 1; transform: translateY(calc(-100% - 14px)); }
+  72%  { opacity: 1; transform: translateY(calc(-100% - 14px)); }
+  100% { opacity: 0; transform: translateY(calc(-100% - 14px)); }
+}
 .project-card__media {
   flex: 0 0 auto;
   margin: var(--media-top) var(--media-side) 0;
@@ -188,6 +212,21 @@
   background: rgba(0,0,0,0.08);
   padding: 0.1rem 0.4rem;
   white-space: nowrap;
+}
+
+.row-label {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Afacad Flux', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+.row-label--row0 {
+  top: 633px;
 }
 
 .project-card--bluecore {
@@ -314,4 +353,45 @@
   .project-card--textonly .project-card__body {
     padding: 0;
   }
+}
+
+/* ── Work page footer ── */
+#page-work .site-footer {
+  border-top: none;
+}
+.work-footer {
+  border: none;
+  padding: 0;
+  background: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.work-footer__headline {
+  font-family: 'Kapakana', cursive;
+  font-size: 100px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.10);
+  white-space: nowrap;
+  display: block;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+.work-footer__meta {
+  position: relative;
+  margin-top: 0rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.0rem;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--black);
+  z-index: 1;
 }
