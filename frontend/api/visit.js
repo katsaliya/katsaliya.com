@@ -4,7 +4,7 @@ let client
 
 async function getClient() {
   if (!client) {
-    client = createClient({ url: process.env.REDIS_URL })
+    client = createClient({ url: process.env.ksport_REDIS_URL })
     await client.connect()
   }
   return client
