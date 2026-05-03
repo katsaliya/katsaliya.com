@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import Nav from '../components/Nav'
 import SideSocial from '../components/SideSocial'
 import LogoOrb from '../components/LogoOrb'
+import Footer from '../components/Footer'
 import '../styles/work.css'
 
 export default function Work() {
@@ -14,15 +15,6 @@ export default function Work() {
   const heroBioRef    = useRef(null)
   const [showPopup, setShowPopup] = useState(false)
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 })
-  const [visitorCount, setVisitorCount] = useState(null)
-
-  /* ── visitor counter ── */
-  useEffect(() => {
-    fetch('/api/visit')
-      .then(r => r.json())
-      .then(data => setVisitorCount(data.count))
-      .catch(() => {})
-  }, [])
 
   /* ── body background ── */
   useEffect(() => {
@@ -226,16 +218,7 @@ export default function Work() {
             </div>{/* /work-canvas */}
           </div>{/* /work-stage */}
 
-          <footer className="site-footer work-footer">
-            <p className="work-footer__headline">more on the way</p>
-            <div className="work-footer__meta">
-              <span>LAST UPDATED: 05 01 26</span>
-              <span className="teal">VISITOR # {visitorCount ?? '...'}</span>
-              <span>@katsaliya 's' 2026 stuff</span>
-              <span>footer footer footer</span>
-              <span>🐾</span>
-            </div>
-          </footer>
+          <Footer showHeadline />
         </main>
       </div>
     </>
