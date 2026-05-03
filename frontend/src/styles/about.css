@@ -5,21 +5,21 @@
 
    .about-body {
      position: relative;
-    /* max-width: 1200; 
+    /* max-width: 1200;
      margin: 0 auto;*/
-     padding: 220px 0 6rem;
+     padding: clamp(4rem, 15vw, 220px) 0 6rem;
      overflow-x: hidden;
    }
-   
+
    .about-text {
-     width: 540px;
+     width: min(540px, 88vw);
      margin: 0 auto;
      position: relative;
      z-index: 2;
    }
-   
+
    .about-section { margin-bottom: 3.5rem; }
-   
+
    .about-section-heading {
      font-family: 'Courier Prime Code', monospace;
      font-size: 15px;
@@ -29,24 +29,24 @@
      color: var(--teal);
      margin-bottom: 1.2rem;
    }
-   
+
    .about-section-body {
      font-family: 'Courier Prime Code', sans-serif;
      font-size: 15px;
      line-height: 1.1;
      color: var(--black);
    }
-   
+
    .about-section-body a { text-decoration: none; }
    .about-section-body a[href]:hover { text-decoration: underline; }
-   
+
    /* Photos float over the page on both sides */
    .about-photos {
      position: absolute;
      inset: 0;
      pointer-events: none;
    }
-   
+
    .about-photo-item {
      position: absolute;
      object-fit: cover;
@@ -56,7 +56,7 @@
      user-select: none;
    }
    .about-photo-item:active { cursor: grabbing; }
-   
+
    /* CENTER — above text */
    .ph-g { width: 160px; height: 160px; top: -180px; left: 50%; transform: translateX(-50%); }
 
@@ -71,8 +71,22 @@
    .ph-c { width: 164px; height: 197px; top: 300px;  right: 290px; }
    .ph-f { width: 117px; height: 120px; top: 600px;  right: 130px; }
    .ph-h { width: 182px; height: 182px; top: 860px;  right:  250px; }
-   
+
+   /* ── Medium viewports: photos are present but shrunk to avoid
+      overlapping the text column. They stay absolute/draggable. ── */
+   @media (max-width: 1200px) {
+     .ph-a { width: 100px; height: 122px; left: 20px; }
+     .ph-d { width: 100px; height: 98px;  left: 160px; }
+     .ph-e { width: 90px;  height: 90px;  left: 60px; }
+     .ph-i { width: 180px; height: 166px; left: -20px; }
+     .ph-b { width: 115px; height: 152px; right: 20px; }
+     .ph-c { width: 120px; height: 144px; right: 120px; }
+     .ph-f { width: 86px;  height: 88px;  right: 30px; }
+     .ph-h { width: 134px; height: 134px; right: 80px; }
+   }
+
    @media (max-width: 900px) {
+     .about-body { padding: clamp(2rem, 8vw, 4rem) clamp(1rem, 5vw, 2rem) 4rem; }
      .about-text { width: 90%; }
      .about-photos { position: static; }
      .about-photo-item {
