@@ -35,7 +35,7 @@
 .play-intro { text-align: center; }
 .play-sandbox-label {
   font-family: 'Courier Prime Code', monospace;
-  font-size: 4.5rem;
+  font-size: clamp(2rem, 6vw, 4.5rem);
   color: var(--black);
   line-height: 1;
   filter: blur(6px);
@@ -48,7 +48,7 @@
 
 .play-coming-soon {
   font-family: 'Kapakana', cursive;
-  font-size: 7rem;
+  font-size: clamp(3rem, 9vw, 7rem);
   color: var(--teal);
   text-align: center;
   letter-spacing: 0;
