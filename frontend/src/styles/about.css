@@ -58,41 +58,99 @@
    .about-photo-item:active { cursor: grabbing; }
 
    /* CENTER — above text */
-   .ph-g { width: 160px; height: 160px; top: -180px; left: 50%; transform: translateX(-50%); }
+   .ph-g {
+     width:  clamp(80px,  11.1vw, 160px);
+     height: clamp(80px,  11.1vw, 160px);
+     top: clamp(-120px, -12.5vw, -80px);
+     left: 50%;
+     transform: translateX(-50%);
+   }
 
    /* LEFT SIDE */
-   .ph-a { width: 136px; height: 166px; top:  60px;  left: 100px; }
-   .ph-d { width: 136px; height: 134px; top: 340px;  left: 300px; }
-   .ph-e { width: 122px; height: 122px; top: 560px;  left: 180px; }
-   .ph-i { width: 260px; height: 240px; top: 780px;  left: -35px; }
+   .ph-a {
+     width:  clamp(70px,  9.4vw, 136px);
+     height: clamp(86px, 11.5vw, 166px);
+     top: 60px;
+     left: clamp(10px, 6.9vw, 100px);
+   }
+   .ph-d {
+     width:  clamp(70px,  9.4vw, 136px);
+     height: clamp(70px,  9.3vw, 134px);
+     top: 340px;
+     left: clamp(60px, 15vw, 300px);
+   }
+   .ph-e {
+     width:  clamp(60px,  8.5vw, 122px);
+     height: clamp(60px,  8.5vw, 122px);
+     top: 560px;
+     left: clamp(20px,  9vw, 180px);
+   }
+   .ph-i {
+     width:  clamp(130px, 18vw, 260px);
+     height: clamp(120px, 16.7vw, 240px);
+     top: 780px;
+     left: clamp(-35px, -2.4vw, -35px);
+   }
 
    /* RIGHT SIDE */
-   .ph-b { width: 155px; height: 206px; top:  20px;  right: 120px; }
-   .ph-c { width: 164px; height: 197px; top: 300px;  right: 290px; }
-   .ph-f { width: 117px; height: 120px; top: 600px;  right: 130px; }
-   .ph-h { width: 182px; height: 182px; top: 860px;  right:  250px; }
-
-   /* ── Medium viewports: photos are present but shrunk to avoid
-      overlapping the text column. They stay absolute/draggable. ── */
-   @media (max-width: 1200px) {
-     .ph-a { width: 100px; height: 122px; left: 20px; }
-     .ph-d { width: 100px; height: 98px;  left: 160px; }
-     .ph-e { width: 90px;  height: 90px;  left: 60px; }
-     .ph-i { width: 180px; height: 166px; left: -20px; }
-     .ph-b { width: 115px; height: 152px; right: 20px; }
-     .ph-c { width: 120px; height: 144px; right: 120px; }
-     .ph-f { width: 86px;  height: 88px;  right: 30px; }
-     .ph-h { width: 134px; height: 134px; right: 80px; }
+   .ph-b {
+     width:  clamp(75px, 10.8vw, 155px);
+     height: clamp(100px, 14.3vw, 206px);
+     top: 20px;
+     right: clamp(10px,  8.3vw, 120px);
+   }
+   .ph-c {
+     width:  clamp(75px, 11.4vw, 164px);
+     height: clamp(90px, 13.7vw, 197px);
+     top: 300px;
+     right: clamp(60px, 15vw, 290px);
+   }
+   .ph-f {
+     width:  clamp(55px,  8.1vw, 117px);
+     height: clamp(55px,  8.3vw, 120px);
+     top: 600px;
+     right: clamp(15px,  9vw, 130px);
+   }
+   .ph-h {
+     width:  clamp(90px, 12.6vw, 182px);
+     height: clamp(90px, 12.6vw, 182px);
+     top: 860px;
+     right: clamp(60px, 17.4vw, 250px);
    }
 
    @media (max-width: 900px) {
-     .about-body { padding: clamp(2rem, 8vw, 4rem) clamp(1rem, 5vw, 2rem) 4rem; }
+     .about-body { padding: 2rem 1.5rem 4rem; }
      .about-text { width: 90%; }
-     .about-photos { position: static; }
-     .about-photo-item {
+
+     /* ph-g lives inside about-text — centre it as a small block above the heading */
+     .about-text .about-photo-item {
+       position: relative !important;
+       width:  clamp(70px, 22vw, 110px) !important;
+       height: clamp(70px, 22vw, 110px) !important;
+       top: auto !important;
+       left: auto !important;
+       transform: none !important;
+       display: block;
+       margin: 0 auto 1.25rem;
+       aspect-ratio: 1;
+     }
+
+     /* All side photos: 2-column grid */
+     .about-photos {
        position: static;
-       width: 100% !important;
+       display: grid;
+       grid-template-columns: repeat(2, 1fr);
+       gap: 0.5rem;
+       padding: 1.5rem 0;
+     }
+     .about-photos .about-photo-item {
+       position: static !important;
+       width:  100% !important;
        height: auto !important;
+       top: auto !important;
+       left: auto !important;
+       right: auto !important;
+       transform: none !important;
        aspect-ratio: 1;
      }
    }
