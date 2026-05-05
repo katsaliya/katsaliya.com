@@ -79,6 +79,10 @@ export default function Work() {
     setShowPopup(true)
     setTimeout(() => setShowPopup(false), 1500)
   }
+
+  const handleBluecoreClick = () => {
+    window.open('https://www.notion.so/BlueCore-Rethinking-the-Mariner-Workforce-from-the-Inside-Out-3544c12299ba809694c3c66fbaf42188', '_blank', 'noopener,noreferrer')
+  }
     
   return (
     <>
@@ -117,7 +121,7 @@ export default function Work() {
               <p className="row-label row-label--row0">some of my recent work</p>
 
               {/* BluecoreAI · canvas(255,694) → frame(129,661) · 775×538 */}
-              <div className="project-card project-card--bluecore" onClick={handleCardClick}>
+              <div className="project-card project-card--bluecore" onClick={handleBluecoreClick}>
                 <div className="project-card__media project-card__media--bluecore">
                   <LogoOrb />
                 </div>
