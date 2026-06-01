@@ -14,11 +14,10 @@ export default function Footer({ showHeadline = false }) {
     <footer className="site-footer work-footer">
       {showHeadline && <p className="work-footer__headline">more on the way</p>}
       <div className="work-footer__meta">
-        <span>꒰ྀི১ Open to opportunities, collabs, and good conversations. ໒꒱ིྀ </span>
-        <span>© Kataliya Sungkamee 2026 </span>
+        <span>꒰ྀི১ Open to opportunities, collabs, and good conversations. ໒꒱ིྀ - KS </span>
+        <span>THANK YOU, ENJOY</span>
         <span>LAST UPDATED: 05 01 26</span>
         <span className="teal">VISITOR # {visitorCount ?? '...'}</span>
-        <span>footer footer footer stuff</span>
       </div>
     </footer>
   )
