@@ -3,6 +3,7 @@ import Work from './pages/Work'
 import About from './pages/About'
 import Play from './pages/Play'
 import Contact from './pages/Contact'
+import Bluecore from './pages/Bluecore'
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/play" element={<Play />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/bluecore" element={<Bluecore />} />
     </Routes>
   )
 }

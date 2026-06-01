@@ -63,7 +63,6 @@ body {
   top: 0;
   z-index: 100;
   background: inherit;
-  padding: 0 clamp(1rem, 7.4vw, 106px);
 }
 .nav-script {
   position: absolute;
@@ -95,6 +94,9 @@ body {
   align-items: center;
   height: 52px;
   justify-content: space-between;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 7.4vw, 106px);
 }
 .nav-links a {
   font-family: 'Afacad Flux', sans-serif;
@@ -145,22 +147,26 @@ body {
 
 .site-footer {
   border-top: var(--border);
-  padding: clamp(1rem, 2vw, 1.8rem) clamp(1rem, 2vw, 2rem);
+  padding: clamp(1rem, 2vw, 1.8rem) 8px;
   text-align: center;
   font-family: '42dot Sans', sans-serif;
   font-size: 0.72rem;
   font-weight: 300;
   color: var(--gray-mid);
   line-height: 1.6;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .work-footer {
   border: none;
-  padding: 0;
+  padding: 0 5px 10px;
   background: #fff;
   text-align: center;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 .work-footer__headline {
   font-family: 'Kapakana', cursive;
@@ -196,8 +202,7 @@ body {
 }
 
 @media (max-width: 900px) {
-  .main-nav { padding: 0 1rem; }
-  .nav-links { height: 48px; gap: 1rem; }
+  .nav-links { height: 48px; gap: 1rem; padding: 0 1rem; }
   .nav-links a { font-size: 0.9rem; }
   .nav-script { font-size: 1.9rem; top: 42%; }
   .side-social {
