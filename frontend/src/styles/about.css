@@ -5,8 +5,8 @@
 
    .about-body {
      position: relative;
-    /* max-width: 1200;
-     margin: 0 auto;*/
+     max-width: 1440px;
+     margin: 0 auto;
      padding: clamp(4rem, 15vw, 220px) 0 6rem;
      overflow-x: hidden;
    }
