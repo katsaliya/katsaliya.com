@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
+import LogoOrb from '../components/LogoOrb'
 import '../styles/bluecore.css'
 
 const SECTIONS = ['context','problem','research','process','solution','nextsteps','takeaways','learnmore']
@@ -234,13 +235,13 @@ export default function Bluecore() {
                   with d.School Paris, to pose a deceptively simple question:
                 </p>
                 <blockquote className="bc-question">
-                  How do we make the mariner workforce more attractive — not for recruitment, but for longevity?
+                  How can we improve the dailty life and well-being of merchant mariners to make the profession more attractive??
                 </blockquote>
                 <p className="bc-body-text">
-                  Inspired by how little technology has been built for the people keeping global trade moving,
+                    {/* ── BODY: sidebar + content Inspired by how little technology has been built for the people keeping global trade moving,
                   we wanted to design something that felt like it belonged at sea — not software imported from
                   a boardroom. BlueCore was built around a single moment: a crew member at the end of a long
-                  shift, with one last thing standing between them and rest. We wanted to make that moment effortless.
+                  shift, with one last thing standing between them and rest. We wanted to make that moment effortless. ── */}
                 </p>
               </section>
 
@@ -332,13 +333,11 @@ export default function Bluecore() {
                     <p className="bc-body-text" style={{ marginBottom: 24 }}>
                       What came out was GreenWatch AI, an AI-powered voice interface that filled
                       paperwork through conversation, detected crew fatigue through acoustic patterns,
-                      and responded to distress the way a therapist would.{' '}
-                      <a href="#learnmore" style={{ color: 'var(--bc-link)' }}>For more info click here</a>,
-                      or feel free to reach out!
+                      and responded to distress the way a therapist would.{' '}For more info, feel free to  <a href="mailto:kataliyasun@gmail.com" target="_blank" rel="noopener noreferrer">reach out!</a>
                     </p>
                     <div className="bc-devpost-links">
-                      <a href="#learnmore">Devpost ↗</a>
-                      <a href="#learnmore">Github ↗</a>
+                      <a href="https://devpost.com/software/greenwatch-rym7e3" target="_blank" rel="noopener noreferrer">Devpost ↗</a>
+                      <a href="https://github.com/katsaliya" target="_blank" rel="noopener noreferrer">Github ↗</a>
                     </div>
                   </div>
                   <div className="bc-sfhacks-visual">
@@ -406,7 +405,7 @@ export default function Bluecore() {
                     </p>
                   </div>
                   <div className="bc-visual-img">
-                    <img src="/images/case-studies/bluecore-visual-identity.png" alt="BlueCore visual identity" />
+                    <LogoOrb />
                   </div>
                 </div>
 
@@ -416,7 +415,7 @@ export default function Bluecore() {
                   <h2 className="bc-section-heading">Your orb is <span className="bc-blue-text">your co-pilot.</span></h2>
                   <div className="bc-feature-layout">
                     <div className="bc-feature-demo">
-                      <PhoneDemo screenImg="/images/case-studies/bluecore-screen-feature1.png" />
+                      <div className="bc-demo-placeholder"><span>Demo in progress</span></div>
                     </div>
                     <div className="bc-feature-text">
                       <p className="bc-body-text">
@@ -433,7 +432,7 @@ export default function Bluecore() {
                   <h2 className="bc-section-heading">Your document queue.<br /><span className="bc-blue-text">Always one tap away.</span></h2>
                   <div className="bc-feature-layout">
                     <div className="bc-feature-demo">
-                      <PhoneDemo screenImg="/images/case-studies/bluecore-screen-feature2.png" />
+                      <div className="bc-demo-placeholder"><span>Demo in progress</span></div>
                     </div>
                     <div className="bc-feature-text">
                       <p className="bc-body-text">
@@ -451,7 +450,7 @@ export default function Bluecore() {
                   <h2 className="bc-section-heading bc-section-heading--bold">Your paper trail, <span className="bc-blue-text">always on record.</span></h2>
                   <div className="bc-feature-layout">
                     <div className="bc-feature-demo">
-                      <PhoneDemo screenImg="/images/case-studies/bluecore-screen-feature3.png" />
+                      <div className="bc-demo-placeholder"><span>Demo in progress</span></div>
                     </div>
                     <div className="bc-feature-text">
                       <p className="bc-body-text">
@@ -469,7 +468,7 @@ export default function Bluecore() {
                   <h2 className="bc-section-heading">Your world doesn&rsquo;t stop when you&rsquo;re at sea.</h2>
                   <div className="bc-feature-layout">
                     <div className="bc-feature-demo">
-                      <PhoneDemo screenImg="/images/case-studies/bluecore-screen-feature4.png" />
+                      <div className="bc-demo-placeholder"><span>Demo in progress</span></div>
                     </div>
                     <div className="bc-feature-text">
                       <p className="bc-body-text">
@@ -487,7 +486,7 @@ export default function Bluecore() {
                 <span className="bc-label">WHAT&rsquo;S NEXT FOR BLUECORE</span>
                 <h2 className="bc-next-heading">
                   We&rsquo;re currently continuing BlueCore iterations as we prepare to present at the{' '}
-                  <span className="bc-highlight">SUGARetwork Expo</span> at SAP in Palo Alto this June.
+                  <span className="bc-highlight">SUGAR Expo</span> at SAP in Palo Alto this June.
                 </h2>
                 <p className="bc-body-text">
                   The immediate next step is industry validation — partnering with shipping companies and
@@ -500,7 +499,7 @@ export default function Bluecore() {
 
               {/* KEY TAKEAWAYS */}
               <section id="takeaways" className="bc-section">
-                <span className="bc-label">Key Takeaways</span>
+                <span className="bc-label">KEY TAKEAWAYS</span>
                 <div className="bc-kt-stack">
                   <div className="bc-kt-card">
                     <span className="bc-kt-label">ON AI AS A TOOL</span>
@@ -536,44 +535,44 @@ export default function Bluecore() {
 
               {/* LEARN MORE */}
               <section id="learnmore" className="bc-section">
-                <span className="bc-label">learn more</span>
-                <div className="bc-posts-row">
-                  <div className="bc-post-card">
-                    <div className="bc-post-img">
-                      <img src="/images/case-studies/bluecore-post-flown.png" alt="Flown post" />
-                    </div>
-                    <div className="bc-post-content">
-                      <span className="bc-post-title">Flown — Designing for Maritime Wellbeing</span>
-                      <span className="bc-post-url">linkedin.com/in/katsaliya — view post</span>
-                    </div>
-                  </div>
-                  <div className="bc-post-card">
-                    <div className="bc-post-img">
-                      <img src="/images/case-studies/bluecore-post-blackrock.png" alt="BlackRock post" />
-                    </div>
-                    <div className="bc-post-content">
-                      <span className="bc-post-title">BlackRock — Design Thinking Session</span>
-                      <span className="bc-post-url">linkedin.com/in/katsaliya — view post</span>
-                    </div>
-                  </div>
-                  <div className="bc-post-card">
-                    <div className="bc-post-img">
-                      <img src="/images/case-studies/bluecore-post-aiawards.png" alt="SFSU AI Awards post" />
-                    </div>
-                    <div className="bc-post-content">
-                      <span className="bc-post-title">SFSU Student AI Awards 2026 — 1st Place</span>
-                      <span className="bc-post-url">linkedin.com/in/katsaliya — view post</span>
-                    </div>
-                  </div>
-                  <div className="bc-post-card">
-                    <div className="bc-post-img">
-                      <img src="/images/case-studies/bluecore-post-sfhacks.png" alt="SF Hacks post" />
-                    </div>
-                    <div className="bc-post-content">
-                      <span className="bc-post-title">SF Hacks 2026 — GreenWatch AI</span>
-                      <span className="bc-post-url">devpost.com/software/greenwatch — view submission</span>
-                    </div>
-                  </div>
+                <span className="bc-label">LEARN MORE ABOUT BLUECORE</span>
+                <div className="bc-posts-grid">
+                  {[
+                    {
+                      id: '7429732127572664320',
+                      href: 'https://www.linkedin.com/posts/katsaliya_my-first-hackathon-this-weekend-our-activity-7429732127572664320-aIuz',
+                    },
+                    {
+                      id: '7447709274186813440',
+                      href: 'https://www.linkedin.com/posts/katsaliya_7-months-into-collaborating-with-ana%C3%AFs-barnab%C3%A9-activity-7447709274186813440-2bVb',
+                    },
+                    {
+                      id: '7459798114259058689',
+                      href: 'https://www.linkedin.com/posts/aroderick_san-francisco-state-university-hosted-its-activity-7459798114259058689-tCGn',
+                    },
+                    {
+                      id: '7452053492816404480',
+                      href: 'https://www.linkedin.com/posts/activity-7452053492816404480-iBVp',
+                    },
+                  ].map(({ id, href }) => (
+                    <a
+                      key={id}
+                      className="bc-post-embed"
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View LinkedIn post"
+                    >
+                      <iframe
+                        src={`https://www.linkedin.com/embed/feed/update/urn:li:activity:${id}`}
+                        className="bc-post-iframe"
+                        frameBorder="0"
+                        allowFullScreen
+                        title={`LinkedIn post ${id}`}
+                      />
+                      <div className="bc-post-overlay" />
+                    </a>
+                  ))}
                 </div>
               </section>
 
