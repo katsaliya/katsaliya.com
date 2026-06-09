@@ -19,7 +19,7 @@ export default function Nav({ scriptRef }) {
         <Link to="/"      className={pathname === '/'      ? 'active' : ''}>WORK</Link>
         <Link to="/about" className={pathname === '/about' ? 'active' : ''}>ABOUT</Link>
         <Link to="/play"  className={pathname === '/play'  ? 'active' : ''}>PLAY</Link>
-        <a href="mailto:ksungkamee@sfsu.edu">CONTACT</a>
+        <a href="mailto:kataliyasun@gmail.com">CONTACT</a>
       </div>
     </nav>
   )
