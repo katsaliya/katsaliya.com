@@ -67,8 +67,6 @@ const CONTENT_ROWS = [
   {
     label: 'DIML — Day in My Life',
     cards: [
-      { type: 'video', src: '/known/diml/diml-0710.mov', caption: '07.10' },
-      { type: 'video', src: '/known/diml/diml-0714.mov', caption: '07.14' },
       { type: 'video', src: '/known/diml/diml-0716.mov', caption: '07.16' },
       { type: 'video', src: '/known/diml/diml-0722.mov', caption: '07.22' },
       { type: 'video', src: '/known/diml/diml-0724.mov', caption: '07.24' },
