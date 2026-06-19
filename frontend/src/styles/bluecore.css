@@ -15,9 +15,9 @@
   --bc-muted:      #959494;
   --bc-link:       #0D8CE8;
 
-  --bc-content-left: 200px;  /* divider x position */
-  --bc-content-pad:  83px;   /* padding from divider to content */
-  --bc-inset: clamp(16px, 3vw, 48px); /* inner page breathing room */
+  --bc-content-left: 200px;                        /* divider x position */
+  --bc-content-pad:  clamp(1.5rem, 4vw, 5.25rem); /* padding from divider to content */
+  --bc-inset:        clamp(1.5rem, 5vw, 5rem);     /* inner page breathing room */
 }
 
 /* ── NAV OVERRIDE: not sticky on case study pages ── */
@@ -44,8 +44,20 @@
 
 /* ── HERO (above banner) ───────────────────── */
 .bc-hero {
-  padding: 28px var(--bc-inset) 28px;
+  padding: clamp(2rem, 5vw, 4rem) var(--bc-inset);
 }
+
+.bc-hero-back {
+  display: inline-block;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 0.8rem;
+  color: var(--bc-muted);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  margin-bottom: 2rem;
+  transition: color 0.15s;
+}
+.bc-hero-back:hover { color: var(--bc-blue); }
 
 .bc-awards {
   animation: bcFadeUp 0.5s ease both;
@@ -86,30 +98,30 @@
 .bc-title {
   font-family: 'Unbounded', sans-serif;
   font-weight: 500;
-  font-size: 39px;
-  line-height: 36px;
-  letter-spacing: -2px;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
   color: var(--bc-navy);
-  max-width: 340px;
+  max-width: 700px;
   margin: 6px 0 0;
 }
 
 .bc-description {
   font-family: 'Inter', sans-serif;
   font-weight: 300;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: -0.5px;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.7;
+  letter-spacing: -0.01em;
   color: var(--bc-text);
   max-width: 900px;
-  margin: 16px 0 0;
+  margin: clamp(1rem, 2vw, 1.5rem) 0 0;
 }
 
 .bc-meta {
   display: grid;
   grid-template-columns: minmax(200px, 40%) 1fr;
-  gap: 16px 60px;
-  margin-top: 48px;
+  gap: clamp(0.75rem, 2vw, 1.5rem) clamp(2rem, 5vw, 4rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
 }
 
 .bc-meta-item {
@@ -156,7 +168,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px var(--bc-inset);
+  padding: clamp(1rem, 2.5vw, 2rem) var(--bc-inset);
 }
 
 /* glass frame — horizontally scrollable */
@@ -255,16 +267,16 @@
 .bc-sections {
   flex: 1;
   min-width: 0;
-  padding: 15px var(--bc-content-pad);
+  padding: clamp(1.5rem, 3vw, 2.5rem) var(--bc-content-pad) clamp(4rem, 8vw, 8rem);
 }
 
 /* ── SECTION SHARED STYLES ─────────────────── */
 .bc-section {
-  padding: 15px 0 80px;
+  padding: 0 0 clamp(4rem, 7vw, 7rem);
   border-bottom: none;
 }
 .bc-section + .bc-section {
-  padding-top: 30px;
+  padding-top: 0;
 }
 
 .bc-label {
@@ -280,11 +292,11 @@
 .bc-section-heading {
   font-family: 'Afacad Flux', sans-serif;
   font-weight: 500;
-  font-size: 54px;
-  line-height: 41px;
-  letter-spacing: -0.06em;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
   color: var(--bc-text);
-  margin: 8px 0 24px;
+  margin: 8px 0 clamp(1rem, 2vw, 1.5rem);
 }
 
 .bc-section-heading--bold {
@@ -300,17 +312,17 @@
   display: block;
   font-family: 'Inter', sans-serif;
   font-weight: 400;
-  font-size: 17px;
-  line-height: 1.4;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.6;
   color: #000000;
-  margin-bottom: 12px;
+  margin-bottom: clamp(0.5rem, 1vw, 0.75rem);
 }
 
 .bc-body-text {
   font-family: 'Inter', sans-serif;
   font-weight: 300;
-  font-size: 17px;
-  line-height: 23px;
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+  line-height: 1.75;
   letter-spacing: -0.01em;
   color: var(--bc-text);
   max-width: 1178px;
@@ -323,9 +335,8 @@
   margin-bottom: 31px;
 }
 #context .bc-body-text {
-  font-size: 18px;
-  line-height: 27px;
-  letter-spacing: -0.01em;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  line-height: 1.75;
 }
 #context .bc-label + .bc-body-text {
   margin-bottom: 76px;

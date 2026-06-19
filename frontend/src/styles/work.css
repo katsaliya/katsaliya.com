@@ -262,7 +262,7 @@
 }
 .card-desc {
   font-family: 'Courier Prime Code', monospace;
-  font-size: 20px;
+  font-size: 15px;
   line-height: 19px;
   letter-spacing: -0.04em;
   color: var(--card-text);

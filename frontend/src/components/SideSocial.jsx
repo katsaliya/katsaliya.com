@@ -4,7 +4,6 @@ const LINKS = [
   { href: 'mailto:kataliyasun@gmail.com',                          icon: '/images/email_icon.png',    label: 'Email'    },
   { href: 'https://linkedin.com/in/katsaliya', target: '_blank', icon: '/images/linkedin_icon.png', label: 'LinkedIn' },
   { href: 'https://github.com/katsaliya',      target: '_blank', icon: '/images/github_icon.png',   label: 'GitHub'   },
-  { href: 'https://tiktok.com/@katsaliya',     target: '_blank', icon: '/images/tiktok_icon.png',   label: 'TikTok'   },
 ]
 
 const MAX_SCALE = 2.2   // peak scale of icon under cursor

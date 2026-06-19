@@ -1,0 +1,308 @@
+/* ══════════════════════════════════════════
+   KNOWN CASE STUDY
+   ══════════════════════════════════════════ */
+
+:root {
+  --kn-red:     #920C00;
+  --kn-red-mid: rgba(146, 12, 0, 0.18);
+  --kn-text:    #1A1A1A;
+  --kn-muted:   #8A8A8A;
+  --kn-border:  #E2E2E2;
+}
+
+/* ── NAV: not sticky on case study ── */
+.page-case-study .main-nav {
+  position: relative;
+  top: auto;
+}
+
+/* ── PAGE WRAPPER ── */
+.kn-page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #FFFFFF;
+  position: relative;
+}
+
+@keyframes knFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HERO ── */
+.kn-hero {
+  padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 5rem);
+}
+
+.kn-hero-layout {
+  display: flex;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+.kn-hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.kn-tag {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--kn-red);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  animation: knFadeUp 0.5s ease both 0.05s;
+}
+
+.kn-title {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 500;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--kn-text);
+  max-width: 700px;
+  margin: 0 0 1.5rem;
+  animation: knFadeUp 0.5s ease both 0.12s;
+}
+
+.kn-description {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.7;
+  color: var(--kn-text);
+  max-width: 680px;
+  margin-bottom: 2.5rem;
+  animation: knFadeUp 0.5s ease both 0.22s;
+}
+
+.kn-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem 4rem;
+  animation: knFadeUp 0.5s ease both 0.34s;
+}
+
+.kn-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kn-meta-label {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kn-red);
+}
+
+.kn-meta-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: var(--kn-text);
+}
+
+/* ── HERO VIDEO (right column) ── */
+.kn-hero-video {
+  flex: 0 0 clamp(240px, 34vw, 540px);
+  border-radius: 8px;
+  overflow: hidden;
+  animation: knFadeUp 0.5s ease both 0.1s;
+}
+
+.kn-hero-video video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .kn-hero-layout {
+    flex-direction: column;
+  }
+  .kn-hero-video {
+    flex: none;
+    width: min(280px, 80vw);
+    margin: 0 auto;
+  }
+}
+
+/* ── SECTIONS ── */
+.kn-body {
+  padding: 0 clamp(1.5rem, 5vw, 5rem) clamp(4rem, 8vw, 8rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4rem, 7vw, 7rem);
+}
+
+.kn-section {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.kn-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.kn-section-label {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kn-red);
+  margin-bottom: 0.75rem;
+}
+
+.kn-section-heading {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--kn-text);
+  margin-bottom: 1.25rem;
+}
+
+.kn-body-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+  line-height: 1.75;
+  color: var(--kn-text);
+  max-width: 720px;
+}
+
+/* ── PLACEHOLDER BLOCK ── */
+.kn-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  background: var(--kn-red-mid);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 0.8rem;
+  color: rgba(146, 12, 0, 0.5);
+  letter-spacing: 0.06em;
+  margin-top: 2rem;
+}
+
+/* ── BACK LINK ── */
+.kn-back {
+  display: inline-block;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 0.8rem;
+  color: var(--kn-muted);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  margin-bottom: 2rem;
+  transition: color 0.15s;
+}
+.kn-back:hover { color: var(--kn-red); }
+
+/* ── PRINT GRID ── */
+.kn-print-header {
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 5vw, 5rem) 1rem;
+}
+
+.kn-print-grid {
+  columns: 3;
+  column-gap: clamp(0.5rem, 1vw, 1rem);
+  padding: 0 clamp(1.5rem, 5vw, 5rem) clamp(4rem, 8vw, 8rem);
+}
+
+.kn-print-item {
+  break-inside: avoid;
+  margin-bottom: clamp(0.5rem, 1vw, 1rem);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.kn-print-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.kn-print-item:nth-child(2n)  { transition-delay: 0.07s; }
+.kn-print-item:nth-child(3n)  { transition-delay: 0.14s; }
+
+.kn-print-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.kn-print-item:hover img { transform: scale(1.02); }
+
+/* PDF tiles */
+.kn-print-item--pdf {
+  aspect-ratio: 3 / 4;
+  background: #f5f5f5;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.kn-print-item--pdf embed {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* ── LIGHTBOX ── */
+.kn-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: knFadeUp 0.2s ease both;
+}
+.kn-lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+  display: block;
+}
+.kn-lightbox__pdf {
+  width: min(90vw, 75vh * 0.75);
+  height: 90vh;
+  border-radius: 4px;
+  display: block;
+  border: none;
+}
+.kn-lightbox__close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.kn-lightbox__close:hover { background: rgba(255,255,255,0.22); }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .kn-hero        { padding: 1.5rem 1.25rem; }
+  .kn-meta        { gap: 1.25rem 2rem; }
+  .kn-print-grid  { columns: 2; padding: 0 1.25rem 4rem; }
+}

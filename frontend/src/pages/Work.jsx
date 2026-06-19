@@ -110,6 +110,7 @@ export default function Work() {
   }
 
   const handleBluecoreClick = () => navigate('/bluecore')
+  const handleKnownClick    = () => navigate('/known')
     
   return (
     <>
@@ -157,11 +158,11 @@ export default function Work() {
                       </div>
                       <div className="project-card__body">
                         <p className="card-desc">
-                          Bringing <span className="teal">wellbeing</span> infrastructure to the{' '}
-                          <em>world's most isolated workforce</em> — through{' '}
-                          <span className="teal">AI, quiet documentation, </span>and{' '}
-                          <span className="teal">design</span> built around the <em>people</em> the
-                          industry <em>forgot</em>. Eight months of field research across two continents,
+                          Bringing wellbeing infrastructure to the{' '}
+                          world's most isolated workforce— through{' '}
+                          AI, quiet documentation, and{' '}
+                          design built around the people the
+                          industry forgot. Eight months of field research across two continents,
                           still iterating with the people it's built for.
                         </p>
                         <div className="card-tags">
@@ -178,8 +179,8 @@ export default function Work() {
                         </div>
                         <div className="project-card__body">
                           <p className="card-desc">
-                            Making <span className="teal">stability accessible</span> for{' '}
-                            <span className="teal">aging adults</span> through passive sensing,
+                            Making stability accessible for{' '}
+                            aging adults through passive sensing,
                             personalized insights, and quiet, dignified design.
                           </p>
                           <div className="card-tags">
@@ -194,9 +195,9 @@ export default function Work() {
                         </div>
                         <div className="project-card__body">
                           <p className="card-desc">
-                            A <span className="teal">biologically guided fragrance ritual</span> for{' '}
-                            <em>L'Oréal Luxe</em>, where skin chemistry <em>replaces</em> guesswork
-                            and <em>refill</em> becomes identity.
+                            A biologically guided fragrance ritual for{' '}
+                            L'Oréal Luxe, where skin chemistry replaces guesswork
+                            and refill becomes identity.
                           </p>
                           <div className="card-tags">
                             <span>Illustrator</span><span>Express</span><span>Strategy</span><span>Product</span>
@@ -208,7 +209,7 @@ export default function Work() {
 
                   {/* Right column: known on top, aidentity below */}
                   <div className="cards-col cards-col--right">
-                    <div className="project-card project-card--known" onClick={handleCardClick}>
+                    <div className="project-card project-card--known" onClick={handleKnownClick}>
                       <div className="project-card__media">
                         <video
                           src="/images/cards/KnownTV.mp4"
@@ -219,8 +220,8 @@ export default function Work() {
                       <div className="project-card__body">
                         <p className="card-desc">
                           A collection of{' '}
-                          <span className="teal">content, marketing materials, and graphics</span> for a
-                          Series A <em>AI-matchmaking startup</em> — prelaunch.
+                          content, marketing materials, and graphics for a
+                          Series A AI-matchmaking startup — prelaunch.
                         </p>
                         <div className="card-tags">
                           <span>Content</span><span>Graphics</span><span>GTM</span><span>CapCut</span>
@@ -235,8 +236,8 @@ export default function Work() {
                       <div className="project-card__body">
                         <p className="card-desc">
                           Reimagining how{' '}
-                          <span className="teal">immigrant families access legal guidance</span> — through{' '}
-                          <span className="teal">AI</span>, plain language, and tools built for the
+                          immigrant families access legal guidance — through{' '}
+                          AI, plain language, and tools built for the
                           communities attorneys can't reach.
                         </p>
                         <div className="card-tags">

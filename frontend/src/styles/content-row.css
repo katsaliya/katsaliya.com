@@ -1,0 +1,254 @@
+/* ══════════════════════════════════════════
+   CONTENT ROW — horizontal scroll sections
+   ══════════════════════════════════════════ */
+
+/* ── Outer (pinned section) ── */
+.cr-outer {
+  width: 100%;
+  height: calc(var(--card-h, 320px) + 4rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-bg, #fff);
+  position: relative;
+}
+
+/* ── Header: label + progress ── */
+.cr-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem var(--page-pad, 2rem);
+}
+
+.cr-label {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--kn-red, #920C00);
+  white-space: nowrap;
+}
+
+/* ── Progress bar ── */
+.cr-progress {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.cr-progress__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--kn-red, #920C00);
+  transform-origin: left;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+/* ── Horizontal track ── */
+.cr-track {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 0 var(--page-pad, 2rem);
+  will-change: transform;
+  /* extra right padding so last card has breathing room */
+  padding-right: calc(var(--page-pad, 2rem) + clamp(1rem, 2vw, 2rem));
+}
+
+/* ── Card shared ── */
+.cr-card {
+  --card-h: clamp(160px, 32vh, 320px);
+  height: var(--card-h);
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+.cr-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+}
+.cr-card:focus-visible {
+  outline: 2px solid var(--teal, #00A2C6);
+  outline-offset: 3px;
+}
+
+/* Card widths by type */
+.cr-card--video,
+.cr-card--placeholder-video { width: calc(var(--card-h) * 16 / 9); }
+.cr-card--image,
+.cr-card--placeholder-image { width: calc(var(--card-h) * 4 / 3); }
+
+/* ── Card media ── */
+.cr-card__media {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.cr-card__media video,
+.cr-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Video overlay UI (mute icon + hint) ── */
+.cr-card__ui {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.cr-card--video:hover .cr-card__ui { opacity: 1; }
+
+.cr-card__mute {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.cr-card__expand-hint {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Placeholder ── */
+.cr-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(146, 12, 0, 0.07);
+  color: rgba(146, 12, 0, 0.45);
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Card caption ── */
+.cr-card__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem 0.9rem;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* ═══════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════ */
+
+.cr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cr-modal__media {
+  /* sizes itself to the media's natural aspect ratio — no black bars */
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 6px;
+  overflow: hidden;
+  background: transparent;
+  will-change: transform, opacity;
+  opacity: 0; /* hidden until FLIP runs after media loads */
+  line-height: 0; /* prevents inline gap under video/img */
+}
+
+.cr-modal__close {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 501;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+.cr-modal__close:hover { background: rgba(255, 255, 255, 0.22); }
+
+.cr-modal__caption {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+/* ── Mobile: disable pin, show stacked ── */
+@media (max-width: 768px) {
+  .cr-outer {
+    height: auto;
+    overflow: visible;
+  }
+  .cr-track {
+    flex-direction: column;
+    padding: 0 var(--page-pad, 1rem);
+    gap: 1rem;
+  }
+  .cr-card--video,
+  .cr-card--placeholder-video,
+  .cr-card--image,
+  .cr-card--placeholder-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .cr-card--image,
+  .cr-card--placeholder-image {
+    aspect-ratio: 4 / 3;
+  }
+  .cr-progress { display: none; }
+  .cr-modal__media {
+    max-width: 95vw;
+    max-height: 80vh;
+  }
+}
