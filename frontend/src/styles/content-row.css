@@ -2,10 +2,10 @@
    CONTENT ROW — horizontal scroll sections
    ══════════════════════════════════════════ */
 
-/* ── Outer (pinned section) ── */
+/* ── Outer (normal flow, no sticky/pin) ── */
 .cr-outer {
+  --card-h: clamp(160px, 35vh, 300px);
   width: 100%;
-  height: calc(var(--card-h, 320px) + 4rem);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -13,13 +13,20 @@
   position: relative;
 }
 
-/* ── Header: label + progress ── */
+/* ── Header: label row + words above the track ── */
 .cr-header {
   flex-shrink: 0;
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1.5rem, 5vw, 5rem) 0;
+}
+
+/* label + progress bar on one line */
+.cr-header__bar {
+  display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 0.75rem var(--page-pad, 2rem);
 }
 
 .cr-label {
@@ -29,6 +36,7 @@
   text-transform: uppercase;
   color: var(--kn-red, #920C00);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ── Progress bar ── */
@@ -48,21 +56,96 @@
   will-change: transform;
 }
 
+/* ── Words above the track ── */
+.cr-info__words {
+  line-height: 1.3;
+  padding-bottom: 0.5rem;
+}
+
+.cr-info__word {
+  display: inline;
+  /* opacity-only — no translateY, no entrance slide */
+  transition: opacity 0.22s ease;
+  will-change: opacity;
+  white-space: pre-wrap;
+}
+
+.cr-info__word--title {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  letter-spacing: -0.04em;
+  color: var(--black, #1A1A1A);
+}
+
+.cr-info__word--desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  color: rgba(0, 0, 0, 0.5);
+  letter-spacing: -0.01em;
+}
+
+/* natural line break between title words and description words */
+.cr-info__word--desc:first-of-type {
+  display: block;
+  margin-top: 0.3rem;
+}
+
+/* ── Track wrapper with arrow navigation ── */
+.cr-track-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.cr-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 300;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 5;
+}
+.cr-arrow--left {
+  left: clamp(0.5rem, 2vw, 1.5rem);
+}
+.cr-arrow--right {
+  right: clamp(0.5rem, 2vw, 1.5rem);
+}
+.cr-arrow:hover {
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.9);
+}
+.cr-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
 /* ── Horizontal track ── */
 .cr-track {
   flex: 1;
   display: flex;
   align-items: center;
   gap: clamp(1rem, 2vw, 2rem);
-  padding: 0 var(--page-pad, 2rem);
+  padding: 0 clamp(1.5rem, 5vw, 5rem);
+  padding-right: calc(clamp(1.5rem, 5vw, 5rem) + clamp(1rem, 2vw, 2rem));
   will-change: transform;
-  /* extra right padding so last card has breathing room */
-  padding-right: calc(var(--page-pad, 2rem) + clamp(1rem, 2vw, 2rem));
+  min-height: 0;
 }
 
 /* ── Card shared ── */
 .cr-card {
-  --card-h: clamp(160px, 32vh, 320px);
   height: var(--card-h);
   flex-shrink: 0;
   position: relative;
@@ -72,28 +155,26 @@
   background: rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease;
 }
-.cr-card:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-}
-.cr-card:focus-visible {
-  outline: 2px solid var(--teal, #00A2C6);
-  outline-offset: 3px;
+.cr-card:hover        { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14); }
+.cr-card:focus-visible { outline: 2px solid var(--teal, #00A2C6); outline-offset: 3px; }
+
+/* Middle card (center position) — subtle scale & emphasis */
+.cr-card:nth-child(2) {
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
-/* Card widths by type */
 .cr-card--video,
 .cr-card--placeholder-video { width: calc(var(--card-h) * 16 / 9); }
 .cr-card--image,
 .cr-card--placeholder-image { width: calc(var(--card-h) * 4 / 3); }
 
-/* ── Card media ── */
 .cr-card__media {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
 }
-
 .cr-card__media video,
 .cr-card__media img {
   width: 100%;
@@ -102,7 +183,6 @@
   display: block;
 }
 
-/* ── Video overlay UI (mute icon + hint) ── */
 .cr-card__ui {
   position: absolute;
   inset: 0;
@@ -123,7 +203,6 @@
   align-items: center;
   margin-bottom: 0.25rem;
 }
-
 .cr-card__expand-hint {
   font-family: 'Courier Prime Code', monospace;
   font-size: 10px;
@@ -132,7 +211,6 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* ── Placeholder ── */
 .cr-card__placeholder {
   width: 100%;
   height: 100%;
@@ -149,12 +227,9 @@
   text-transform: uppercase;
 }
 
-/* ── Card caption ── */
 .cr-card__caption {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   padding: 0.6rem 0.9rem;
   font-family: 'Courier Prime Code', monospace;
   font-size: 11px;
@@ -162,6 +237,35 @@
   color: rgba(255, 255, 255, 0.85);
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
+}
+
+/* ── Meta below the track (platform + stat) ── */
+.cr-info__meta {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1.5rem, 5vw, 5rem);
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  /* opacity-only reveal — no translateY */
+  transition: opacity 0.35s ease;
+  will-change: opacity;
+}
+
+.cr-info__platform {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kn-red, #920C00);
+}
+
+.cr-info__stat {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 500;
+  font-size: clamp(1rem, 2vw, 1.6rem);
+  letter-spacing: -0.03em;
+  color: var(--black, #1A1A1A);
 }
 
 /* ═══════════════════════════════════════════
@@ -181,27 +285,24 @@
 }
 
 .cr-modal__media {
-  /* sizes itself to the media's natural aspect ratio — no black bars */
   max-width: 90vw;
   max-height: 85vh;
   border-radius: 6px;
   overflow: hidden;
   background: transparent;
   will-change: transform, opacity;
-  opacity: 0; /* hidden until FLIP runs after media loads */
-  line-height: 0; /* prevents inline gap under video/img */
+  opacity: 0;
+  line-height: 0;
 }
 
 .cr-modal__close {
   position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
+  top: 1.5rem; right: 1.5rem;
   z-index: 501;
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -209,7 +310,7 @@
   justify-content: center;
   transition: background 0.15s ease;
 }
-.cr-modal__close:hover { background: rgba(255, 255, 255, 0.22); }
+.cr-modal__close:hover { background: rgba(255,255,255,0.22); }
 
 .cr-modal__caption {
   position: fixed;
@@ -219,36 +320,19 @@
   font-family: 'Courier Prime Code', monospace;
   font-size: 12px;
   letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255,255,255,0.6);
   white-space: nowrap;
 }
 
-/* ── Mobile: disable pin, show stacked ── */
+/* ── Mobile: stack vertically ── */
 @media (max-width: 768px) {
-  .cr-outer {
-    height: auto;
-    overflow: visible;
+  .cr-outer   { height: auto; overflow: visible; }
+  .cr-track   { flex-direction: column; padding: 0 var(--page-pad, 1rem); gap: 1rem; }
+  .cr-card--video, .cr-card--placeholder-video,
+  .cr-card--image,  .cr-card--placeholder-image {
+    width: 100%; height: auto; aspect-ratio: 16/9;
   }
-  .cr-track {
-    flex-direction: column;
-    padding: 0 var(--page-pad, 1rem);
-    gap: 1rem;
-  }
-  .cr-card--video,
-  .cr-card--placeholder-video,
-  .cr-card--image,
-  .cr-card--placeholder-image {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-  .cr-card--image,
-  .cr-card--placeholder-image {
-    aspect-ratio: 4 / 3;
-  }
+  .cr-card--image, .cr-card--placeholder-image { aspect-ratio: 4/3; }
   .cr-progress { display: none; }
-  .cr-modal__media {
-    max-width: 95vw;
-    max-height: 80vh;
-  }
+  .cr-modal__media { max-width: 95vw; max-height: 80vh; }
 }
