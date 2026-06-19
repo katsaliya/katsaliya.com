@@ -66,6 +66,17 @@ const PRINT_ITEMS = [
 const CONTENT_ROWS = [
   {
     label: 'DIML — Day in My Life',
+    info: {
+      title: 'Day in My Life',
+      description: 'Behind-the-scenes content following the founder\'s daily routine — raw, unfiltered, and building in public. Each episode captured a different chapter of early-stage startup life.',
+      platform: '@known on TikTok & Instagram',
+      stat: 'avg. 12K views per post',
+    },
+    sections: [
+      { label: '1', startIndex: 0 },
+      { label: '2', startIndex: 3 },
+      { label: '3', startIndex: 6 },
+    ],
     cards: [
       { type: 'video', src: '/known/diml/diml-0716.mov', caption: '07.16' },
       { type: 'video', src: '/known/diml/diml-0722.mov', caption: '07.22' },
@@ -79,6 +90,12 @@ const CONTENT_ROWS = [
   },
   {
     label: 'App',
+    info: {
+      title: 'In-App',
+      description: 'Feature walkthroughs and product highlights shot directly inside the Known app — showing the experience before most people had access to it.',
+      platform: '@known on Instagram',
+      stat: 'placeholder — avg. views per post',
+    },
     cards: [
       { type: 'video', src: '/known/app/app-0722.mov', caption: '07.22' },
       { type: 'video', src: '/known/app/app-0808.mov', caption: '08.08' },
@@ -87,6 +104,12 @@ const CONTENT_ROWS = [
   },
   {
     label: 'Event Teasers & Recaps',
+    info: {
+      title: 'Events',
+      description: 'Teasers and same-day recaps from Known\'s Bay Area matchmaking events — building anticipation beforehand and capturing the energy after. Content that turned attendees into followers.',
+      platform: '@known on Instagram & LinkedIn',
+      stat: 'placeholder — event attendance growth',
+    },
     cards: [
       { type: 'video', src: '/known/events/event-0625.mov',      caption: '06.25 teaser' },
       { type: 'video', src: '/known/events/event-0714.mov',      caption: '07.14 teaser' },
@@ -100,6 +123,12 @@ const CONTENT_ROWS = [
   },
   {
     label: 'Founder-Led Series',
+    info: {
+      title: 'Founder',
+      description: 'A documentary-style series following the founder through the highs and lows of building Known — vision, mission, and the messy middle of early-stage growth.',
+      platform: '@known on LinkedIn & TikTok',
+      stat: 'placeholder — avg. reach per post',
+    },
     cards: [
       { type: 'video', src: '/known/founder-series/founder-0801.mov', caption: '08.01' },
       { type: 'video', src: '/known/founder-series/founder-0811.mov', caption: '08.11' },
@@ -109,16 +138,17 @@ const CONTENT_ROWS = [
 ]
 
 export default function Known() {
-  const printRefs  = useRef([])
+  const printRefs = useRef([])
   const [lightbox, setLightbox] = useState(null)
 
   useEffect(() => {
     document.body.className = 'page-light-body page-case-study'
-    window.scrollTo(0, 0)
-    return () => { document.body.className = '' }
+    // Delay until after GSAP ScrollTrigger pins have initialised
+    const t = setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 50)
+    return () => { clearTimeout(t); document.body.className = '' }
   }, [])
 
-  /* Scroll fade-in for print grid items */
+  /* Scroll fade-in for print grid items and row info blocks */
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => {
@@ -186,7 +216,7 @@ export default function Known() {
 
         {/* ── HORIZONTAL CONTENT ROWS ── */}
         {CONTENT_ROWS.map(row => (
-          <ContentRow key={row.label} label={row.label} cards={row.cards} />
+          <ContentRow key={row.label} label={row.label} cards={row.cards} info={row.info} sections={row.sections || []} />
         ))}
 
         {/* ── PRINT & GRAPHICS GRID ── */}

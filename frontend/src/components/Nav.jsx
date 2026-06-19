@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 export default function Nav({ scriptRef }) {
   const { pathname } = useLocation()
 
-  const scriptVisible = pathname === '/about' || pathname === '/play' || pathname === '/bluecore'
+  const scriptVisible = pathname === '/about' || pathname === '/play' || pathname === '/bluecore' || pathname === '/known'
 
   return (
     <nav className="main-nav" id="mainNav">
