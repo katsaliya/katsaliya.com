@@ -4,6 +4,7 @@ import About from './pages/About'
 import Play from './pages/Play'
 import Contact from './pages/Contact'
 import Bluecore from './pages/Bluecore'
+import Known from './pages/Known'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/play" element={<Play />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/bluecore" element={<Bluecore />} />
+      <Route path="/known" element={<Known />} />
     </Routes>
   )
 }

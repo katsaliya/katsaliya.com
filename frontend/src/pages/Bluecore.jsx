@@ -158,11 +158,12 @@ export default function Bluecore() {
           {/* ── HERO ── */}
 
           <div className="bc-hero">
+            <Link to="/" className="bc-hero-back">← back to work</Link>
             <div className="bc-awards">
               <span className="bc-award">🥇 1st Place @ SF HACKS 2026</span>
               <span className="bc-award">🥇 1st Place @ SFSU&rsquo;S STUDENT AI AWARDS 2026</span>
             </div>
-            <h1 className="bc-title">BlueCore: AI Paperwork Automation</h1>
+            <h1 className="bc-title">BlueCore</h1>
             <p className="bc-description">
               A voice-first maritime documentation tool crafted for the SUGAR Network for Design Innovation,
               a global innovation collaboration program focused on human-centered design.
