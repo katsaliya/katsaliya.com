@@ -1,61 +1,85 @@
-/* ══════════════════════════════════════════
-   ABOUT PAGE
-   ══════════════════════════════════════════ */
-   #page-about { background: var(--white); }
+/* ═══════════════════════════════════════════════════════════════════════════
+   ABOUT.CSS — About/Biography Page
 
-   .about-body {
-     position: relative;
-     max-width: 1440px;
-     margin: 0 auto;
-     padding: clamp(4rem, 15vw, 220px) 0 6rem;
-     overflow-x: hidden;
-   }
+   Personal biography page with draggable photo gallery. The page has a
+   centered text column with biography sections and absolutely-positioned
+   draggable photos floating around it.
 
-   .about-text {
-     width: min(540px, 88vw);
-     margin: 0 auto;
-     position: relative;
-     z-index: 2;
-   }
+   Key Features:
+   - Centered text content (narrow column for readability)
+   - Absolutely positioned draggable photos
+   - Responsive sizing with clamp() for fluid scaling
+   - Photo positioning with CSS variables (ph-a through ph-i)
+   - Cursor changes to indicate draggability
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-   .about-section { margin-bottom: 3.5rem; }
+/* Page background: white */
+#page-about { background: var(--white); }
 
-   .about-section-heading {
-     font-family: 'Courier Prime Code', monospace;
-     font-size: 15px;
-     font-weight: 700;
-     letter-spacing: 0;
-     text-transform: uppercase;
-     color: var(--teal);
-     margin-bottom: 1.2rem;
-   }
+/* Main about page container */
+.about-body {
+  position: relative;  /* Positioning context for absolutely positioned photos */
+  max-width: 1440px;  /* Constrain to readable width */
+  margin: 0 auto;  /* Center horizontally */
+  padding: clamp(4rem, 15vw, 220px) 0 6rem;  /* Responsive vertical padding */
+  overflow-x: hidden;  /* Hide overflow from dragged photos */
+}
 
-   .about-section-body {
-     font-family: 'Courier Prime Code', sans-serif;
-     font-size: 15px;
-     line-height: 1.1;
-     color: var(--black);
-   }
+/* Text content: centered narrow column for readability */
+.about-text {
+  width: min(540px, 88vw);  /* Max 540px, but no more than 88% of viewport */
+  margin: 0 auto;  /* Center horizontally */
+  position: relative;
+  z-index: 2;  /* Above the floating photos */
+}
 
-   .about-section-body a { text-decoration: none; }
-   .about-section-body a[href]:hover { text-decoration: underline; }
+/* Individual biography section */
+.about-section { margin-bottom: 3.5rem; }  /* Space between sections */
 
-   /* Photos float over the page on both sides */
-   .about-photos {
-     position: absolute;
-     inset: 0;
-     pointer-events: none;
-   }
+/* Section heading: "HOW I GOT HERE", "WHAT I'VE BEEN UP TO" */
+.about-section-heading {
+  font-family: 'Courier Prime Code', monospace;  /* Monospace label font */
+  font-size: 15px;
+  font-weight: 700;  /* Bold weight */
+  letter-spacing: 0;
+  text-transform: uppercase;  /* All caps */
+  color: var(--teal);  /* Brand color */
+  margin-bottom: 1.2rem;  /* Space below heading */
+}
 
-   .about-photo-item {
-     position: absolute;
-     object-fit: cover;
-     display: block;
-     pointer-events: all;
-     cursor: grab;
-     user-select: none;
-   }
-   .about-photo-item:active { cursor: grabbing; }
+/* Section body text: biography paragraphs */
+.about-section-body {
+  font-family: 'Courier Prime Code', sans-serif;  /* Body font */
+  font-size: 15px;
+  line-height: 1.1;  /* Tight line height for narrative flow */
+  color: var(--black);
+}
+
+/* Inline links in biography text (e.g., "Madrid", "Seoul") */
+.about-section-body a { text-decoration: none; }  /* No underline by default */
+.about-section-body a[href]:hover { text-decoration: underline; }  /* Underline on hover */
+
+/* ─── DRAGGABLE PHOTO GALLERY ─── */
+
+/* Container for all draggable photos (positioned absolutely) */
+.about-photos {
+  position: absolute;  /* Overlay on top of text */
+  inset: 0;  /* Cover entire container */
+  pointer-events: none;  /* Don't intercept pointer events by default */
+}
+
+/* Individual photo element: draggable by user */
+.about-photo-item {
+  position: absolute;  /* Can be positioned anywhere on page */
+  object-fit: cover;  /* Scale/crop to fill dimensions */
+  display: block;
+  pointer-events: all;  /* Enable pointer events on photos */
+  cursor: grab;  /* Show "grab" cursor to indicate draggability */
+  user-select: none;  /* Don't select image text on drag */
+}
+
+/* Photo while being dragged */
+.about-photo-item:active { cursor: grabbing; }  /* Change cursor to "grabbing" */
 
    /* CENTER — above text */
    .ph-g {
@@ -154,3 +178,12 @@
        aspect-ratio: 1;
      }
    }
+
+/* ─────────────────────────────────────────
+   ABOUT PAGE NAV STYLING (from work page)
+   ───────────────────────────────────────── */
+
+#page-about .main-nav {
+  border-bottom: 1px solid #e2e2e2;
+  background: #ffffff;
+}

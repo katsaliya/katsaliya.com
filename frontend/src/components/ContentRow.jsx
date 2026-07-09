@@ -1,22 +1,93 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONTENT ROW — Horizontal Scrolling Card Gallery with Modal Expansion
+
+   A reusable component for displaying media-rich cards (TikTok, Instagram,
+   images, videos) in a horizontally-scrolling layout. Cards expand into a
+   full-screen modal with smooth FLIP animation (First, Last, Invert, Play).
+
+   Features:
+   - Horizontal scroll with arrow navigation (GSAP smooth animation)
+   - Video autoplay (IntersectionObserver — only most visible video plays)
+   - Responsive card gallery with entrance animations
+   - Modal expansion with FLIP technique for smooth animation
+   - Instagram embed reprocessing on updates
+   - Keyboard support (Escape to close modal)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Import React hooks for state, effects, and optimization */
 import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react'
+
+/* Import GSAP for smooth animations and ScrollTrigger plugin */
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+/* Register GSAP plugin for scroll-based animations */
 gsap.registerPlugin(ScrollTrigger)
 
+/* ─── LOAD THIRD-PARTY EMBED SCRIPTS ─── */
+/* TikTok and Instagram embeds require their scripts to process embed markup */
+/* These are loaded once at component initialization to process embeds */
+if (typeof window !== 'undefined') {
+  /* Load TikTok embed script (only once) */
+  if (!window.tiktok) {
+    const script = document.createElement('script')
+    script.src = 'https://www.tiktok.com/embed.js'
+    script.async = true
+    document.body.appendChild(script)
+  }
+  /* Load Instagram embed script (only once) */
+  if (!window.instgrm) {
+    const script = document.createElement('script')
+    script.src = 'https://www.instagram.com/embed.js'
+    script.async = true
+    document.body.appendChild(script)
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   CONTENT ROW COMPONENT
+
+   Props:
+   - label: Section label for header
+   - cards: Array of card objects {type, src, alt, ...}
+   - info: Title/description for header {title, description}
+   - sections: Additional sections to render
+   ───────────────────────────────────────────────────────────────────── */
 export default function ContentRow({ label, cards = [], info, sections = [] }) {
+  /* ─── DOM ELEMENT REFERENCES ─── */
+  /* Outer container (prevents scrollbar from appearing) */
   const outerRef = useRef(null)
-  const trackRef    = useRef(null)  // flex row — translated by GSAP
-  const cardRefs    = useRef([])
-  const videoRefs   = useRef([])
-  const mediaRef    = useRef(null)
-  const overlayRef  = useRef(null)
 
+  /* Flex row containing all cards (animated with transform: translateX) */
+  const trackRef = useRef(null)
+
+  /* Individual card elements (for calculating FLIP animation) */
+  const cardRefs = useRef([])
+
+  /* Video elements inside cards (for autoplay control) */
+  const videoRefs = useRef([])
+
+  /* Modal media element (image/video being expanded) */
+  const mediaRef = useRef(null)
+
+  /* Modal overlay/backdrop */
+  const overlayRef = useRef(null)
+
+  /* ─── UI STATE ─── */
+  /* Progress bar value (0-1) for visual scrolling indicator */
   const [progress, setProgress] = useState(0)
-  const [expanded, setExpanded]  = useState(null)
 
+  /* Expanded card data + original position for FLIP animation */
+  const [expanded, setExpanded] = useState(null)
+
+  /* ─── ANIMATION STATE (NON-RENDERING) ─── */
+  /* Maximum scroll progress calculated from track size */
   const maxProgressRef = useRef(0)
+
+  /* Total horizontal scroll distance available (for arrow navigation) */
   const scrollDistRef = useRef(0)
+
+  /* Current scroll offset (updated by arrow clicks) */
   const manualOffsetRef = useRef(0)
 
   const words = useMemo(() => {
@@ -27,10 +98,7 @@ export default function ContentRow({ label, cards = [], info, sections = [] }) {
     ]
   }, [info])
 
-  /* ── Scroll-scrubbed animation (Apple-style, Lenis-paired) ───────
-     Extends scroll distance 2.5x for more deliberate, weighted motion.
-     Card pan + word reveals chained into single timeline for unified feel.
-     Heavy scrub lag (1.8) pairs with Lenis smooth scroll.            */
+  /* ── Cache scroll distance for arrow navigation ───────────── */
   useLayoutEffect(() => {
     const outer = outerRef.current
     const track = trackRef.current
@@ -41,80 +109,48 @@ export default function ContentRow({ label, cards = [], info, sections = [] }) {
       return Math.max(0, track.scrollWidth - outer.offsetWidth)
     }
 
-    const ctx = gsap.context(() => {
-      const scrollDist = getScrollDist()
-      const baseDistance = scrollDist * 2.5
-
-      // Cache scrollDist for hover-scroll calculations
-      scrollDistRef.current = scrollDist
-
-      // Direct scrub on track — applies scroll-driven position
-      gsap.to(track, {
-        x: -scrollDist,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: outer,
-          start: 'top bottom',
-          end: () => `+=${baseDistance}`,
-          scrub: 1.5,
-          onUpdate: self => {
-            maxProgressRef.current = Math.max(maxProgressRef.current, self.progress)
-            setProgress(maxProgressRef.current)
-          },
-        },
-      })
-
-      // Word reveals: separate scrubs for text reveal
-      words.forEach((word, i) => {
-        const wordEl = document.querySelector(`[data-word-index="${i}"]`)
-        if (wordEl) {
-          const revealStart = (i / words.length) * baseDistance * 0.78
-          gsap.to(wordEl, {
-            opacity: 1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: outer,
-              start: `top bottom +=${revealStart}`,
-              end: `top bottom +=${revealStart + 100}`,
-              scrub: 1.5,
-            },
-          })
-        }
-      })
-
-      // Meta reveal at 72% of scroll distance
-      const metaEl = outer.querySelector('[data-meta="true"]')
-      if (metaEl) {
-        gsap.to(metaEl, {
-          opacity: 1,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: outer,
-            start: `top bottom +=${baseDistance * 0.72}`,
-            end: `top bottom +=${baseDistance * 0.72 + 100}`,
-            scrub: 1.5,
-          },
-        })
-      }
-    }, outer)
-
-    return () => ctx.revert()
-  }, [words])
+    scrollDistRef.current = getScrollDist()
+  }, [cards])
 
   /* ── Video autoplay via IntersectionObserver ─────────────── */
   useEffect(() => {
     const videos = videoRefs.current.filter(Boolean)
     if (!videos.length) return
     const observer = new IntersectionObserver(
-      entries => entries.forEach(e => {
-        if (e.isIntersecting) e.target.play().catch(() => {})
-        else { e.target.pause(); e.target.currentTime = 0 }
-      }),
-      { threshold: 0.4 }
+      entries => {
+        let mostVisible = null
+        let maxRatio = 0
+        entries.forEach(e => {
+          if (e.isIntersecting && e.intersectionRatio > maxRatio) {
+            maxRatio = e.intersectionRatio
+            mostVisible = e.target
+          }
+        })
+        // Only the most visible video plays, others pause and mute
+        entries.forEach(e => {
+          if (e.target === mostVisible && maxRatio > 0.3) {
+            e.target.play().catch(() => {})
+            e.target.muted = false
+          } else {
+            e.target.pause()
+            e.target.currentTime = 0
+            e.target.muted = true
+          }
+        })
+      },
+      { threshold: [0.3, 0.5, 0.7] }
     )
     videos.forEach(v => observer.observe(v))
     return () => observer.disconnect()
   }, [])
+
+  /* ── Process embeds ──────────────────────────────────────── */
+  useEffect(() => {
+    // Reprocess Instagram embeds when cards mount/update
+    if (window.instgrm?.Embeds?.process) {
+      window.instgrm.Embeds.process()
+    }
+  }, [cards])
 
   /* ── Modal helpers ───────────────────────────────────────── */
   useEffect(() => {
@@ -176,13 +212,13 @@ export default function ContentRow({ label, cards = [], info, sections = [] }) {
 
     const scrollDist = scrollDistRef.current
 
-    // Calculate step size: width of 1 card + 1 gap
+    // Calculate step size: width of 1.5 cards + gap
     const cards = trackRef.current.querySelectorAll('.cr-card')
     if (cards.length === 0) return
 
     const cardWidth = cards[0].offsetWidth
     const gap = 24 // approximate gap size (clamp(1rem, 2vw, 2rem))
-    const stepSize = cardWidth + gap
+    const stepSize = (cardWidth + gap) * 1.5
 
     const newOffset = direction === 'left'
       ? Math.max(0, manualOffsetRef.current - stepSize)
@@ -244,7 +280,7 @@ export default function ContentRow({ label, cards = [], info, sections = [] }) {
                   {card.type === 'video' ? (
                     <>
                       <video ref={el => { videoRefs.current[i] = el }}
-                             src={card.src} muted loop playsInline />
+                             src={card.src} muted loop playsInline preload="none" />
                       <div className="cr-card__ui">
                         <span className="cr-card__mute">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -256,6 +292,37 @@ export default function ContentRow({ label, cards = [], info, sections = [] }) {
                     </>
                   ) : card.type === 'image' ? (
                     <img src={card.src} alt={card.caption || ''} loading="lazy" />
+                  ) : card.type === 'tiktok' ? (
+                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', borderRadius: '8px' }}>
+                      <iframe
+                        src={`https://www.tiktok.com/embed/v2/${card.src}`}
+                        width="100%"
+                        style={{ border: 'none', display: 'block', minHeight: '100%' }}
+                        allow="autoplay"
+                      />
+                    </div>
+                  ) : card.type === 'instagram' ? (
+                    <a
+                      href={`https://www.instagram.com/p/${card.src}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        height: '100%',
+                        background: 'rgba(0,0,0,0.05)',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        color: '#888',
+                        fontSize: '14px',
+                        padding: '1rem',
+                        textAlign: 'center'
+                      }}
+                    >
+                      View on Instagram →
+                    </a>
                   ) : (
                     <div className="cr-card__placeholder">
                       {card.type === 'placeholder-video' && (
@@ -301,8 +368,39 @@ export default function ContentRow({ label, cards = [], info, sections = [] }) {
           </button>
           <div className="cr-modal__media" ref={mediaRef} onClick={e => e.stopPropagation()}>
             {expanded.type === 'video' ? (
-              <video src={expanded.src} controls autoPlay onLoadedMetadata={runFlip}
+              <video src={expanded.src} controls autoPlay preload="auto" onLoadedMetadata={runFlip}
                      style={{ display: 'block', maxWidth: '90vw', maxHeight: '85vh' }} />
+            ) : expanded.type === 'tiktok' ? (
+              <iframe
+                src={`https://www.tiktok.com/embed/v2/${expanded.src}`}
+                width="100%"
+                height="600"
+                frameBorder="0"
+                allow="autoplay"
+                style={{ maxWidth: '90vw', maxHeight: '85vh', display: 'block' }}
+              />
+            ) : expanded.type === 'instagram' ? (
+              <a
+                href={`https://www.instagram.com/p/${expanded.src}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  maxWidth: '90vw',
+                  maxHeight: '85vh',
+                  background: 'rgba(0,0,0,0.05)',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#888',
+                  fontSize: '16px',
+                  padding: '2rem',
+                  textAlign: 'center'
+                }}
+              >
+                View this Instagram post →
+              </a>
             ) : (
               <img src={expanded.src} alt={expanded.caption || ''} onLoad={runFlip}
                    style={{ display: 'block', maxWidth: '90vw', maxHeight: '85vh' }} />

@@ -1,26 +1,155 @@
-/* ══════════════════════════════════════════
-   KNOWN CASE STUDY
-   ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   KNOWN.CSS — Case Study Page Design System
 
-:root {
-  --kn-red:     #920C00;
-  --kn-red-mid: rgba(146, 12, 0, 0.18);
-  --kn-text:    #1A1A1A;
-  --kn-muted:   #8A8A8A;
-  --kn-border:  #E2E2E2;
+   Comprehensive styling for the Known case study page (AI-matchmaking startup).
+   Features:
+   - Design tokens (red palette, spacing scale, shadows)
+   - Sticky section navigation with scrollspy
+   - Hero section with split layout (text + video)
+   - Section cards and gallery layouts
+   - Strategy pillars and process steps visualization
+   - Lightbox for print material gallery
+   - Entrance animations for sections
+
+   Color Palette:
+   - Primary: Deep red (#920C00) representing Known's brand
+   - Accents: Red with varying opacity for backgrounds and borders
+   - Typography: Dark text (#1A1A1A) on white backgrounds
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Datatype';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Datatype-Regular.ttf') format('truetype');
 }
 
-/* ── NAV: not sticky on case study ── */
+/* Root CSS variables: colors, spacing, shadows */
+:root {
+  /* Color Palette: Known's brand colors */
+  --kn-red:      #920C00;  /* Primary brand color (deep red) */
+  --kn-red-mid:  rgba(146, 12, 0, 0.18);  /* Red overlay for backgrounds */
+  --kn-text:     #1A1A1A;  /* Primary text color (near-black) */
+  --kn-muted:    #666666;  /* Secondary text color (gray) */
+  --kn-border:   #E2E2E2;  /* Border color (light gray) */
+
+  /* Spacing Scale (8px base, from shared.css pattern) */
+  --space-xs:    0.5rem;   /* 8px — tight spacing */
+  --space-sm:    1rem;     /* 16px — small gap */
+  --space-md:    1.5rem;   /* 24px — standard gap */
+  --space-lg:    2rem;     /* 32px — large gap */
+  --space-xl:    3rem;     /* 48px — extra large gap */
+  --space-2xl:   4rem;     /* 64px — section spacing */
+  --space-3xl:   5rem;     /* 80px — major spacing */
+
+  /* Shadow System (elevation levels, red-tinted) */
+  --shadow-sm:   0 2px 4px rgba(146, 12, 0, 0.04);   /* Subtle elevation */
+  --shadow-md:   0 8px 16px rgba(146, 12, 0, 0.08);  /* Medium elevation */
+  --shadow-lg:   0 12px 32px rgba(146, 12, 0, 0.12); /* Large elevation */
+  --shadow-xl:   0 20px 48px rgba(146, 12, 0, 0.16); /* Extra large elevation */
+}
+
+/* ─── MAIN NAVIGATION OVERRIDE ─── */
+/* Case study pages don't use sticky main nav, only sticky section nav */
 .page-case-study .main-nav {
-  position: relative;
+  position: relative;  /* No sticky positioning */
   top: auto;
+}
+
+/* ─── SECTION NAVIGATION (sticky) ─── */
+/* Sticky navigation that highlights current section as user scrolls */
+.kn-nav {
+  position: sticky;  /* Sticks to top while scrolling */
+  top: 0;  /* Distance from top when sticky */
+  z-index: 49;  /* Above page content, below modals */
+  background: var(--white);  /* White background */
+  border-bottom: 1px solid rgba(146, 12, 0, 0.08);  /* Subtle red divider */
+  padding: 0 clamp(var(--space-md), 5vw, var(--space-3xl));  /* Responsive horizontal padding */
+  margin: 0;
+  line-height: 1;  /* Tight line height */
+  height: 48px;  /* Fixed height for consistent layout */
+  display: flex;
+  align-items: center;  /* Vertically center all items */
+}
+
+/* Container for nav title and links (centered layout) */
+.kn-nav__content {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-lg), 5vw, var(--space-2xl));  /* Responsive gap */
+  max-width: 1440px;  /* Match page width */
+  margin: 0 auto;  /* Center within nav */
+  height: 100%;
+  width: 100%;
+}
+
+/* Nav title: "Known" (hidden until hero scrolls out of view) */
+.kn-nav__title {
+  font-family: 'Afacad Flux', sans-serif;  /* Display font for case study */
+  font-weight: 600;  /* Semi-bold weight */
+  font-size: clamp(0.95rem, 1.6vw, 1.2rem);  /* Responsive from 0.95rem to 1.2rem */
+  letter-spacing: -0.03em;  /* Tight letter spacing */
+  color: var(--kn-red);  /* Known's red brand color */
+  white-space: nowrap;  /* Don't wrap title */
+  flex-shrink: 0;  /* Don't compress title */
+  padding: 0;
+  margin: 0;
+  opacity: 0;  /* Hidden by default */
+  transition: opacity 0.2s ease;  /* Smooth fade in/out */
+  pointer-events: none;  /* Can't click hidden title */
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* When hero scrolls out of view, show the nav title */
+.kn-nav.is-sticky .kn-nav__title {
+  opacity: 1;  /* Visible */
+  pointer-events: auto;  /* Can interact with title */
+}
+
+/* Section links container (scrollable on mobile) */
+.kn-nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-md), 2.5vw, var(--space-lg));  /* Responsive gap between links */
+  overflow-x: auto;  /* Allow horizontal scrolling on mobile */
+  overflow-y: hidden;
+  scrollbar-width: none;  /* Hide scrollbar (Firefox) */
+  flex: 1;  /* Take remaining space */
+  height: 100%;
+}
+/* Hide scrollbar (Chrome/Safari) */
+.kn-nav__links::-webkit-scrollbar { display: none; }
+
+/* Individual section link */
+.kn-nav a {
+  font-family: 'Courier Prime Code', monospace;  /* Monospace for labels */
+  font-size: 12px;  /* Small label size */
+  letter-spacing: 0.1em;  /* Spaced letter-case */
+  text-transform: uppercase;  /* All caps */
+  color: rgba(146, 12, 0, 0.7);  /* Muted red (semi-transparent) */
+  text-decoration: none;
+  white-space: nowrap;  /* Don't wrap labels */
+  flex-shrink: 0;  /* Don't compress links */
+  padding: 0;
+  transition: color 0.2s ease;  /* Smooth color transition */
+  border-bottom: 2px solid transparent;  /* Indicator line (hidden by default) */
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Hover and active state: highlight with color and underline */
+.kn-nav a:hover,
+.kn-nav a.active {
+  color: var(--kn-red);  /* Solid red on hover/active */
+  border-bottom-color: var(--kn-red);  /* Show indicator line */
 }
 
 /* ── PAGE WRAPPER ── */
 .kn-page {
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
   min-height: 100vh;
   background: #FFFFFF;
   position: relative;
@@ -33,13 +162,13 @@
 
 /* ── HERO ── */
 .kn-hero {
-  padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 5rem);
+  padding: clamp(var(--space-lg), 5vw, var(--space-2xl)) clamp(var(--space-md), 5vw, var(--space-3xl));
 }
 
 .kn-hero-layout {
   display: flex;
   align-items: center;
-  gap: clamp(2rem, 5vw, 5rem);
+  gap: clamp(var(--space-lg), 5vw, var(--space-3xl));
 }
 
 .kn-hero-text {
@@ -49,11 +178,11 @@
 
 .kn-tag {
   font-family: 'Courier Prime Code', monospace;
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   color: var(--kn-red);
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-sm);
   animation: knFadeUp 0.5s ease both 0.05s;
 }
 
@@ -61,11 +190,11 @@
   font-family: 'Afacad Flux', sans-serif;
   font-weight: 500;
   font-size: clamp(2.5rem, 6vw, 5rem);
-  line-height: 1;
+  line-height: 1.05;
   letter-spacing: -0.04em;
   color: var(--kn-text);
   max-width: 700px;
-  margin: 0 0 1.5rem;
+  margin: 6px 0 0;
   animation: knFadeUp 0.5s ease both 0.12s;
 }
 
@@ -74,29 +203,31 @@
   font-weight: 300;
   font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   line-height: 1.7;
+  letter-spacing: -0.01em;
   color: var(--kn-text);
-  max-width: 680px;
-  margin-bottom: 2.5rem;
+  max-width: 900px;
+  margin: clamp(1rem, 2vw, 1.5rem) 0 0;
   animation: knFadeUp 0.5s ease both 0.22s;
 }
 
 .kn-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem 4rem;
+  display: grid;
+  grid-template-columns: minmax(200px, 40%) 1fr;
+  gap: clamp(0.75rem, 2vw, 1.5rem) clamp(2rem, 5vw, 4rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
   animation: knFadeUp 0.5s ease both 0.34s;
 }
 
 .kn-meta-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-xs);
 }
 
 .kn-meta-label {
   font-family: 'Courier Prime Code', monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 14px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--kn-red);
 }
@@ -104,7 +235,7 @@
 .kn-meta-value {
   font-family: 'Inter', sans-serif;
   font-weight: 300;
-  font-size: 0.9rem;
+  font-size: 14px;
   color: var(--kn-text);
 }
 
@@ -141,14 +272,15 @@
   gap: clamp(4rem, 7vw, 7rem);
 }
 
-.kn-section {
-  opacity: 0;
-  transform: translateY(24px);
-}
-.kn-section.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+.kn-label {
+  display: block;
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--kn-red);
+  margin-bottom: 12px;
+  scroll-margin-top: 120px;
 }
 
 .kn-section-label {
@@ -196,32 +328,341 @@
 }
 
 /* ── BACK LINK ── */
+.kn-footer-link {
+  padding: clamp(3rem, 6vw, 5rem) clamp(var(--space-md), 5vw, var(--space-3xl)) clamp(2rem, 4vw, 3rem);
+  text-align: left;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
 .kn-back {
   display: inline-block;
   font-family: 'Courier Prime Code', monospace;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--kn-muted);
   text-decoration: none;
   letter-spacing: 0.04em;
-  margin-bottom: 2rem;
   transition: color 0.15s;
 }
 .kn-back:hover { color: var(--kn-red); }
 
-/* ── PRINT GRID ── */
-.kn-print-header {
-  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 5vw, 5rem) 1rem;
+/* ── SECTION BASE ── */
+.kn-section {
+  padding: 0 clamp(var(--space-md), 5vw, var(--space-3xl)) clamp(4rem, 7vw, 7rem);
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
+.kn-section:first-of-type {
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+
+.kn-section + .kn-section {
+  padding-top: 0;
+}
+
+/* ── BRIEF SECTION ── */
+.kn-brief {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(var(--space-2xl), 10vw, 6rem);
+}
+
+.kn-brief__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: clamp(var(--space-lg), 4vw, var(--space-xl));
+  border-left: 3px solid var(--kn-red);
+  background: rgba(146, 12, 0, 0.02);
+  border-radius: 0 8px 8px 0;
+}
+
+.kn-brief__label {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 600;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--kn-red);
+  margin: 0;
+}
+
+.kn-brief__text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  line-height: 1.75;
+  color: var(--kn-text);
+  margin: 0;
+  max-width: 1178px;
+}
+
+/* ── STRATEGY SECTION ── */
+.kn-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(var(--space-lg), 4vw, var(--space-xl));
+  margin-top: var(--space-xl);
+}
+
+.kn-pillar {
+  padding: clamp(var(--space-lg), 4vw, var(--space-xl));
+  border: 2px solid rgba(146, 12, 0, 0.12);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(146, 12, 0, 0.02) 0%, rgba(146, 12, 0, 0) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  transition: all 0.3s ease;
+}
+
+.kn-pillar:hover {
+  border-color: var(--kn-red);
+  background: linear-gradient(135deg, rgba(146, 12, 0, 0.05) 0%, rgba(146, 12, 0, 0.01) 100%);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.kn-pillar__name {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  letter-spacing: -0.03em;
+  color: var(--kn-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.kn-pillar__goal {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+  color: rgba(0, 0, 0, 0.75);
+  margin: 0;
+  line-height: 1.75;
+}
+
+.kn-pillar__platforms {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  margin-top: var(--space-xs);
+}
+
+.kn-pillar__badge {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--kn-red);
+  border: 1.5px solid var(--kn-red);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: rgba(146, 12, 0, 0.05);
+}
+
+/* ── PROCESS SECTION ── */
+.kn-steps {
+  margin-top: var(--space-xl);
+  max-width: 700px;
+}
+
+.kn-step {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+  line-height: 1.75;
+  color: var(--kn-text);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid rgba(146, 12, 0, 0.1);
+  max-width: 1178px;
+}
+
+.kn-step:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.kn-step__number {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  color: var(--kn-red);
+  width: var(--space-xl);
+  height: var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(146, 12, 0, 0.08);
+  border-radius: 50%;
+  border: 2px solid var(--kn-red);
+}
+
+.kn-step__text {
+  flex: 1;
+  padding-top: var(--space-xs);
+}
+
+/* ── FEATURED CONTENT SECTION ── */
+.kn-featured {
+}
+
+.kn-platform-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(var(--space-lg), 4vw, var(--space-xl));
+  margin: var(--space-xl) 0 clamp(var(--space-2xl), 8vw, 6rem);
+}
+
+.kn-platform-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: clamp(var(--space-lg), 3vw, var(--space-xl));
+  border: 2px solid rgba(146, 12, 0, 0.15);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(146, 12, 0, 0.03) 0%, rgba(146, 12, 0, 0) 100%);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+.kn-platform-card:hover {
+  border-color: var(--kn-red);
+  background: linear-gradient(135deg, rgba(146, 12, 0, 0.08) 0%, rgba(146, 12, 0, 0.02) 100%);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-xl);
+}
+
+.kn-platform-card svg {
+  flex-shrink: 0;
+  color: var(--kn-red);
+  width: 48px;
+  height: 48px;
+}
+
+.kn-platform-name {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  letter-spacing: -0.03em;
+  color: var(--kn-text);
+  margin: 0;
+}
+
+.kn-platform-handle {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--kn-red);
+  margin: var(--space-xs) 0 0;
+  font-weight: 500;
+}
+
+.kn-platform-cta {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--kn-red);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.kn-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(var(--space-md), 2.5vw, var(--space-lg));
+}
+
+.kn-highlight-card {
+  aspect-ratio: 9 / 16;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(146, 12, 0, 0.08) 0%, rgba(146, 12, 0, 0.02) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid rgba(146, 12, 0, 0.1);
+}
+
+.kn-highlight-card:hover {
+  border-color: var(--kn-red);
+  background: linear-gradient(135deg, rgba(146, 12, 0, 0.15) 0%, rgba(146, 12, 0, 0.05) 100%);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+}
+
+.kn-highlight-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── PERFORMANCE SECTION ── */
+.kn-performance {
+  background: linear-gradient(180deg, rgba(146, 12, 0, 0.02) 0%, rgba(146, 12, 0, 0) 100%);
+  border-top: 2px solid rgba(146, 12, 0, 0.1);
+}
+
+.kn-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(var(--space-xl), 6vw, var(--space-2xl));
+  margin-top: var(--space-xl);
+}
+
+.kn-stat {
+  text-align: center;
+  padding: clamp(var(--space-lg), 4vw, var(--space-xl));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(146, 12, 0, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.kn-stat__value {
+  font-family: 'Afacad Flux', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  letter-spacing: -0.04em;
+  color: var(--kn-red);
+  margin: 0;
+  line-height: 1;
+}
+
+.kn-stat__label {
+  font-family: 'Courier Prime Code', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.75);
+  margin: var(--space-sm) 0 0;
+  font-weight: 500;
+}
+
+/* ── PRINT GRID ── */
 .kn-print-grid {
   columns: 3;
-  column-gap: clamp(0.5rem, 1vw, 1rem);
-  padding: 0 clamp(1.5rem, 5vw, 5rem) clamp(4rem, 8vw, 8rem);
+  column-gap: clamp(var(--space-xs), 1vw, var(--space-sm));
+  margin-top: var(--space-xl);
 }
 
 .kn-print-item {
   break-inside: avoid;
-  margin-bottom: clamp(0.5rem, 1vw, 1rem);
+  margin-bottom: clamp(var(--space-xs), 1vw, var(--space-sm));
   cursor: pointer;
   opacity: 0;
   transform: translateY(16px);
@@ -302,7 +743,78 @@
 
 /* ── MOBILE ── */
 @media (max-width: 768px) {
-  .kn-hero        { padding: 1.5rem 1.25rem; }
-  .kn-meta        { gap: 1.25rem 2rem; }
-  .kn-print-grid  { columns: 2; padding: 0 1.25rem 4rem; }
+  .kn-nav {
+    height: 48px;
+    padding: 0 1rem;
+  }
+
+  .kn-nav__content {
+    gap: 1rem;
+  }
+
+  .kn-nav__title {
+    font-size: 0.95rem;
+  }
+
+  .kn-nav__links {
+    gap: 1rem;
+  }
+
+  .kn-nav a {
+    font-size: 10px;
+  }
+
+  .kn-hero        { padding: var(--space-md) var(--space-sm); }
+  .kn-meta        { gap: var(--space-sm) var(--space-lg); }
+
+  .kn-section {
+    padding: 0 var(--space-sm) clamp(3rem, 6vw, 4rem);
+  }
+
+  .kn-section:first-of-type {
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .kn-brief {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .kn-brief__column {
+    padding: var(--space-md);
+    border-left-width: 2px;
+  }
+
+  .kn-pillars {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .kn-platform-links {
+    grid-template-columns: 1fr;
+    margin: var(--space-lg) 0;
+  }
+
+  .kn-platform-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-sm);
+  }
+
+  .kn-platform-cta {
+    margin-left: 0;
+  }
+
+  .kn-highlights-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kn-stats {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .kn-print-grid {
+    columns: 2;
+  }
 }

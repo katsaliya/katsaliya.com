@@ -1,433 +1,1096 @@
-/* ══════════════════════════════════════════
-   WORK PAGE
-   ══════════════════════════════════════════ */
-#page-work { background: var(--page-bg); }
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORK PAGE STYLES — Responsive design for hero and project cards
+   This file controls layout, colors, typography, and animations for the work page
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* 1440px Figma canvas scaled by scripts/work.js. */
+/* ─── CUSTOM FONTS ─── */
+
+
+/* Import Jellyka font file and register it so CSS can use font-family: 'Jellyka' */
+@font-face {
+  /* Name this font so we reference it in CSS */
+  font-family: 'Jellyka Saint-Andrews Queen';
+  /* Load the font file from the public/fonts folder */
+  src: url('/fonts/jellyka-saint-andrews-queen.ttf') format('truetype');
+  /* Font weight: 400 = regular/normal weight (not bold) */
+  font-weight: 400;
+  /* Font style: normal = not italic */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Datatype';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Datatype-Regular.ttf') format('truetype');
+}
+
+/* Local Be Vietnam Pro fonts */
+/* Self-hosted fonts for better performance and control */
+
+@font-face {
+  font-family: 'Be Vietnam';
+  src: url('/fonts/BeVietnamPro-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Be Vietnam';
+  src: url('/fonts/BeVietnamPro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Be Vietnam';
+  src: url('/fonts/BeVietnamPro-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* ─── ROOT VARIABLES ─── */
+/* CSS variables store reusable values (colors, sizes, etc.) */
+/* Use them like: color: var(--work-teal); */
+:root {
+  /* Primary accent color for the work page (bright teal) */
+  /* Used for emphasis text, borders, hover states */
+  /* TO CHANGE: Replace #00A2C6 with any hex color (e.g., #FF6B6B for red) */
+  --work-teal: #00A2C6;
+
+  /* Main text color (almost black) */
+  /* Used for body text, headings, etc. */
+  /* TO CHANGE: Replace #000000 with different color for text */
+  --work-black: #000000;
+
+  /* Secondary/muted text color (medium gray) */
+  /* Used for less important text like CTAs or metadata */
+  /* TO CHANGE: Replace #83847F with different gray */
+  --work-gray: #83847F;
+
+  /* Decorative border color (teal with transparency) */
+  /* Used for the dashed line under hero name */
+  /* rgba(0, 162, 198, 0.54) = teal at 54% opacity */
+  /* TO CHANGE: Adjust the 0.54 value (higher = more opaque, lower = more transparent) */
+  --work-border: rgba(0, 162, 198, 0.54);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGE LAYOUT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Work page container */
+#page-work {
+  /* Background color for entire page */
+  /* TO CHANGE: Replace #FFFFFF with any color (e.g., #F5F5F5 for light gray) */
+  background: #FFFFFF;
+  /* Full page width */
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NAV-SCRIPT STYLING
+   (The "Kataliya!" text that appears when scrolling)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NAV LINKS STYLING (WORK/ABOUT/PLAY/CONTACT on right side)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Make navbar visible on work page */
+#page-work .main-nav {
+  border-bottom: 1px solid #e2e2e2;
+  background: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORK STAGE & CANVAS (Container divs)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Outer container for all work page content */
 .work-stage {
+  /* Full width of viewport */
   width: 100%;
-  max-width: 1440px;
+  /* No margin (don't center) */
   margin: 0 auto;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-  transform: translateZ(0); /* promote to GPU layer so clipping is composited */
-  contain: layout;
+  /* Show all overflow content (don't hide) */
+  overflow: visible;
 }
+
+/* Inner canvas container (removed from old scaled layout) */
 .work-canvas {
+  /* Position relative allows absolute/fixed children to position relative to this */
   position: relative;
-  width: 1440px;
-  transform: scale(var(--work-scale, 1));
-  transform-origin: top left;
-  will-change: transform;
-  backface-visibility: hidden; /* prevents unnecessary repaints during scale */
-}
-
-.face-hero {
-  text-align: center;
-  padding: 30px 0 30px;
-  max-width: 913px;
-  margin: 0 auto;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.face-pre {
-  position: relative;
-  font-family: 'Courier Prime Code', monospace;
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--black);
-  letter-spacing: -0.1em;
-  line-height: 39px;
-  animation: fadeUp 0.6s ease both;
-  animation-delay: 0.05s;
-}
-.face-name {
-  position: relative;
-  font-family: 'Kapakana', cursive;
-  font-size: 4rem;
-  color: var(--teal);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 0.1rem 0 0.8rem;
-  animation: fadeUp 0.6s ease both;
-  animation-delay: 0.15s;
-}
-.face-bio {
-  position: relative;
-  font-family: 'Courier Prime Code', monospace;
-  font-size: 1.25rem;
-  letter-spacing: -0.1em;
-  line-height: 25px;
-  color: var(--black);
-  padding: 0 15rem;
-  animation: fadeUp 0.6s ease both;
-  animation-delay: 1s;
-}
-.face-type__static {
-  visibility: hidden;
-}
-
-/* Grid wrapper for single-line elements (face-pre, face-name).
-   Both layers share the same grid cell so they're always co-located.
-   The cell is sized by the static layer (full text), so the typing layer
-   starts at the exact left edge of the final text — no measurement needed. */
-.face-type__line-wrapper {
-  display: inline-grid;
-}
-.face-type__line-wrapper > * {
-  grid-area: 1 / 1;
-}
-
-.face-type__typing {
-  box-sizing: border-box;
-  pointer-events: none;
-  text-align: left;
-}
-.face-type__typing--line {
-  white-space: nowrap;
-}
-.face-type__typing--bio {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: auto;
-  white-space: normal;
-  text-align: center;
-}
-.type-cursor {
-  display: inline-block;
-  width: 0.45em;
-  margin-left: 0.04em;
-  border-right: 2px solid currentColor;
-  animation: typeCursorBlink 0.85s steps(1) infinite;
-  vertical-align: baseline;
-}
-@keyframes typeCursorBlink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-/* ── CARDS SECTION ─────────────────────────── */
-.cards-section {
-  --card-gap: 24px;
-  padding: 0 129px 80px;
-  margin-top: var(--cards-top, 60px); /* ← change this to move the whole grid up/down */
-}
-
-.row-label {
-  text-align: center;
-  font-family: 'Afacad Flux', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.22);
-  pointer-events: none;
-  margin-bottom: 28px;
-  opacity: 0;
-  transform: translateY(28px);
-}
-.row-label.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-
-/* Two-column layout — equal gap on all sides */
-.cards-layout {
-  display: flex;
-  gap: var(--card-gap);
-  align-items: flex-start;
-}
-
-.cards-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--card-gap);
-  flex: 1; /* fills remaining width */
-}
-
-.cards-col--right {
-  flex: 0 0 var(--card-width, 373px); /* fixed at the right-column card width */
-}
-
-/* Sub-row inside left column (steady + maisonid) */
-.card-row {
-  display: flex;
-  gap: var(--card-gap);
-}
-.card-row .project-card {
-  flex: 1;      /* share the left column width equally */
-  width: auto;  /* override fixed --card-width */
-}
-
-.project-card {
-  position: relative;
-  width: var(--card-width);
-  height: var(--card-height);
-  flex-shrink: 0;
-  background: var(--card-bg);
-  overflow: hidden;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  /* entrance state — becomes visible via IntersectionObserver */
-  opacity: 0;
-  transform: translateY(28px);
-}
-.project-card.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-.project-card.is-visible {
-  transition: opacity 0.55s ease, transform 0.55s ease,
-              box-shadow 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-.project-card.is-visible:hover {
-  transform: scale(0.97);
-  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-.coming-soon-popup {
-  position: fixed;
-  transform: translateY(calc(-100% - 14px));
-  background: rgba(0, 0, 0, 0.78);
-  color: #fff;
-  font-family: 'Courier Prime Code', monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.45rem 1rem;
-  border-radius: 3px;
-  pointer-events: none;
-  z-index: 10;
-  white-space: nowrap;
-  animation: popup-fade 1.5s ease forwards;
-}
-@keyframes popup-fade {
-  0%   { opacity: 0; transform: translateY(calc(-100% - 20px)); }
-  12%  { opacity: 1; transform: translateY(calc(-100% - 14px)); }
-  72%  { opacity: 1; transform: translateY(calc(-100% - 14px)); }
-  100% { opacity: 0; transform: translateY(calc(-100% - 14px)); }
-}
-.project-card__media {
-  flex: 0 0 auto;
-  position: relative;
-  margin: var(--media-top) var(--media-side) 0;
-  height: var(--media-height);
-  background: var(--media-bg, #ffffff);
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.project-card__media img {
-  position: absolute;
-  inset: 0;
+  /* Full width */
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  /* No scaling (old Figma canvas used: transform: scale()) */
+  transform: none;
+  /* Don't wait for transform changes (old optimization for scaled canvas) */
+  will-change: auto;
 }
-.project-card__media--bluecore {
-  background: white;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO SECTION — Large introduction area at top
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Hero section container */
+.face-hero {
+  /* Position relative allows absolute children to position relative to this */
+  position: relative;
+  /* Full page width */
+  width: 100%;
+
+  /* Padding: top/bottom and left/right */
+  /* First value = vertical (top & bottom) padding */
+  /* clamp(2rem, 8vw, 4rem) = responsive top/bottom padding */
+  /* Second value = horizontal (left & right) padding */
+  /* clamp(1.5rem, 5vw, 5.25rem) = responsive left/right padding that aligns with nav-script */
+  /* TO CHANGE: Adjust values to add/remove breathing room around hero content */
+  /* padding: clamp(2rem, 8vw, 4rem) clamp(1.5rem, 5vw, 5.25rem); */
+  padding: 0 clamp(5rem, 2.5vw, 3rem);
+
+  /* Background color (white) */
+  /* TO CHANGE: Replace #FFFFFF with any color (e.g., #F9F9F9 for off-white) */
+  background: #FFFFFF;
+
+  /* Display as flex container */
+  /* Allows child elements to stack vertically */
+  display: flex;
+
+  /* Stack items vertically (top to bottom) */
+  flex-direction: column;
+
+  /* Space between child elements */
+  /* clamp(2rem, 6vw, 4rem) = responsive gap between intro/name/description 
+  gap: clamp(2rem, 6vw, 4rem);*/
+
+  /* Minimum height: taller on desktop, shorter on mobile */
+  /* clamp(600px, 80vh, 1024px) = min 600px, preferred 80% viewport height, max 1024px */
+  /* This makes the hero section take up most of the initial screen view */
+  /* TO CHANGE: Increase first value to make hero taller on small screens 
+  min-height: clamp(600px, 80vh, 1024px);*/
+
+  /* Vertical alignment of items inside */
+  /* 'center' centers items, 'flex-start' aligns to top, 'flex-end' aligns to bottom */
+  /* This centers the content vertically within the min-height space */
+  /* TO CHANGE: Use 'flex-start' to align all content to top */
+  justify-content: center;
+  align-items: center;
+  /* No top margin - hero starts right below navbar */
+  /* Navbar is sticky/fixed at top, so no gap needed */
+  margin-top: 0;
+}
+
+/* ─── Hero Intro Text: "Hello, I'm" ─── */
+.work-hero__intro {
+  /* Font: Be Vietnam Light (same as intro) */
+  font-family: 'Be Vietnam', sans-serif;
+
+  /* Use Light weight for elegant, refined look */
+  font-weight: 300;
+
+  /* Font size with responsive scaling */
+  /* clamp(0.95rem, 1.5vw, 1.2rem) = responsive body text size */
+  /* TO CHANGE: Make bigger for easier reading on mobile (e.g., clamp(1rem, 1.8vw, 1.3rem)) */
+  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+
+  /* Line height for readability of body text */
+  /* 1.7 = spacious (good for longer paragraphs) */
+  /* TO CHANGE: Use 1.5 for tighter spacing, 1.9 for very spacious */
+  line-height: 1.7;
+
+  /* Tight letter spacing */
+  letter-spacing: -0.01em;
+
+  /* Text color */
+  color: var(--work-black);
+
+  /* Text color */
+  color: var(--work-black);
+
+}
+
+/* ─── Hero Name: "Kataliya Sungkamee" with Typewriter Effect ─── */
+.work-hero__name {
+  /* Display as inline-block to contain cursor */
+  display: inline-block;
+
+  /* Font family: Jellyka (decorative script font) for English */
+  font-family: 'Be Vietnam Pro', sans-serif;
+
+  /* Font weight: 150 = very thin/light */
+  /* This font looks best when thin to avoid looking too heavy */
+  font-weight: 300;
+
+  /* Large, responsive font size */
+  /* clamp(3rem, 12vw, 4.5rem) = scales with viewport (gets bigger on bigger screens) */
+  /* TO CHANGE: Make it bigger with clamp(4rem, 15vw, 5.5rem), smaller with clamp(2.5rem, 10vw, 4rem) */
+  font-size: clamp(3rem, 12vw, 4.5rem);
+
+  /* Fixed line height for layout stability across scripts */
+  line-height: 1.1;
+
+  /* Text color (black) */
+  color: var(--work-black);
+
+  /* Margin: top and bottom spacing */
+  margin: clamp(0.5rem, 2vw, 1rem) 0;
+
+  /* Position relative for cursor positioning */
+  position: relative;
+
+  /* Ensure text stays visible */
+  overflow: visible;
+} 
+
+/* Typewriter cursor styling */
+.typewriter-cursor {
+  /* Thin vertical bar cursor */
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  background-color: var(--work-black);
+  vertical-align: top;
+
+  /* Smooth transition between solid and blinking states */
+  transition: opacity 0.2s ease;
+}
+
+/* Solid cursor state (while typing or deleting) */
+.typewriter-cursor.solid {
+  opacity: 1;
+  animation: none;
+}
+
+/* Blinking cursor state (during pauses) */
+.typewriter-cursor.blinking {
+  opacity: 1;
+  animation: blinkCursor 1s steps(2) infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Accessibility: screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-cursor {
+    animation: none;
+    opacity: 1;
+  }
+
+  .typewriter-text {
+    /* Show static English name only */
+    font-family: 'Be Vietnam', sans-serif;
+  }
+}
+
+/* ─── Bio Text Container ─── */
+.work-hero__bios {
+  /* Display as flex for vertical stacking */
+  display: flex;
+
+  /* Stack items vertically */
+  flex-direction: column;
+
+  /* Space between bio paragraphs */
+  /* clamp(1.5rem, 3vw, 2rem) = responsive gap between paragraphs */
+  /* TO CHANGE: Increase for more separation */
+  gap: clamp(1.5rem, 3vw, 2rem);
+
+  /* Maximum width for the text (ensures readability) */
+  /* min(100%, 900px) = use full width, but no wider than 900px */
+  /* This keeps text from getting too wide on very large screens */
+  /* TO CHANGE: Adjust 900px to make text narrower (e.g., 750px) or wider (e.g., 1000px) */
+  max-width: min(100%, 900px);
+}
+
+/* ─── Individual Bio Paragraph ─── */
+.work-hero__bio {
+  /* Font: Be Vietnam Light (same as intro) */
+  font-family: 'Be Vietnam', sans-serif;
+
+  /* Use Light weight for elegant, refined look */
+  font-weight: 300;
+
+  /* Font size with responsive scaling */
+  /* clamp(0.95rem, 1.5vw, 1.2rem) = responsive body text size */
+  /* TO CHANGE: Make bigger for easier reading on mobile (e.g., clamp(1rem, 1.8vw, 1.3rem)) */
+  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+
+  /* Line height for readability of body text */
+  /* 1.7 = spacious (good for longer paragraphs) */
+  /* TO CHANGE: Use 1.5 for tighter spacing, 1.9 for very spacious */
+  line-height: 1.7;
+
+  /* Tight letter spacing */
+  letter-spacing: -0.01em;
+
+  /* Text color */
+  color: var(--work-black);
+
+  /* No margin (flex container handles spacing with gap) */
+  margin: 0;
+}
+
+/* Bold text inside bio (emphasized words like "designer and builder") */
+.work-hero__bio em {
+  /* Don't use actual italic style */
+  font-style: normal;
+
+  /* Color: teal accent (draws attention to these words) */
+  /* TO CHANGE: Use var(--work-black) to match surrounding text, or any other color */
+  color: var(--work-teal);
+
+  /* Make bold (heavy weight) */
+  font-weight: 600;
+}
+
+/* Teal-colored text inside bio (like company name) */
+.work-hero__bio .teal {
+  /* Color: teal accent */
+  color: var(--work-teal);
+
+  /* Make bold */
+  font-weight: 600;
+}
+
+/* ─── CTA Text: "Check out my works 🡓" ─── */
+.work-hero__cta {
+  /* Font: Be Vietnam (consistent with bio text) */
+  font-family: 'Be Vietnam', sans-serif;
+
+  /* Font size: smaller than body text */
+  /* clamp(0.8rem, 1.2vw, 1rem) = responsive size */
+  /* TO CHANGE: Increase values to make CTA more prominent */
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+
+  /* Line height */
+  line-height: 1.5;
+
+  /* Text color: gray (less prominent than body text) */
+  /* TO CHANGE: Use var(--work-black) to make more bold/visible */
+  color: var(--work-gray);
+
+  /* Tight letter spacing */
+  letter-spacing: -0.01em;
+
+  /* Space above CTA (separates it from bio text) */
+  /* clamp(2rem, 4vw, 3rem) = responsive margin top */
+  /* TO CHANGE: Increase to push CTA further down */
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROJECT CARDS SECTION
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Cards section container */
+.cards-section {
+  /* CSS variable for gap between cards (masonry columns and card rows) */
+  --card-gap: clamp(0.75rem, 1.5vw, 1rem);
+
+  /* Padding: top/bottom and left/right */
+  /* First two values = top (2-4rem) and bottom (3-6rem) padding */
+  /* Last value = left/right padding (matches hero content) */
+  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 5vw, 5.25rem) clamp(3rem, 8vw, 6rem);
+
+}
+
+/* ─── Masonry Grid Layout ─── */
+.masonry-grid {
+  /* Flex layout for columns */
+  display: flex;
+
+  /* Gap between columns */
+  gap: var(--card-gap);
+
+  /* Align columns at top */
+  align-items: flex-start;
+
+  /* Full width */
+  width: 100%;
+
+  /* No padding or margin */
+  margin: 0;
   padding: 0;
 }
 
-.project-card__body {
-  flex: 1;
-  margin-top: var(--body-gap);
-  padding: 0 var(--card-side, 0) var(--body-bottom);
+/* Individual masonry column */
+.masonry-column {
+  /* Stack cards vertically */
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  min-height: 0;
-  box-sizing: border-box;
-}
-.project-card--textonly .project-card__body {
-  margin-top: 0;
-  padding-top: var(--body-top);
-}
-.card-title {
-  font-family: 'Courier Prime Code', monospace;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--card-text);
-  text-transform: lowercase;
-  letter-spacing: 0;
-}
-.card-desc {
-  font-family: 'Courier Prime Code', monospace;
-  font-size: 15px;
-  line-height: 19px;
-  letter-spacing: -0.04em;
-  color: var(--card-text);
+
+  /* Gap between cards (uses CSS variable defined in .cards-section) */
+  gap: var(--card-gap);
+
+  /* Flex: equal width columns */
   flex: 1;
+
+  /* Min width to prevent zero-width on narrow screens */
+  min-width: 0;
 }
-.card-desc em {
-  font-style: italic;
-  color: inherit;
-}
-.card-role {
-  font-family: '42dot Sans', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 300;
-  color: rgba(29,33,41,0.6);
-}
-.card-tags {
+
+/* ─── Individual Project Card ─── */
+.project-card {
+  /* Position relative allows absolute children */
+  position: relative;
+
+  /* Include padding in width calculation (better sizing) */
+  box-sizing: border-box;
+
+  /* Stack content vertically */
   display: flex;
-  flex-wrap: nowrap;
-  gap: 0.35rem;
-  margin-top: auto;
-  align-self: flex-end;
-  justify-content: flex-end;
-  text-align: right;
+  flex-direction: column;
+
+  /* Gap between media and title */
+  gap: clamp(0.5rem, 1vw, 0.75rem);
+
+  /* Fully visible by default (entrance animation removed for now) */
+  opacity: 1;
+  transform: translateY(0);
+
+  /* Smooth transitions for hover */
+  transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.3s ease,
+              transform 0.3s ease;
+
+  /* Show pointer cursor on hover (indicates clickable) */
+  cursor: pointer;
+
+  /* Background color: transparent (media and title have their own backgrounds) */
+  background: transparent;
+  
+}
+
+/* When intersection observer detects card in viewport, add "is-visible" class */
+.project-card.is-visible {
+  /* Class still exists for future fade animations */
+}
+
+/* Hover effect when mouse hovers over card */
+/* Only the overlay fade on media section - no card lift or border glow */
+.project-card:hover {
+  /* No visual changes to the card itself */
+  /* Overlay fade handled separately in .project-card:hover .project-card__overlay */
+}
+
+/* ─── Card Media Area: Fills entire top, edge-to-edge ─── */
+.project-card__media {
+  /* Position relative for overlay */
+  position: relative;
+
+  /* Fill entire width */
   width: 100%;
+
+  /* No margin or padding */
+  margin: 0;
+  padding: 0;
+
+  /* Allow ribbon to extend beyond edges */
+  overflow: visible;
+
+  /* Include padding in size calculations */
+  box-sizing: border-box;
+
+  /* Rounded corners on all sides */
+  border-radius: 3px;
+
+  /* Thin black border at 10% opacity */
+  border: 0.5px solid rgba(0, 0, 0, 0.31);
+
+  /* Use flexbox to center media if needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Background fallback if media fails to load */
+  background: #f0f4fa;
+
+  /* Height determined by media's natural aspect ratio */
+  /* No fixed height - let media dictate the height */
 }
-.card-tags span {
-  font-family: '42dot Sans', sans-serif;
-  font-size: 20px;
+
+/* Images and videos inside card media */
+.project-card__media img,
+.project-card__media video {
+  /* Display as block to avoid inline spacing */
+  display: block;
+
+  /* Width: fill container width */
+  width: 100%;
+
+  /* Height: auto to preserve aspect ratio */
+  height: auto;
+
+  /* No object-fit needed since we're using natural aspect ratio */
+}
+
+/* ─── Ribbon: Award badge on top-right corner ─── */
+.project-card__ribbon {
+  /* Position absolutely over media */
+  position: absolute;
+  top: -50px;
+  left: -90px;
+
+  /* Size for the ribbon - super small corner badge */
+  width: 175px;
+  height: 175px;
+
+  /* Cover the full area */
+  object-fit: cover;
+
+  /* Ensure it appears above other content */
+  z-index: 10;
+
+  /* Don't intercept clicks */
+  pointer-events: none;
+}
+
+/* ─── Hover Overlay: Fades in over media ─── */
+.project-card__overlay {
+  /* Overlay positioned absolutely over media */
+  position: absolute;
+  inset: 0;
+
+  /* Semi-transparent dark background */
+  background: rgba(0, 0, 0, 0.593);
+
+  /* Starting state: invisible and not interactive */
+  opacity: 0;
+  pointer-events: none;
+
+  /* Smooth fade transition */
+  transition: opacity 0.3s ease, pointer-events 0.3s ease;
+
+  /* Flex layout for positioning content */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Show overlay on card hover */
+.project-card:hover .project-card__overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Overlay description text */
+.project-card__overlay-desc {
+  /* Font: Be Vietnam */
+  font-family: 'Datatype', sans-serif;
+  /* Font size: smaller than body */
+  font-size: clamp(1rem, 1vw, 0.95rem);
+  /* Line height for readability */
+  line-height: 1.5;
+
+  /* Text color: white */
+  color: #ffffff;
+
+  /* Margin: no default spacing */
+  margin: 0;
+
+  /* Flex shrink to make room for buttons */
+  flex-shrink: 0;
+
+  /* Center the text */
+  text-align: center;
+
+  /* Preserve line breaks in the text */
+  white-space: pre-line;
+}
+
+/* Top-right: Link arrow button */
+.project-card__overlay-link {
+  /* Position at top-right */
+  position: absolute;
+  top: clamp(0.75rem, 2vw, 1rem);
+  right: clamp(0.75rem, 2vw, 1rem);
+
+  /* Minimal button styling */
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+
+  /* Cursor pointer */
+  cursor: pointer;
+
+  /* Padding for hit area */
+  padding: 0.5rem;
+
+  /* No outline */
+  outline: none;
+
+  /* Smooth hover transition */
+  transition: opacity 0.2s ease;
+}
+
+.project-card__overlay-link:hover {
+  opacity: 0.7;
+}
+
+/* Bottom-left: Quick view button */
+.project-card__overlay-quickview {
+  /* Position at bottom-left */
+  position: absolute;
+  bottom: clamp(0.75rem, 2vw, 1rem);
+  left: clamp(0.75rem, 2vw, 1rem);
+
+  /* Minimal button styling */
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-family: 'Be Vietnam', sans-serif;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
   font-weight: 500;
-  letter-spacing: -0.07em;
-  color: rgba(90,90,90,0.53);
-  background: rgba(0,0,0,0.08);
-  padding: 0.1rem 0.4rem;
+
+  /* Cursor pointer */
+  cursor: pointer;
+
+  /* Padding for hit area */
+  padding: 0.5rem 0;
+
+  /* No outline */
+  outline: none;
+
+  /* Smooth hover transition */
+  transition: opacity 0.2s ease;
+
+  /* Uppercase styling */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.project-card__overlay-quickview:hover {
+  opacity: 0.7;
+}
+
+/* ─── Title Strip: Fixed height, separate from media ─── */
+.project-card__title {
+  /* Fixed height for consistent layout */
+  height: 30px;
+
+  /* Padding inside title area 
+  padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1rem, 2vw, 1.5rem);*/
+
+  /* Flex: center vertically */
+  display: flex;
+  align-items: center;
+
+  /* Background: white with subtle border */
+  background: #ffffff;
+  /* Don't shrink */
+  flex-shrink: 0;
+}
+
+.project-card__title h3 {
+  /* Font: Be Vietnam */
+  font-family: 'Datatype', sans-serif;
+
+  /* Font size */
+  font-size: clamp(0.5rem, 1.0vw, 0.9rem);
+
+  /* Font weight: semi-bold */
+  font-weight: 300;
+
+  /* Text color */
+  color: var(--work-black);
+
+  /* Letter spacing */
+  letter-spacing: -0.01em;
+
+  /* No margin */
+  margin: 0;
+
+  /* Truncate text if too long */
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+
+  /* Line height for proper vertical centering */
+  line-height: 1.4;
 }
 
-.project-card--bluecore {
-  --card-width: 775px;
-  --card-height: 538px;
-  --card-bg: rgba(225,236,255,0.68);
-  --media-top: 39px;
-  --media-side: 36px;
-  --media-height: 311px;
-  --body-gap: 30px;
-  --card-side: 36px;
-  --body-bottom: 12px;
-}
-.project-card--known {
-  --card-width: 373px;
-  --card-height: 498px;
-  --card-bg: rgba(146,12,0,0.18);
-  --media-top: 20px;
-  --media-side: 30px;
-  --media-height: 297px;
-  --body-gap: 36px;
-  --card-side: 30px;
-  --body-bottom: 12px;
-}
-.project-card--steady {
-  --card-width: 378px;
-  --card-height: 498px;
-  --card-bg: rgba(51,72,92,0.24);
-  --media-top: 19px;
-  --media-side: 17px;
-  --media-height: 326px;
-  --body-gap: 13px;
-  --card-side: 17px;
-  --body-bottom: 12px;
-}
-.project-card--maisonid {
-  --card-width: 378px;
-  --card-height: 498px;
-  --card-bg: #F2F0EA;
-  --media-top: 19px;
-  --media-side: 18px;
-  --media-height: 314px;
-  --body-gap: 18px;
-  --card-side: 18px;
-  --body-bottom: 12px;
-}
-.project-card--aidentity {
-  --card-width: 373px;
-  --card-height: 538px;
-  --card-bg: rgba(117,2,79,0.24);
-  --media-top: 20px;
-  --media-side: 30px;
-  --media-height: 297px;
-  --body-gap: 18px;
-  --card-side: 30px;
-  --body-bottom: 12px;
-}
-.project-card--hci {
-  --card-left: 129px;
-  --card-top: 1752px;
-  --card-width: 378px;
-  --card-height: 517px;
-  --card-bg: #F2F0EA;
-  --body-top: 16px;
-  --card-side: 16px;
-  --body-bottom: 16px;
-}
-.project-card--gatoraid {
-  --card-left: 744px;
-  --card-top: 1752px;
-  --card-width: 556px;
-  --card-height: 556px;
-  --card-bg: #F2F0EA;
-  --body-top: 16px;
-  --card-side: 16px;
-  --body-bottom: 16px;
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUICK VIEW MODAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Modal backdrop: dimmed background covering entire screen */
+.quick-view-modal-backdrop {
+  /* Fixed positioning covering full screen */
+  position: fixed;
+  inset: 0;
+
+  /* Semi-transparent dark background */
+  background: rgba(0, 0, 0, 0.7);
+
+  /* Flex layout for centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* High z-index: above all page content */
+  z-index: 2000;
+
+  /* Smooth fade-in transition */
+  animation: fadeIn 0.3s ease;
 }
 
+/* Modal container */
+.quick-view-modal {
+  /* Position relative for close button positioning */
+  position: relative;
+
+  /* Max width for content */
+  max-width: clamp(400px, 90vw, 900px);
+
+  /* Max height for screen (leave room for close button) */
+  max-height: 85vh;
+
+  /* Background: white */
+  background: #ffffff;
+
+  /* Rounded corners */
+  border-radius: 12px;
+
+  /* Overflow: hidden to clip content behind border-radius */
+  overflow: hidden;
+
+  /* Box shadow for depth */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  /* Smooth scale-in animation */
+  animation: scaleIn 0.3s ease;
+}
+
+/* Close button */
+.quick-view-modal__close {
+  /* Absolute position at top-right of modal */
+  position: absolute;
+  top: clamp(1rem, 3vw, 1.5rem);
+  right: clamp(1rem, 3vw, 1.5rem);
+
+  /* Minimal styling */
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Padding for hit area */
+  padding: 0.5rem;
+
+  /* Outline */
+  outline: none;
+
+  /* Smooth hover */
+  transition: opacity 0.2s ease;
+
+  /* Z-index above modal content */
+  z-index: 2001;
+}
+
+.quick-view-modal__close:hover {
+  opacity: 0.7;
+}
+
+/* Modal content wrapper */
+.quick-view-modal__content {
+  /* Flex layout */
+  display: flex;
+  flex-direction: column;
+
+  /* Responsive gap */
+  gap: clamp(1.5rem, 4vw, 2rem);
+
+  /* Padding (top padding accounts for close button) */
+  padding: clamp(3.5rem, 5vw, 4.5rem) clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3rem);
+
+  /* Max height and scrolling */
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+/* Media preview inside modal */
+.quick-view-modal__media {
+  /* Responsive height */
+  height: clamp(300px, 50vh, 600px);
+
+  /* Background fallback */
+  background: #f0f4fa;
+
+  /* Rounded corners */
+  border-radius: 8px;
+
+  /* Flex: center content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Hide overflow */
+  overflow: hidden;
+}
+
+.quick-view-modal__media img,
+.quick-view-modal__media video {
+  /* Fill container */
+  width: 100%;
+  height: 100%;
+
+  /* Fit without distortion */
+  object-fit: contain;
+
+  /* Display as block */
+  display: block;
+}
+
+/* Text content in modal */
+.quick-view-modal__text {
+  /* Stack vertically */
+  display: flex;
+  flex-direction: column;
+
+  /* Gap between elements */
+  gap: 1rem;
+}
+
+.quick-view-modal__text h2 {
+  /* Font: Be Vietnam */
+  font-family: 'Be Vietnam', sans-serif;
+
+  /* Font size */
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+
+  /* Font weight: bold */
+  font-weight: 700;
+
+  /* Text color */
+  color: var(--work-black);
+
+  /* Letter spacing */
+  letter-spacing: -0.01em;
+
+  /* No margin */
+  margin: 0;
+}
+
+.quick-view-modal__text p {
+  /* Font: Be Vietnam */
+  font-family: 'Be Vietnam', sans-serif;
+
+  /* Font size */
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+
+  /* Line height for readability */
+  line-height: 1.7;
+
+  /* Letter spacing */
+  letter-spacing: -0.01em;
+
+  /* Text color */
+  color: var(--work-black);
+
+  /* No margin */
+  margin: 0;
+}
+
+/* Modal fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal scale-in animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMING SOON POPUP
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Popup that appears when clicking "coming soon" cards */
+.coming-soon-popup {
+  /* Fixed positioning at click location */
+  position: fixed;
+
+  /* Position above click point */
+  /* calc(-100% - 14px) = move up by 100% of popup height plus 14px gap */
+  transform: translateY(calc(-100% - 14px));
+
+  /* Background: dark transparent */
+  background: rgba(0, 0, 0, 0.78);
+
+  /* Text color: white */
+  color: #fff;
+
+  /* Font: Be Vietnam */
+  font-family: 'Be Vietnam', sans-serif;
+
+  /* Small text size */
+  font-size: 0.85rem;
+
+  /* Letter spacing */
+  letter-spacing: 0.05em;
+
+  /* Uppercase text */
+  text-transform: uppercase;
+
+  /* Internal padding */
+  padding: 0.5rem 1rem;
+
+  /* Rounded corners */
+  border-radius: 6px;
+
+  /* Don't respond to clicks (let them pass through) */
+  pointer-events: none;
+
+  /* High z-index: appear above everything */
+  z-index: 1000;
+
+  /* Don't wrap text */
+  white-space: nowrap;
+
+  /* Fade-out animation */
+  animation: popupFade 1.5s ease forwards;
+}
+
+/* Popup fade animation: appear, stay, disappear */
+@keyframes popupFade {
+  0% { /* Start: invisible and lower */
+    opacity: 0;
+    transform: translateY(calc(-100% - 20px));
+  }
+  12% { /* Quickly fade in */
+    opacity: 1;
+    transform: translateY(calc(-100% - 14px));
+  }
+  72% { /* Stay visible for most of animation */
+    opacity: 1;
+    transform: translateY(calc(-100% - 14px));
+  }
+  100% { /* Fade out */
+    opacity: 0;
+    transform: translateY(calc(-100% - 14px));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Fade up animation (used by cards and labels) */
+@keyframes fadeUp {
+  from { /* Start state */
+    opacity: 0; /* Invisible */
+    transform: translateY(20px); /* Shifted down 20px */
+  }
+  to { /* End state */
+    opacity: 1; /* Fully visible */
+    transform: translateY(0); /* In normal position */
+  }
+}
+
+/* Hero fade up animation */
+.face-hero {
+  animation: fadeUp 0.6s ease both 0.2s;
+}
+
+/* Intro text fade up animation */
+.work-hero__intro {
+  animation: fadeUp 0.5s ease both 0.3s;
+}
+
+/* Name fade up animation */
+.work-hero__name {
+  animation: fadeUp 0.5s ease both 0.4s;
+}
+
+/* Bios fade up animation */
+.work-hero__bios {
+  animation: fadeUp 0.5s ease both 0.5s;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Medium screens: adjust spacing and layout */
 @media (max-width: 900px) {
-  .work-stage { overflow: visible; }
-  .work-canvas {
-    width: 100%;
-    padding: clamp(3rem, 8vw, 5.5rem) clamp(0.75rem, 4vw, 1rem) 2rem;
-    transform: none;
-  }
+  /* Hero section adjustments for tablets */
   .face-hero {
-    padding: clamp(1.25rem, 4vw, 2rem) 0 clamp(1.5rem, 4vw, 2.5rem);
-    max-width: 100%;
+    /* Reduce padding on sides */
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    /* Don't force minimum height */
+    min-height: auto;
+    /* Reduce gap between elements */
+    gap: clamp(1.5rem, 4vw, 2.5rem);
   }
-  .face-pre {
-    font-size: clamp(1rem, 3.5vw, 1.35rem);
-    line-height: 1.4;
+}
+
+/* Medium screens: adjust spacing and layout */
+@media (max-width: 768px) {
+  /* Hero section adjustments for tablets */
+  .face-hero {
+    /* Reduce padding on sides */
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    /* Don't force minimum height */
+    min-height: auto;
+    /* Reduce gap between elements */
+    gap: clamp(1.5rem, 4vw, 2.5rem);
   }
-  .face-name {
-    font-size: clamp(2.2rem, 9vw, 3.6rem);
+}
+
+/* Small screens: significant adjustments for mobile */
+@media (max-width: 480px) {
+  /* Nav links smaller and tighter */
+  #page-work .nav-links {
+    /* Reduce spacing between links */
+    gap: 0.75rem;
   }
-  .face-bio {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-    line-height: 1.5;
-    padding: 0 clamp(0.25rem, 2vw, 0.5rem);
+
+  /* Cards section tighter padding */
+  .cards-section {
+    padding: clamp(1.5rem, 4vw, 2rem);
   }
-  .face-type__typing { padding: 0 clamp(0.25rem, 2vw, 0.5rem); }
-  .cards-section { padding: 0 0.75rem 2rem; margin-top: 2rem; }
-  .cards-layout { flex-direction: column; }
-  .cards-col--right { flex: 1; width: 100%; }
-  .project-card { width: 100%; height: auto; min-height: 0; padding: 1rem; }
-  .card-row .project-card { flex: 1; }
-  .project-card__media {
-    margin: 0 0 1rem;
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 10;
+
+  /* Cards shorter on mobile */
+  .project-card {
+    min-height: 320px;
   }
-  .project-card__media--bluecore {
-    padding: 0;
-  }
-  .project-card__media img { object-fit: contain; }
-  .project-card__body {
-    margin-top: 0;
-    padding: 0;
-    min-height: 0;
-  }
-  .project-card--textonly .project-card__body {
-    padding: 0;
-  }
-  .card-desc {
-    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
-    line-height: 1.4;
-  }
-  .card-tags span {
-    font-size: clamp(0.75rem, 2vw, 0.9rem);
-  }
-  .row-label { display: none; }
 }

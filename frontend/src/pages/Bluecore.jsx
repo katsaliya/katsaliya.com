@@ -1,13 +1,43 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   BLUECORE.JSX — Case Study Page
+
+   BlueCore is a voice-first maritime documentation tool case study page.
+   Features a sticky section navigation that highlights as the user scrolls
+   through research, design process, and key insights.
+
+   Key interactions:
+   - Sticky section navigation with smooth scroll-to-section
+   - Hero text that fades out and nav title fades in as you scroll
+   - Banner with drag-to-scroll (mouse + touch)
+   - Entrance animations for sections and banner
+   - PhotoRow component for side-by-side images
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Import React hooks for state and DOM manipulation */
 import { useEffect, useRef, useState, useCallback } from 'react'
+
+/* Import Link for internal navigation (not used in case study, but available) */
 import { Link } from 'react-router-dom'
+
+/* Import global navigation component */
 import Nav from '../components/Nav'
+
+/* Import page footer component */
 import Footer from '../components/Footer'
+
+/* Import 3D animated wireframe orb component */
 import LogoOrb from '../components/LogoOrb'
+
+/* Import page-specific styles */
 import '../styles/bluecore.css'
 
+/* ─── SECTION IDENTIFIERS ─── */
+/* Array of section IDs that appear on page (used for navigation and scrollspy) */
 const SECTIONS = ['context','problem','research','process','solution','nextsteps','takeaways','learnmore']
 
-/* ── Orb SVG (wireframe rings, Figma "OrbLogo") ── */
+/* ─── REUSABLE COMPONENTS ─── */
+
+/* Orb SVG component: renders wireframe rings (used in demos) */
 function OrbRings({ color = '#E7F1FF', size = 290, className = '', style }) {
   return (
     <svg width={size} height={size} viewBox="0 0 290 290" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className={className} style={style}>
@@ -21,18 +51,27 @@ function OrbRings({ color = '#E7F1FF', size = 290, className = '', style }) {
   )
 }
 
-/* ── Phone frame (simplified for feature sections) ── */
+/* Phone demo component: displays app mockup with decorative orb rings */
+/* Props: screenImg (screenshot path), screenColor (gradient color) */
 function PhoneDemo({ screenImg, screenColor = '#0c1a35' }) {
   return (
     <div className="bc-demo-card">
+      {/* Glow effect behind phone */}
       <div className="bc-demo-glow" />
+
+      {/* Small decorative orb rings */}
       <OrbRings color="#4B82C3" size={290} className="bc-demo-orb bc-demo-orb--small" />
+
+      {/* Phone frame container */}
       <div className="bc-demo-phone">
+        {/* Phone bezel image */}
         <img
           className="bc-phone-frame-img"
           src="/images/assets/phone-frame.png"
           alt=""
         />
+
+        {/* Screen content (image or placeholder gradient) */}
         <div className="bc-demo-screen">
           {screenImg
             ? <img src={screenImg} alt="" />
@@ -40,15 +79,33 @@ function PhoneDemo({ screenImg, screenColor = '#0c1a35' }) {
           }
         </div>
       </div>
+
+      {/* Large decorative orb rings */}
       <OrbRings color="#4B82C3" size={323} className="bc-demo-orb bc-demo-orb--large" />
     </div>
   )
 }
 
+/* ─────────────────────────────────────────────────────────────────────
+   BLUECORE CASE STUDY PAGE
+   ───────────────────────────────────────────────────────────────────── */
 export default function Bluecore() {
-  const sidenavRef      = useRef(null)
-  const bannerFrameRef  = useRef(null)
+  /* ─── REFS FOR TRACKING SCROLL & ELEMENTS ─── */
+  /* Banner element for drag-to-scroll detection */
+  const bannerFrameRef = useRef(null)
+
+  /* Hero section to detect when it scrolls out of view */
+  const heroRef = useRef(null)
+
+  /* Section navigation for scroll position detection */
+  const navRef = useRef(null)
+
+  /* ─── STATE ─── */
+  /* Currently active section (for nav highlight) */
   const [activeSection, setActiveSection] = useState('context')
+
+  /* Whether hero has scrolled out of view (shows nav title when true) */
+  const [navIsSticky, setNavIsSticky] = useState(false)
 
   useEffect(() => {
     document.body.className = 'page-light-body page-case-study'
@@ -58,13 +115,8 @@ export default function Bluecore() {
 
   /* ── Scrollspy: highlight whichever section's label has passed the nav anchor ── */
   useEffect(() => {
-    const getNavTop = () => {
-      const first = sidenavRef.current?.querySelector('a')
-      return first ? first.getBoundingClientRect().top : 30
-    }
-
     const onScroll = () => {
-      const navTop = getNavTop()
+      const navTop = navRef.current?.getBoundingClientRect().bottom ?? 100
       let current = SECTIONS[0]
       for (const id of SECTIONS) {
         const label = document.querySelector(`#${id} .bc-label`)
@@ -72,6 +124,10 @@ export default function Bluecore() {
         if (label.getBoundingClientRect().top <= navTop + 4) current = id
       }
       setActiveSection(current)
+
+      // Check if hero is out of view to show nav title
+      const heroBottom = heroRef.current?.getBoundingClientRect().bottom ?? 0
+      setNavIsSticky(heroBottom < 20)
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -138,12 +194,12 @@ export default function Bluecore() {
     return () => observer.disconnect()
   }, [])
 
-  /* ── Click: scroll so the section's bc-label aligns with the CONTEXT line ── */
+  /* ── Click: scroll so the section's bc-label aligns with the nav ── */
   const handleNavClick = useCallback((e, id) => {
     e.preventDefault()
     const label = document.querySelector(`#${id} .bc-label`)
     if (!label) return
-    const navTop  = sidenavRef.current?.querySelector('a')?.getBoundingClientRect().top ?? 30
+    const navTop = navRef.current?.getBoundingClientRect().bottom ?? 100
     const labelTop = label.getBoundingClientRect().top
     window.scrollTo({ top: window.scrollY + labelTop - navTop, behavior: 'smooth' })
     setActiveSection(id)
@@ -152,13 +208,14 @@ export default function Bluecore() {
   return (
     <>
       <div className="site-wrapper">
+        {/* Page nav-script: K.Sun logo */}
+        <div className="page-nav-script">K.Sun</div>
+
         <Nav />
         <main className="bc-page">
 
           {/* ── HERO ── */}
-
-          <div className="bc-hero">
-            <Link to="/" className="bc-hero-back">← back to work</Link>
+          <div className="bc-hero" ref={heroRef}>
             <div className="bc-awards">
               <span className="bc-award">🥇 1st Place @ SF HACKS 2026</span>
               <span className="bc-award">🥇 1st Place @ SFSU&rsquo;S STUDENT AI AWARDS 2026</span>
@@ -196,18 +253,17 @@ export default function Bluecore() {
             </div>
           </div>
 
-          {/* ── BODY: sidebar + content ── */}
-          <div className="bc-body-layout">
-
-            {/* Sidebar nav */}
-            <aside className="bc-sidebar">
-              <nav className="bc-sidenav" ref={sidenavRef}>
+          {/* ── SECTION NAVIGATION ── */}
+          <nav className={`bc-nav ${navIsSticky ? 'is-sticky' : ''}`} ref={navRef}>
+            <div className="bc-nav__content">
+              <div className="bc-nav__title">BlueCore</div>
+              <div className="bc-nav__links">
                 {[
                   ['context',   'CONTEXT'],
-                  ['problem',   'THE PROBLEM'],
-                  ['research',  'THE RESEARCH'],
-                  ['process',   'PROCESS + KEY INSIGHTS'],
-                  ['solution',  'THE SOLUTION'],
+                  ['problem',   'PROBLEM'],
+                  ['research',  'RESEARCH'],
+                  ['process',   'PROCESS'],
+                  ['solution',  'SOLUTION'],
                   ['nextsteps', 'NEXT STEPS'],
                   ['takeaways', 'TAKEAWAYS'],
                   ['learnmore', 'LEARN MORE'],
@@ -219,14 +275,12 @@ export default function Bluecore() {
                     onClick={e => handleNavClick(e, id)}
                   >{label}</a>
                 ))}
-              </nav>
-              <Link to="/" className="bc-back-link">← BACK</Link>
-            </aside>
+              </div>
+            </div>
+          </nav>
 
-            <div className="bc-divider" />
-
-            {/* ── SECTIONS ── */}
-            <div className="bc-sections">
+          {/* ── SECTIONS ── */}
+          <div className="bc-sections">
 
               {/* CONTEXT */}
               <section id="context" className="bc-section">
@@ -578,7 +632,11 @@ export default function Bluecore() {
               </section>
 
             </div>{/* end bc-sections */}
-          </div>{/* end bc-body-layout */}
+
+          {/* ── BACK LINK ── */}
+          <div className="bc-footer-link">
+            <Link to="/" className="bc-back-link">← back to work</Link>
+          </div>
 
         </main>
         <Footer />

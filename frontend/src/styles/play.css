@@ -1,70 +1,104 @@
-/* ══════════════════════════════════════════
-   PLAY PAGE
-   ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   PLAY.CSS — Experimental Playground Page
+
+   Playful page with decorative blurred background gradient and placeholder
+   content. Designed as a creative sandbox for future experiments and projects.
+
+   Features:
+   - Fixed blurred gradient background ("play-blush")
+   - Centered placeholder content with "Coming Soon!" message
+   - Transparent nav and footer to show background
+   - Large responsive typography with cursive "Coming Soon!" text
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Page background: transparent to show gradient behind */
 #page-play { background: transparent; position: relative; }
+
+/* Page body elements: transparent to show background gradient */
 .page-play-body,
-.page-play-body .site-wrapper,
-.page-play-body .main-nav { background: transparent; }
+.page-play-body .site-wrapper { background: transparent; }
 
+/* ─── BACKGROUND EFFECT ─── */
+
+/* Fixed blurred gradient background: decorative "blush" gradient */
+/* Creates a soft, dreamy aesthetic with deep pink-to-white gradient */
 .play-blush {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
+  position: fixed;  /* Fixed to viewport (doesn't scroll) */
+  inset: 0;  /* Cover entire viewport */
+  z-index: 0;  /* Behind all content */
   background: radial-gradient(
-    ellipse 80% 70% at 50% 50%,
-    #F2C4CE 0%,
-    #F5D5DD 40%,
-    #F9E8ED 70%,
-    #FDF2F4 100%
+    ellipse 80% 70% at 50% 50%,  /* Elliptical gradient centered on page */
+    #F2C4CE 0%,    /* Deep pink at center */
+    #F5D5DD 40%,   /* Medium pink */
+    #F9E8ED 70%,   /* Light pink */
+    #FDF2F4 100%   /* Very light pink at edges */
   );
-  filter: blur(100px);
-  transform: scale(1.08);
-  pointer-events: none;
+  filter: blur(100px);  /* Heavy blur for soft effect */
+  transform: scale(1.08);  /* Slightly larger to avoid edge artifacts */
+  pointer-events: none;  /* Don't intercept clicks */
 }
 
+/* ─── MAIN CONTENT ─── */
+
+/* Main content container: centered, full height */
 .play-inner {
-  position: relative;
-  z-index: 1;
-  min-height: calc(100vh - 120px);
-  display: flex;
+  position: relative;  /* Positioning context */
+  z-index: 1;  /* Above background gradient */
+  min-height: calc(100vh - 120px);  /* Full height minus nav and footer */
+  display: flex;  /* Flex layout for centering */
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: center;  /* Horizontally center content */
+  justify-content: center;  /* Vertically center content */
 }
 
+/* Intro section: centered text */
 .play-intro { text-align: center; }
+
+/* Sandbox welcome label: subtle, blurred text */
 .play-sandbox-label {
-  font-family: 'Courier Prime Code', monospace;
-  font-size: clamp(2rem, 6vw, 4.5rem);
+  font-family: 'Courier Prime Code', monospace;  /* Monospace label font */
+  font-size: clamp(2rem, 6vw, 4.5rem);  /* Responsive from 2rem to 4.5rem */
   color: var(--black);
-  line-height: 1;
-  filter: blur(6px);
-  opacity: 0.35;
+  line-height: 1;  /* Tight line height */
+  filter: blur(6px);  /* Slight blur for soft look */
+  opacity: 0.35;  /* Very transparent (barely visible) */
   display: inline-block;
-  pointer-events: none;
-  user-select: none;
-  padding-bottom: 1rem;
+  pointer-events: none;  /* Don't intercept clicks */
+  user-select: none;  /* Don't select text on interaction */
+  padding-bottom: 1rem;  /* Space below label */
 }
 
+/* Main placeholder text: "Coming Soon!" */
 .play-coming-soon {
-  font-family: 'Kapakana', cursive;
-  font-size: clamp(3rem, 9vw, 7rem);
-  color: var(--teal);
+  font-family: 'Kapakana', cursive;  /* Cursive font for playful look */
+  font-size: clamp(3rem, 9vw, 7rem);  /* Large responsive size */
+  color: var(--teal);  /* Brand teal color */
   text-align: center;
   letter-spacing: 0;
   line-height: 1;
   position: relative;
-  z-index: 1;
+  z-index: 1;  /* Above background */
 }
 
+/* Page footer: transparent background */
 .page-play .site-footer {
   position: relative;
-  z-index: 1;
-  background: transparent;
+  z-index: 1;  /* Above background */
+  background: transparent;  /* Show background behind */
 }
 
+/* ─────────────────────────────────────────
+   PLAY PAGE NAV STYLING (from work page)
+   ───────────────────────────────────────── */
+
+#page-play .main-nav {
+  border-bottom: 1px solid #e2e2e2;
+  background: #ffffff;
+}
+
+/* Mobile responsive: adjust text sizes */
 @media (max-width: 900px) {
   .play-inner { min-height: calc(100vh - 120px); }
-  .play-sandbox-label { font-size: 2.5rem; }
-  .play-coming-soon { font-size: 4.5rem; }
+  .play-sandbox-label { font-size: 2.5rem; }  /* Smaller on mobile */
+  .play-coming-soon { font-size: 4.5rem; }  /* Smaller on mobile */
 }

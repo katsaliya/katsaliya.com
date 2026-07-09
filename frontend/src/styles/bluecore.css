@@ -1,70 +1,202 @@
-/* ══════════════════════════════════════════
-   BLUECORE CASE STUDY — DESIGN SYSTEM
-   ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   BLUECORE.CSS — Case Study Page Design System
 
-:root {
-  --bc-blue:       #4B82C3;
-  --bc-navy:       #1E334C;
-  --bc-light-blue: #95C5FF;
-  --bc-pale-blue:  rgba(149, 197, 255, 0.1);
-  --bc-border:     #DCECFF;
-  --bc-highlight:  #D5E8FF;
-  --bc-card-bg:    #FFFFFF;
-  --bc-card-border: #E6E6E6;
-  --bc-text:       #000000;
-  --bc-muted:      #959494;
-  --bc-link:       #0D8CE8;
+   Comprehensive styling for the BlueCore case study page including:
+   - Design tokens (colors, spacing, shadows)
+   - Navigation (sticky section nav with active states)
+   - Hero, banner, and section layouts
+   - Card-based content patterns
+   - Entrance animations
+   - Responsive design using clamp() for fluid scaling
 
-  --bc-content-left: 200px;                        /* divider x position */
-  --bc-content-pad:  clamp(1.5rem, 4vw, 5.25rem); /* padding from divider to content */
-  --bc-inset:        clamp(1.5rem, 5vw, 5rem);     /* inner page breathing room */
+   Design Tokens:
+   - Colors: BlueCore's palette (deep navy, electric blue, light variants)
+   - Spacing: Clamp-based responsive padding (8px to 5rem scale)
+   - Typography: Headings (Afacad Flux), body (Be Vietnam Pro), labels (Datatype)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Datatype';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Datatype-Regular.ttf') format('truetype');
 }
 
-/* ── NAV OVERRIDE: not sticky on case study pages ── */
+/* Root CSS variables: colors, spacing, layout dimensions */
+:root {
+  /* Color Palette: BlueCore's brand colors */
+  --bc-blue:        #4B82C3;  /* Primary accent (electric blue) */
+  --bc-navy:        #1E334C;  /* Dark text, deep backgrounds */
+  --bc-light-blue:  #95C5FF;  /* Lighter accent for hover states */
+  --bc-pale-blue:   rgba(149, 197, 255, 0.1);  /* Subtle background overlay */
+  --bc-border:      #DCECFF;  /* Light dividers and borders */
+  --bc-highlight:   #D5E8FF;  /* Selection and emphasis */
+  --bc-card-bg:     #FFFFFF;  /* Card backgrounds (white) */
+  --bc-card-border: #E6E6E6;  /* Subtle card borders */
+  --bc-text:        #000000;  /* Primary text color */
+  --bc-muted:       #959494;  /* Disabled/secondary text */
+  --bc-link:        #0D8CE8;  /* Hyperlink color */
+
+  /* Spacing & Layout */
+  --bc-content-left: 200px;  /* Left sidebar width (not used in current layout) */
+  --bc-content-pad:  clamp(1.5rem, 4vw, 5.25rem);  /* Padding from content divider */
+  --bc-inset:        clamp(1.5rem, 5vw, 5rem);  /* Page edge padding (responsive) */
+}
+
+/* ─── MAIN NAVIGATION OVERRIDE ─── */
+/* Case study pages don't use sticky main nav, only sticky section nav */
 .page-case-study .main-nav {
-  position: relative;
+  position: relative;  /* No sticky positioning on case study */
   top: auto;
 }
 
-/* ── PAGE WRAPPER ──────────────────────────── */
+/* ─── SECTION NAVIGATION (sticky) ─── */
+/* Sticky navigation that remains visible while scrolling through sections */
+/* Highlights the current section based on scroll position */
+.bc-nav {
+  position: sticky;  /* Sticks to top of page */
+  top: 0;  /* Distance from top when sticky */
+  z-index: 49;  /* Above page content, below modals */
+  background: var(--bc-card-bg);  /* White background */
+  border-bottom: 1px solid var(--bc-border);  /* Subtle divider */
+  padding: 0 var(--bc-inset);  /* Horizontal padding matching page edges */
+  margin: 0;
+  line-height: 1;  /* Tight line-height for compact nav */
+  height: 48px;  /* Fixed height for consistent layout */
+  display: flex;  /* Flex layout for alignment */
+  align-items: center;  /* Vertically center items */
+}
+
+/* Container for nav title and links */
+/* Centered layout with max-width to constrain to page width */
+.bc-nav__content {
+  display: flex;  /* Flex layout for horizontal alignment */
+  align-items: center;  /* Vertically center items */
+  gap: clamp(2rem, 5vw, 3rem);  /* Responsive spacing between title and links */
+  max-width: 1440px;  /* Match page max-width */
+  margin: 0 auto;  /* Center within nav */
+  height: 100%;
+  width: 100%;
+}
+
+/* Nav title: "BlueCore" (hidden until hero scrolls out of view) */
+.bc-nav__title {
+  font-family: 'Unbounded', sans-serif;  /* Bold sans-serif for case study title */
+  font-weight: 600;  /* Semi-bold weight */
+  font-size: clamp(0.95rem, 1.6vw, 1.2rem);  /* Responsive from 0.95rem to 1.2rem */
+  letter-spacing: -0.03em;  /* Slightly tighter letter spacing */
+  color: var(--bc-blue);  /* BlueCore blue */
+  white-space: nowrap;  /* Don't wrap title */
+  flex-shrink: 0;  /* Don't compress when space is tight */
+  padding: 0;
+  margin: 0;
+  opacity: 0;  /* Hidden by default */
+  transition: opacity 0.2s ease;  /* Fade-in/out transition */
+  pointer-events: none;  /* Can't click hidden title */
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* When hero is scrolled out of view, show the nav title */
+.bc-nav.is-sticky .bc-nav__title {
+  opacity: 1;  /* Visible */
+  pointer-events: auto;  /* Can interact with visible title */
+}
+
+/* Section links container (scrollable on mobile) */
+.bc-nav__links {
+  display: flex;  /* Horizontal layout */
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 1.5rem);  /* Responsive gap between links */
+  overflow-x: auto;  /* Allow horizontal scrolling on mobile */
+  overflow-y: hidden;  /* No vertical scrolling */
+  scrollbar-width: none;  /* Hide scrollbar (Firefox) */
+  flex: 1;  /* Take remaining space */
+  height: 100%;
+}
+/* Hide scrollbar (Chrome/Safari) */
+.bc-nav__links::-webkit-scrollbar { display: none; }
+
+/* Individual section link */
+.bc-nav a {
+  font-family: 'Datatype', monospace;  /* Monospace for labels */
+  font-size: 11px;  /* Small label size */
+  letter-spacing: 0.1em;  /* Spaced letter-case */
+  text-transform: uppercase;  /* All caps */
+  color: rgba(75, 130, 195, 0.6);  /* Muted blue (semi-transparent) */
+  text-decoration: none;  /* No underline */
+  white-space: nowrap;  /* Don't wrap labels */
+  flex-shrink: 0;  /* Don't compress links */
+  padding: 0;
+  transition: color 0.2s ease;  /* Smooth color transition on hover */
+  border-bottom: 2px solid transparent;  /* Indicator line (hidden by default) */
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Hover and active state: highlight with color and underline */
+.bc-nav a:hover,
+.bc-nav a.active {
+  color: var(--bc-blue);  /* Solid blue on hover/active */
+  border-bottom-color: var(--bc-blue);  /* Show indicator line */
+}
+
+/* ─── PAGE WRAPPER ─── */
+/* Main case study page container with centered layout */
 .bc-page {
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: #FFFFFF;
+  max-width: 1440px;  /* Constrain to readable width */
+  margin: 0 auto;  /* Center horizontally */
+  min-height: 100vh;  /* Full viewport height minimum */
+  background: #FFFFFF;  /* White background */
   position: relative;
 }
 
-/* ── ENTRANCE ANIMATION ────────────────────── */
+/* ─── ENTRANCE ANIMATIONS ─── */
+/* Fade-up animation: used for hero, sections, and content */
+/* Creates a staggered entrance effect as user scrolls */
 @keyframes bcFadeUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;  /* Start invisible */
+    transform: translateY(22px);  /* Start 22px lower */
+  }
+  to {
+    opacity: 1;  /* End fully visible */
+    transform: translateY(0);  /* End at normal position */
+  }
 }
 
-/* ── HERO (above banner) ───────────────────── */
+/* ─── HERO SECTION (above banner) ─── */
+/* Top section with title, awards, description, and meta information */
 .bc-hero {
-  padding: clamp(2rem, 5vw, 4rem) var(--bc-inset);
+  padding: clamp(2rem, 5vw, 4rem) var(--bc-inset);  /* Responsive padding */
 }
 
+/* Back link (optional navigation to project list) */
 .bc-hero-back {
   display: inline-block;
-  font-family: 'Courier Prime Code', monospace;
-  font-size: 0.8rem;
-  color: var(--bc-muted);
+  font-family: 'Datatype', monospace;  /* Monospace label */
+  font-size: 0.8rem;  /* Small text */
+  color: var(--bc-muted);  /* Subtle gray */
   text-decoration: none;
-  letter-spacing: 0.04em;
-  margin-bottom: 2rem;
-  transition: color 0.15s;
+  letter-spacing: 0.04em;  /* Slightly spaced */
+  margin-bottom: 2rem;  /* Space below */
+  transition: color 0.15s;  /* Smooth color transition */
 }
+/* Back link on hover becomes blue */
 .bc-hero-back:hover { color: var(--bc-blue); }
 
+/* Awards section: appears first with staggered animation */
 .bc-awards {
-  animation: bcFadeUp 0.5s ease both;
-  animation-delay: 0.05s;
+  animation: bcFadeUp 0.5s ease both;  /* Fade-up animation */
+  animation-delay: 0.05s;  /* Slight delay for stagger */
 }
+
+/* Main case study title (e.g., "BlueCore") */
 .bc-title {
-  animation: bcFadeUp 0.5s ease both;
+  animation: bcFadeUp 0.5s ease both;  /* Fade-up animation */
   animation-delay: 0.15s;
 }
 .bc-description {
@@ -84,7 +216,7 @@
 }
 
 .bc-award {
-  font-family: 'Courier Prime Code', monospace;
+  font-family: 'Datatype', monospace;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -107,7 +239,7 @@
 }
 
 .bc-description {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   line-height: 1.7;
@@ -136,7 +268,7 @@
 }
 
 .bc-meta-label {
-  font-family: 'Courier Prime Code', monospace;
+  font-family: 'Datatype', monospace;
   font-size: 14px;
   letter-spacing: 0.04em;
   color: var(--bc-blue);
@@ -144,7 +276,7 @@
 }
 
 .bc-meta-value {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: 14px;
   color: #000000;
@@ -202,73 +334,31 @@
   pointer-events: none;
 }
 
-/* ── BODY LAYOUT (sidebar + content) ──────── */
-.bc-body-layout {
-  display: flex;
-  align-items: flex-start;
-  min-height: 600px;
-  padding: 0 var(--bc-inset);
-}
-
-.bc-sidebar {
-  width: var(--bc-content-left);
-  flex-shrink: 0;
-  position: sticky;
-  top: 15px;
-  align-self: flex-start;
-  padding-left: 0;
-  padding-top: 15px;
-}
-/* sidebar back-link and sidenav are left-aligned by the body-layout inset */
-
-.bc-sidenav {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.bc-sidenav a {
-  font-family: 'Courier Prime Code', monospace;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 163%;
-  color: var(--bc-muted);
-  text-decoration: none;
-  display: block;
-  transition: color 0.15s;
-}
-.bc-sidenav a:hover,
-.bc-sidenav a.active { color: var(--bc-blue); }
-
-.bc-back-link {
-  display: block;
-  margin-top: 16px;
-  font-family: 'Courier Prime Code', monospace;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 163%;
-  color: var(--bc-muted);
-  text-decoration: none;
-  transition: color 0.15s;
-  text-align: right;
-  padding-right: 12px;
-}
-.bc-back-link:hover { color: var(--bc-blue); }
-
-/* ── DIVIDER ───────────────────────────────── */
-.bc-divider {
-  width: 1px;
-  background: rgba(0, 0, 0, 0.2);
-  align-self: stretch;
-  flex-shrink: 0;
-}
-
 /* ── SECTIONS AREA ─────────────────────────── */
 .bc-sections {
-  flex: 1;
-  min-width: 0;
-  padding: clamp(1.5rem, 3vw, 2.5rem) var(--bc-content-pad) clamp(4rem, 8vw, 8rem);
+  padding: clamp(2rem, 4vw, 3rem) var(--bc-inset) clamp(4rem, 8vw, 8rem);
+  max-width: 1440px;
+  margin: 0 auto;
 }
+
+/* ── BACK LINK ── */
+.bc-footer-link {
+  padding: clamp(3rem, 6vw, 5rem) var(--bc-inset) clamp(2rem, 4vw, 3rem);
+  text-align: left;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.bc-back-link {
+  display: inline-block;
+  font-family: 'Datatype', monospace;
+  font-size: 0.85rem;
+  color: var(--bc-muted);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+}
+.bc-back-link:hover { color: var(--bc-blue); }
 
 /* ── SECTION SHARED STYLES ─────────────────── */
 .bc-section {
@@ -281,7 +371,7 @@
 
 .bc-label {
   display: block;
-  font-family: 'Courier Prime Code', monospace;
+  font-family: 'Datatype', monospace;
   font-weight: 400;
   font-size: 14px;
   line-height: 118.63%;
@@ -307,10 +397,10 @@
 .bc-blue-text { color: var(--bc-light-blue); }
 .bc-navy-text { color: var(--bc-navy); }
 
-/* Feature-specific label (Inter black, distinct from blue bc-label) */
+/* Feature-specific label (Be Vietnam Pro black, distinct from blue bc-label) */
 .bc-feature-label {
   display: block;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 400;
   font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   line-height: 1.6;
@@ -319,7 +409,7 @@
 }
 
 .bc-body-text {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 1.3vw, 1rem);
   line-height: 1.75;
@@ -389,7 +479,7 @@
 }
 
 .bc-research-intro {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: 21px;
   line-height: 29px;
@@ -420,7 +510,7 @@
 }
 
 .bc-research-interviews {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 400;
   font-size: 28px;
   line-height: 38px;
@@ -446,7 +536,7 @@
 }
 
 .bc-stat-and {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 400;
   font-size: 30px;
   line-height: 1.4;
@@ -527,7 +617,7 @@
   margin-top: 16px;
 }
 .bc-devpost-links a {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 500;
   font-size: 12px;
   line-height: 15px;
@@ -537,7 +627,7 @@
 }
 
 .bc-greenwatch-note {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: 17px;
   line-height: 23px;
@@ -552,19 +642,27 @@
 .bc-ki-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  margin: 48px 0 0;
+  gap: clamp(2rem, 4vw, 3rem);
+  margin: clamp(3rem, 6vw, 4rem) 0 0;
 }
 
 .bc-ki-card {
-  background: var(--bc-pale-blue);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 10px;
-  padding: 28px 24px 24px;
+  background: linear-gradient(135deg, var(--bc-pale-blue) 0%, rgba(149, 197, 255, 0.04) 100%);
+  border: 2px solid rgba(75, 130, 195, 0.12);
+  border-radius: 12px;
+  padding: clamp(2rem, 3vw, 2.5rem);
+  transition: all 0.3s ease;
+}
+
+.bc-ki-card:hover {
+  border-color: var(--bc-blue);
+  background: linear-gradient(135deg, rgba(149, 197, 255, 0.12) 0%, rgba(75, 130, 195, 0.06) 100%);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(75, 130, 195, 0.12);
 }
 
 .bc-ki-label {
-  font-family: 'Courier Prime Code', monospace;
+  font-family: 'Datatype', monospace;
   font-weight: 400;
   font-size: 14px;
   line-height: 23px;
@@ -574,7 +672,7 @@
 }
 
 .bc-ki-title {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 400;
   font-size: 27px;
   line-height: 23px;
@@ -584,7 +682,7 @@
 }
 
 .bc-ki-body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: 17px;
   line-height: 23px;
@@ -711,7 +809,7 @@
 }
 .bc-demo-screen--placeholder::after {
   content: 'screen coming soon';
-  font-family: 'Courier Prime Code', monospace;
+  font-family: 'Datatype', monospace;
   font-size: 11px;
   color: rgba(255,255,255,0.3);
   letter-spacing: 0.05em;
@@ -746,7 +844,7 @@
 
 /* ── NEXT STEPS ────────────────────────────── */
 .bc-next-heading {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 600;
   font-size: 40px;
   line-height: 40px;
@@ -777,19 +875,27 @@
 .bc-kt-stack {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  margin-top: 24px;
+  gap: clamp(1.5rem, 2.5vw, 2rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
 }
 
 .bc-kt-card {
-  background: var(--bc-pale-blue);
-  border: 1px solid var(--bc-border);
-  border-radius: 10px;
-  padding: 28px 36px 32px;
+  background: linear-gradient(135deg, var(--bc-pale-blue) 0%, rgba(149, 197, 255, 0.04) 100%);
+  border: 2px solid rgba(75, 130, 195, 0.12);
+  border-radius: 12px;
+  padding: clamp(2rem, 3vw, 2.5rem);
+  transition: all 0.3s ease;
+}
+
+.bc-kt-card:hover {
+  border-color: var(--bc-blue);
+  background: linear-gradient(135deg, rgba(149, 197, 255, 0.12) 0%, rgba(75, 130, 195, 0.06) 100%);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(75, 130, 195, 0.12);
 }
 
 .bc-kt-label {
-  font-family: 'Courier Prime Code', monospace;
+  font-family: 'Datatype', monospace;
   font-weight: 400;
   font-size: 14px;
   line-height: 23px;
@@ -799,7 +905,7 @@
 }
 
 .bc-kt-body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: 300;
   font-size: 17px;
   line-height: 118.63%;
@@ -853,10 +959,20 @@
 .bc-research-display { font-size: clamp(1.3rem, 3.8vw, 54px); }
 .bc-research-interviews { font-size: clamp(1rem, 3vw, 28px); }
 
-/* Tablet – collapse sidebar */
+/* Tablet */
 @media (max-width: 1100px) {
-  .bc-sidebar  { display: none; }
-  .bc-divider  { display: none; }
+  .bc-nav {
+    padding: 0 1rem;
+  }
+
+  .bc-nav__links {
+    gap: 1rem;
+  }
+
+  .bc-nav a {
+    font-size: 10px;
+  }
+
   .bc-sections { padding: 40px clamp(20px, 5vw, 60px); }
 
   .bc-banner-frame { max-width: 100%; }

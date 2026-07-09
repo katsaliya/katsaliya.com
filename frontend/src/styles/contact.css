@@ -1,44 +1,78 @@
-/* ══════════════════════════════════════════
-   CONTACT PAGE
-   ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONTACT.CSS — Contact Page
+
+   Simple two-column contact page with heading, introduction text, and
+   form placeholder area.
+
+   Layout:
+   - Left: Contact heading and introduction text
+   - Right: Form placeholder (ready to be replaced with real form)
+   - Responsive: Stacks vertically on mobile (< 900px)
+   - Centered with max-width constraint and full viewport height
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Page background: white */
 #page-contact { background: var(--white); }
+
+/* Main contact section: two-column grid layout */
 .contact-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  padding: 5rem 3rem;
-  max-width: 1440px;
-  margin: 0 auto;
-  min-height: calc(100vh - 52px);
-  align-items: center;
-}
-.contact-left h2 {
-  font-family: 'Afacad Flux', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-}
-.contact-left p {
-  font-family: '42dot Sans', sans-serif;
-  font-size: 0.88rem;
-  line-height: 1.85;
-  color: var(--gray-dark);
-  font-weight: 300;
-  max-width: 340px;
-}
-.contact-right {
-  background: #E2E2E2;
-  border-radius: 8px;
-  height: 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.82rem;
-  color: var(--gray-mid);
+  display: grid;  /* CSS Grid for responsive columns */
+  grid-template-columns: 1fr 1fr;  /* Two equal columns */
+  gap: clamp(2rem, 6vw, 4rem);  /* Responsive gap between columns */
+  padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 5vw, 4rem);  /* Responsive padding */
+  max-width: 1440px;  /* Match site max-width */
+  margin: 0 auto;  /* Center horizontally */
+  min-height: calc(100vh - 52px);  /* Full viewport height minus nav */
+  align-items: center;  /* Vertically center columns */
 }
 
+/* Left column: heading */
+.contact-left h2 {
+  font-family: 'Afacad Flux', sans-serif;  /* Display font */
+  font-size: 1rem;  /* Standard heading size */
+  font-weight: 500;  /* Medium weight */
+  margin-bottom: 1.5rem;  /* Space below heading */
+}
+
+/* Left column: introduction text */
+.contact-left p {
+  font-family: '42dot Sans', sans-serif;  /* Body font */
+  font-size: 0.88rem;  /* Slightly smaller than body */
+  line-height: 1.85;  /* Spacious line height for readability */
+  color: var(--gray-dark);  /* Dark gray text */
+  font-weight: 300;  /* Light weight for elegant look */
+  max-width: 340px;  /* Limit text width for readability */
+}
+
+/* Right column: form placeholder area */
+.contact-right {
+  background: linear-gradient(135deg, rgba(0, 162, 198, 0.04) 0%, rgba(0, 162, 198, 0.02) 100%);  /* Subtle teal gradient */
+  border: 2px solid rgba(0, 162, 198, 0.12);  /* Teal border with transparency */
+  border-radius: 12px;  /* Rounded corners */
+  height: clamp(260px, 50vw, 380px);  /* Responsive height */
+  display: flex;
+  align-items: center;  /* Center content vertically */
+  justify-content: center;  /* Center content horizontally */
+  font-size: 0.82rem;  /* Small text for placeholder */
+  color: var(--gray-mid);  /* Gray placeholder text */
+  transition: all 0.3s ease;  /* Smooth transition on hover */
+}
+
+/* Form area on hover: enhanced visibility */
+.contact-right:hover {
+  border-color: var(--accent-primary);  /* Teal border becomes more visible */
+  background: linear-gradient(135deg, rgba(0, 162, 198, 0.08) 0%, rgba(0, 162, 198, 0.04) 100%);  /* Slightly more opaque */
+}
+
+/* Mobile responsive: stack vertically instead of side-by-side */
 @media (max-width: 900px) {
-  .contact-body { display: block; padding: 2rem 1rem; }
-  .contact-left p { max-width: none; }
-  .contact-right { height: 260px; margin-top: 2rem; }
+  .contact-body {
+    display: block;  /* Change to block layout */
+    padding: 2rem 1rem;  /* Tighter mobile padding */
+  }
+  .contact-left p { max-width: none; }  /* Full width on mobile */
+  .contact-right {
+    height: 260px;  /* Fixed height on mobile */
+    margin-top: 2rem;  /* Space between sections */
+  }
 }
