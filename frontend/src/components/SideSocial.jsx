@@ -1,90 +1,60 @@
-import { useRef, useCallback, useEffect } from 'react'
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDE SOCIAL.JSX — Social Media Icons Sidebar
 
+   This component displays social media links (Email, LinkedIn, GitHub)
+   fixed on the left side of the page.
+
+   On hover, icon color changes to teal (handled via CSS).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Social media links: Email, LinkedIn, GitHub */
 const LINKS = [
+  /* Email link (opens email client) */
   { href: 'mailto:kataliyasun@gmail.com',                          icon: '/images/email_icon.png',    label: 'Email'    },
+
+  /* LinkedIn link (opens in new tab) */
   { href: 'https://linkedin.com/in/katsaliya', target: '_blank', icon: '/images/linkedin_icon.png', label: 'LinkedIn' },
+
+  /* GitHub link (opens in new tab) */
   { href: 'https://github.com/katsaliya',      target: '_blank', icon: '/images/github_icon.png',   label: 'GitHub'   },
 ]
 
-const MAX_SCALE = 2.2   // peak scale of icon under cursor
-const LERP   = 0.25  // was 0.16 — snappier response
-const RADIUS = 130   // was 110 — slightly wider spread
+/* ─────────────────────────────────────────────────────────────────────
+   COMPONENT
+   ───────────────────────────────────────────────────────────────────── */
 
 export default function SideSocial() {
-  const linkRefs     = useRef([])
-  const targetScales = useRef(LINKS.map(() => 1))
-  const current      = useRef(LINKS.map(() => 1))
-  const rafRef       = useRef(null)
-  const hovering     = useRef(false)
+  /* Magnification animation removed - icons now display statically */
+  /* Only color change on hover (handled in CSS) */
 
-  const animate = useCallback(() => {
-    let settled = true
-    linkRefs.current.forEach((link, i) => {
-      if (!link) return
-      const t    = targetScales.current[i]
-      const next = current.current[i] + (t - current.current[i]) * LERP
-      current.current[i] = next
-      link.style.transform = `scale(${next.toFixed(4)})`
-      /*link.style.transform = `translateX(${((next - 1) * 40).toFixed(2)}px) scale(${next.toFixed(4)})`*/
-      link.style.marginBottom = `${((next - 1) * 12).toFixed(2)}px`
-      if (Math.abs(next - t) > 0.001) settled = false  // was 0.0015
-    })
-
-    rafRef.current = (!settled || hovering.current)
-      ? requestAnimationFrame(animate)
-      : null
-  }, [])
-
-  const startLoop = useCallback(() => {
-    if (!rafRef.current) rafRef.current = requestAnimationFrame(animate)
-  }, [animate])
-
-  const handleMouseMove = useCallback((e) => {
-    hovering.current = true
-    const mouseY = e.clientY
-    linkRefs.current.forEach((link, i) => {
-      if (!link) return
-      const rect = link.getBoundingClientRect()
-      const dist = Math.abs(mouseY - (rect.top + rect.height / 2))
-      targetScales.current[i] = dist < RADIUS
-        ? 1 + (MAX_SCALE - 1) * Math.cos((dist / RADIUS) * (Math.PI / 2))
-        : 1
-    })
-    startLoop()
-  }, [startLoop])
-
-  const handleMouseLeave = useCallback(() => {
-    hovering.current = false
-    targetScales.current = LINKS.map(() => 1)
-    startLoop()
-  }, [startLoop])
-
-  useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current)
-  }, [])
+  /* ─────────────────────────────────────────────────────────────────────
+     RENDER
+     ───────────────────────────────────────────────────────────────────── */
 
   return (
-    <div
-      className="side-social"
-      id="sideSocial"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      {LINKS.map(({ href, target, icon, label }, i) => (
+    /* Container for social icons */
+    /* className="side-social" = CSS styling (fixed on left side) */
+    <div className="side-social" id="sideSocial">
+
+      {/* Loop through each social link and render an icon */}
+      {LINKS.map(({ href, target, icon, label }) => (
+        /* Individual social icon link */
         <a
           key={label}
           href={href}
           target={target}
-          rel={target ? 'noopener noreferrer' : undefined}
+          rel={target ? 'noopener noreferrer' : undefined} /* Security: prevent window.opener access */
           aria-label={label}
-          ref={el => linkRefs.current[i] = el}
         >
+          {/* Icon image using background-image (works with PNG files) */}
+          {/* TO CHANGE: Edit icon colors in shared.css: .side-social__icon { background-color: ... } */}
           <span
             className="side-social__icon"
-            style={{ maskImage: `url(${icon})`, WebkitMaskImage: `url(${icon})` }}
+            style={{ backgroundImage: `url(${icon})` }}
           />
         </a>
       ))}
+
     </div>
   )
 }

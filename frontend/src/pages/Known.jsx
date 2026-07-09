@@ -1,154 +1,173 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
-import Nav from '../components/Nav'
-import Footer from '../components/Footer'
-import ContentRow from '../components/ContentRow'
-import '../styles/known.css'
-import '../styles/content-row.css'
+/* ═══════════════════════════════════════════════════════════════════════════
+   KNOWN.JSX — Case Study Page
 
-/*
-  Drop files into /public/known/<category>/ and add entries here.
-  type: 'video' | 'image' | 'placeholder-video' | 'placeholder-image'
-*/
+   Known is a Series A AI-matchmaking startup's content & marketing case study.
+   Showcases content strategy, print materials, social media campaigns, and
+   TikTok strategy for building brand voice from scratch.
+
+   Key interactions:
+   - Sticky section navigation with smooth scrolling
+   - Lightbox for expanding print material gallery
+   - Entrance animations for sections and gallery items
+   - FeaturedTikToks section with platform links
+   - Responsive gallery of design materials
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Import React hooks for state and lifecycle management */
+import { useEffect, useRef, useState, useCallback } from 'react'
+
+/* Import Link for internal navigation (not used in case study, available for future) */
+import { Link } from 'react-router-dom'
+
+/* Import global navigation component */
+import Nav from '../components/Nav'
+
+/* Import page footer component */
+import Footer from '../components/Footer'
+
+/* Import page-specific styles */
+import '../styles/known.css'
+
+/* ─── SECTION IDENTIFIERS ─── */
+/* Array of section IDs on page (used for scrollspy and navigation) */
+const SECTIONS = ['brief', 'strategy', 'process', 'content', 'materials', 'results']
+
+/* ─── CONTENT DATA ─── */
+
+/* Print materials gallery: images and PDFs for lightbox viewing */
 const PRINT_ITEMS = [
-  // Standalone prints
   { type: 'image', src: '/known/print/flyer-car-show.png',   alt: 'Car Show Flyer' },
   { type: 'image', src: '/known/print/welcome-print.png',    alt: 'Welcome Print' },
-
-  // Always Playing Singles (10)
   ...Array.from({ length: 10 }, (_, i) => ({
     type: 'image', src: `/known/print/aps-${i + 1}.png`, alt: `Always Playing Singles ${i + 1}`,
   })),
-
-  // Blind Match (3)
   ...Array.from({ length: 3 }, (_, i) => ({
     type: 'image', src: `/known/print/blind-match-${i + 1}.png`, alt: `Blind Match ${i + 1}`,
   })),
-
-  // First Date Fund (2)
   ...Array.from({ length: 2 }, (_, i) => ({
     type: 'image', src: `/known/print/first-date-fund-${i + 1}.png`, alt: `First Date Fund ${i + 1}`,
   })),
-
-  // Match & Mixer (4)
   ...Array.from({ length: 4 }, (_, i) => ({
     type: 'image', src: `/known/print/match-mixer-${i + 1}.png`, alt: `Match & Mixer ${i + 1}`,
   })),
-
-  // SF Dating Scene (2)
   ...Array.from({ length: 2 }, (_, i) => ({
     type: 'image', src: `/known/print/sf-dating-${i + 1}.png`, alt: `SF Dating Scene ${i + 1}`,
   })),
-
-  // The Summer I... (4)
   ...Array.from({ length: 4 }, (_, i) => ({
     type: 'image', src: `/known/print/summer-i-${i + 1}.png`, alt: `The Summer I... ${i + 1}`,
   })),
-
-  // PDFs
   { type: 'pdf', src: '/known/print/blind-match.pdf',     alt: 'Blind Match' },
   { type: 'pdf', src: '/known/print/flyer-prints.pdf',    alt: 'Flyer Prints' },
   { type: 'pdf', src: '/known/print/flyer-variation.pdf', alt: 'Flyer Variation' },
   { type: 'pdf', src: '/known/print/magazine-print.pdf',  alt: 'Magazine Print' },
   { type: 'pdf', src: '/known/print/post-2.pdf',          alt: 'Post' },
-
-  // Date cards (10)
   ...Array.from({ length: 10 }, (_, i) => ({
     type: 'image', src: `/known/print/date-card-${i + 1}.png`, alt: `Date Card ${i + 1}`,
   })),
-
-  // Playing cards (5)
   ...Array.from({ length: 5 }, (_, i) => ({
     type: 'image', src: `/known/print/playing-card-${i + 1}.png`, alt: `Playing Card ${i + 1}`,
   })),
 ]
 
-const CONTENT_ROWS = [
+/* Content strategy pillars: three main content approaches */
+/* Each pillar targets specific platforms and marketing goals */
+const STRATEGY_PILLARS = [
   {
-    label: 'DIML — Day in My Life',
-    info: {
-      title: 'Day in My Life',
-      description: 'Behind-the-scenes content following the founder\'s daily routine — raw, unfiltered, and building in public. Each episode captured a different chapter of early-stage startup life.',
-      platform: '@known on TikTok & Instagram',
-      stat: 'avg. 12K views per post',
-    },
-    sections: [
-      { label: '1', startIndex: 0 },
-      { label: '2', startIndex: 3 },
-      { label: '3', startIndex: 6 },
-    ],
-    cards: [
-      { type: 'video', src: '/known/diml/diml-0716.mov', caption: '07.16' },
-      { type: 'video', src: '/known/diml/diml-0722.mov', caption: '07.22' },
-      { type: 'video', src: '/known/diml/diml-0724.mov', caption: '07.24' },
-      { type: 'video', src: '/known/diml/diml-0729.mov', caption: '07.29' },
-      { type: 'video', src: '/known/diml/diml-0730.mov', caption: '07.30' },
-      { type: 'video', src: '/known/diml/diml-0731.mov', caption: '07.31' },
-      { type: 'video', src: '/known/diml/diml-0804.mov', caption: '08.04' },
-      { type: 'video', src: '/known/diml/diml-0819.mov', caption: '08.19' },
-    ],
+    name: 'Day in My Life',
+    goal: 'Humanize the founder, build parasocial trust',
+    platforms: ['TikTok', 'Instagram'],
   },
   {
-    label: 'App',
-    info: {
-      title: 'In-App',
-      description: 'Feature walkthroughs and product highlights shot directly inside the Known app — showing the experience before most people had access to it.',
-      platform: '@known on Instagram',
-      stat: 'placeholder — avg. views per post',
-    },
-    cards: [
-      { type: 'video', src: '/known/app/app-0722.mov', caption: '07.22' },
-      { type: 'video', src: '/known/app/app-0808.mov', caption: '08.08' },
-      { type: 'video', src: '/known/app/app-0813.mov', caption: '08.13' },
-    ],
+    name: 'Founder Series',
+    goal: 'Establish credibility and vision',
+    platforms: ['TikTok', 'Instagram'],
   },
   {
-    label: 'Event Teasers & Recaps',
-    info: {
-      title: 'Events',
-      description: 'Teasers and same-day recaps from Known\'s Bay Area matchmaking events — building anticipation beforehand and capturing the energy after. Content that turned attendees into followers.',
-      platform: '@known on Instagram & LinkedIn',
-      stat: 'placeholder — event attendance growth',
-    },
-    cards: [
-      { type: 'video', src: '/known/events/event-0625.mov',      caption: '06.25 teaser' },
-      { type: 'video', src: '/known/events/event-0714.mov',      caption: '07.14 teaser' },
-      { type: 'video', src: '/known/events/event-0716.mov',      caption: '07.16 teaser' },
-      { type: 'video', src: '/known/events/event-0728.mov',      caption: '07.28 teaser' },
-      { type: 'video', src: '/known/events/dotthebay.mov',       caption: '@DoTheBay' },
-      { type: 'video', src: '/known/events/soft-launch-recap.mov', caption: 'Soft Launch Recap' },
-      { type: 'video', src: '/known/events/linkedin-recap.mov',  caption: 'LinkedIn Recap' },
-      { type: 'video', src: '/known/events/event-recap.mov',     caption: 'Event Recap' },
-    ],
-  },
-  {
-    label: 'Founder-Led Series',
-    info: {
-      title: 'Founder',
-      description: 'A documentary-style series following the founder through the highs and lows of building Known — vision, mission, and the messy middle of early-stage growth.',
-      platform: '@known on LinkedIn & TikTok',
-      stat: 'placeholder — avg. reach per post',
-    },
-    cards: [
-      { type: 'video', src: '/known/founder-series/founder-0801.mov', caption: '08.01' },
-      { type: 'video', src: '/known/founder-series/founder-0811.mov', caption: '08.11' },
-      { type: 'video', src: '/known/founder-series/founder-0818.mov', caption: '08.18' },
-    ],
+    name: 'Events',
+    goal: 'Drive IRL signups and community proof',
+    platforms: ['TikTok', 'Instagram'],
   },
 ]
 
+/* Content creation workflow: steps from brief to iteration */
+const PROCESS_STEPS = [
+  'Brief & platform audit',
+  'Content pillar definition',
+  'Shoot & direct (same-day turnaround)',
+  'Edit in CapCut — music, captions, pacing',
+  'Post, monitor, iterate based on performance',
+]
+
+/* Featured TikTok videos for "Featured Content" section */
+/* TO CHANGE: Replace IDs with actual TikTok video IDs from your account */
+const FEATURED_TIKTOKS = [
+  { id: '7541552580887907615', placeholder: true },
+  { id: '7548243888914353439', placeholder: true },
+  { id: '7520841844310199582', placeholder: true },
+  { id: '7532327613310831903', placeholder: true },
+]
+
+/* ─────────────────────────────────────────────────────────────────────
+   KNOWN CASE STUDY PAGE
+   ───────────────────────────────────────────────────────────────────── */
 export default function Known() {
+  /* ─── REFS FOR TRACKING ELEMENTS ─── */
+  /* Print gallery items for entrance animation observer */
   const printRefs = useRef([])
+
+  /* Section navigation for scroll position tracking */
+  const navRef = useRef(null)
+
+  /* Hero section for detecting scroll-out */
+  const heroRef = useRef(null)
+
+  /* ─── STATE ─── */
+  /* Currently expanded lightbox item (null when closed) */
   const [lightbox, setLightbox] = useState(null)
+
+  /* Currently active section (for nav highlight) */
+  const [activeSection, setActiveSection] = useState('brief')
+
+  /* Whether hero has scrolled out of view (shows nav title when true) */
+  const [navIsSticky, setNavIsSticky] = useState(false)
 
   useEffect(() => {
     document.body.className = 'page-light-body page-case-study'
-    // Delay until after GSAP ScrollTrigger pins have initialised
     const t = setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 50)
     return () => { clearTimeout(t); document.body.className = '' }
   }, [])
 
-  /* Scroll fade-in for print grid items and row info blocks */
+  useEffect(() => {
+    const onScroll = () => {
+      const navTop = navRef.current?.getBoundingClientRect().bottom ?? 100
+      let current = SECTIONS[0]
+      for (const id of SECTIONS) {
+        const label = document.querySelector(`#${id} .kn-label`)
+        if (!label) continue
+        if (label.getBoundingClientRect().top <= navTop + 4) current = id
+      }
+      setActiveSection(current)
+
+      // Check if hero is out of view to show nav logo
+      const heroBottom = heroRef.current?.getBoundingClientRect().bottom ?? 0
+      setNavIsSticky(heroBottom < 20)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const handleNavClick = useCallback((e, id) => {
+    e.preventDefault()
+    const label = document.querySelector(`#${id} .kn-label`)
+    if (!label) return
+    const navTop = navRef.current?.getBoundingClientRect().bottom ?? 100
+    const labelTop = label.getBoundingClientRect().top
+    window.scrollTo({ top: window.scrollY + labelTop - navTop, behavior: 'smooth' })
+    setActiveSection(id)
+  }, [])
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => {
@@ -163,9 +182,9 @@ export default function Known() {
     return () => observer.disconnect()
   }, [])
 
-  /* Lightbox */
-  const openLightbox  = useCallback(item => { setLightbox(item); document.body.style.overflow = 'hidden' }, [])
-  const closeLightbox = useCallback(() => { setLightbox(null); document.body.style.overflow = '' }, [])
+  const openLightbox = (item) => { setLightbox(item); document.body.style.overflow = 'hidden' }
+  const closeLightbox = () => { setLightbox(null); document.body.style.overflow = '' }
+
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') closeLightbox() }
     window.addEventListener('keydown', onKey)
@@ -174,16 +193,18 @@ export default function Known() {
 
   return (
     <div className="site-wrapper">
+      {/* Page nav-script: K.Sun logo */}
+      <div className="page-nav-script">K.Sun</div>
+
       <Nav />
 
       <main className="kn-page">
 
         {/* ── HERO ── */}
-        <div className="kn-hero">
-          <Link to="/" className="kn-back">← back to work</Link>
+        <div className="kn-hero" ref={heroRef}>
+          {/* Back link will be at bottom */}
 
           <div className="kn-hero-layout">
-            {/* Left: text */}
             <div className="kn-hero-text">
               <h1 className="kn-title">Known</h1>
               <p className="kn-description">
@@ -198,7 +219,7 @@ export default function Known() {
                 </div>
                 <div className="kn-meta-item">
                   <span className="kn-meta-label">Tools</span>
-                  <span className="kn-meta-value">CapCut · Canva · Illustrator · Photoshop </span>
+                  <span className="kn-meta-value">CapCut · Canva · Illustrator · Photoshop</span>
                 </div>
                 <div className="kn-meta-item">
                   <span className="kn-meta-label">Timeline</span>
@@ -207,23 +228,139 @@ export default function Known() {
               </div>
             </div>
 
-            {/* Right: video */}
             <div className="kn-hero-video">
               <video src="/images/cards/KnownTV.mp4" autoPlay loop muted playsInline />
             </div>
           </div>
         </div>
 
-        {/* ── HORIZONTAL CONTENT ROWS ── */}
-        {CONTENT_ROWS.map(row => (
-          <ContentRow key={row.label} label={row.label} cards={row.cards} info={row.info} sections={row.sections || []} />
-        ))}
+        {/* ── SECTION NAVIGATION ── */}
+        <nav className={`kn-nav ${navIsSticky ? 'is-sticky' : ''}`} ref={navRef}>
+          <div className="kn-nav__content">
+            <div className="kn-nav__title">Known</div>
+            <div className="kn-nav__links">
+              {[
+                ['brief', 'BRIEF'],
+                ['strategy', 'STRATEGY'],
+                ['process', 'PROCESS'],
+                ['content', 'CONTENT'],
+                ['materials', 'MATERIALS'],
+                ['results', 'RESULTS'],
+              ].map(([id, label]) => (
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  className={activeSection === id ? 'active' : ''}
+                  onClick={e => handleNavClick(e, id)}
+                >{label}</a>
+              ))}
+            </div>
+          </div>
+        </nav>
 
-        {/* ── PRINT & GRAPHICS GRID ── */}
-        <div className="kn-print-header">
-          <p className="kn-section-label">Graphics &amp; Marketing Materials</p>
+        {/* ── BRIEF SECTION ── */}
+        <div id="brief" className="kn-section kn-brief">
+          <span className="kn-label">THE BRIEF</span>
+          <div className="kn-brief__column">
+            <h3 className="kn-brief__label">The Problem</h3>
+            <p className="kn-brief__text">
+              Known had zero social presence pre-launch and needed to build an audience
+              before the product existed. With no budget for paid ads or influencers,
+              organic content strategy was the only lever.
+            </p>
+          </div>
+          <div className="kn-brief__column">
+            <h3 className="kn-brief__label">My Role</h3>
+            <p className="kn-brief__text">
+              Sole content creator, strategist, and graphic designer for 4 months.
+              Shaped the brand voice across TikTok, Instagram, and pitch decks while
+              managing the creative pipeline end-to-end.
+            </p>
+          </div>
         </div>
-        <div className="kn-print-grid">
+
+        {/* ── STRATEGY SECTION ── */}
+        <div id="strategy" className="kn-section kn-strategy">
+          <span className="kn-label">CONTENT ARCHITECTURE</span>
+          <div className="kn-pillars">
+            {STRATEGY_PILLARS.map(pillar => (
+              <div key={pillar.name} className="kn-pillar">
+                <h4 className="kn-pillar__name">{pillar.name}</h4>
+                <p className="kn-pillar__goal">{pillar.goal}</p>
+                <div className="kn-pillar__platforms">
+                  {pillar.platforms.map(p => (
+                    <span key={p} className="kn-pillar__badge">{p}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── PROCESS SECTION ── */}
+        <div id="process" className="kn-section kn-process">
+          <span className="kn-label">WORKFLOW</span>
+          <div className="kn-steps">
+            {PROCESS_STEPS.map((step, i) => (
+              <div key={i} className="kn-step">
+                <span className="kn-step__number">{i + 1}.</span>
+                <span className="kn-step__text">{step}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── FEATURED CONTENT SECTION ── */}
+        <div id="content" className="kn-section kn-featured">
+          <span className="kn-label">FEATURED CONTENT</span>
+
+          <div className="kn-platform-links">
+            <a href="https://www.tiktok.com/@joinknown" target="_blank" rel="noopener noreferrer" className="kn-platform-card">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.1 1.82 2.89 2.89 0 0 1 5.1-1.81V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-3.47v-3.5a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.01-.04z"/>
+              </svg>
+              <div>
+                <p className="kn-platform-name">TikTok</p>
+                <p className="kn-platform-handle">@joinknown</p>
+              </div>
+              <span className="kn-platform-cta">View →</span>
+            </a>
+
+            <a href="https://www.instagram.com/joinknown" target="_blank" rel="noopener noreferrer" className="kn-platform-card">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><circle cx="17.5" cy="6.5" r="1.5"/>
+              </svg>
+              <div>
+                <p className="kn-platform-name">Instagram</p>
+                <p className="kn-platform-handle">@joinknown</p>
+              </div>
+              <span className="kn-platform-cta">View →</span>
+            </a>
+          </div>
+
+          <div className="kn-highlights-grid">
+            {FEATURED_TIKTOKS.map((item, i) => (
+              <a
+                key={i}
+                href={`https://www.tiktok.com/video/${item.id}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="kn-highlight-card"
+              >
+                <div className="kn-highlight-placeholder">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity=".4">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.1 1.82 2.89 2.89 0 0 1 5.1-1.81V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-3.47v-3.5a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.01-.04z"/>
+                  </svg>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* ── GRAPHICS & MARKETING MATERIALS ── */}
+        <div id="materials" className="kn-section">
+          <span className="kn-label">GRAPHICS &amp; MARKETING MATERIALS</span>
+          <div className="kn-print-grid">
           {PRINT_ITEMS.map((item, i) => (
             <div
               key={item.src}
@@ -238,6 +375,26 @@ export default function Known() {
               )}
             </div>
           ))}
+          </div>
+        </div>
+
+        {/* ── PERFORMANCE SECTION ── */}
+        <div id="results" className="kn-section kn-performance">
+          <span className="kn-label">RESULTS</span>
+          <div className="kn-stats">
+            <div className="kn-stat">
+              <p className="kn-stat__value">—</p>
+              <p className="kn-stat__label">views</p>
+            </div>
+            <div className="kn-stat">
+              <p className="kn-stat__value">—</p>
+              <p className="kn-stat__label">followers gained</p>
+            </div>
+            <div className="kn-stat">
+              <p className="kn-stat__value">—</p>
+              <p className="kn-stat__label">events promoted</p>
+            </div>
+          </div>
         </div>
 
         {/* ── LIGHTBOX ── */}
@@ -260,6 +417,11 @@ export default function Known() {
             )}
           </div>
         )}
+
+        {/* ── BACK LINK ── */}
+        <div className="kn-footer-link">
+          <Link to="/" className="kn-back">← back to work</Link>
+        </div>
 
       </main>
 
