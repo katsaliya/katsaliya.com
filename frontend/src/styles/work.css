@@ -82,8 +82,7 @@
 /* Work page container */
 #page-work {
   /* Background color for entire page */
-  /* TO CHANGE: Replace #FFFFFF with any color (e.g., #F5F5F5 for light gray) */
-  background: #FFFFFF;
+  background: var(--white);
   /* Full page width */
   width: 100%;
 }
@@ -99,8 +98,8 @@
 
 /* Make navbar visible on work page */
 #page-work .main-nav {
-  border-bottom: 1px solid #e2e2e2;
-  background: #ffffff;
+  border-bottom: var(--border);
+  background: var(--white);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -137,48 +136,49 @@
 .face-hero {
   /* Position relative allows absolute children to position relative to this */
   position: relative;
-  /* Full page width */
+  /* Full page width (full-bleed background extends edge-to-edge) */
   width: 100%;
+  /* Exact viewport height - no more, no less */
+  height: 100vh;
+  /* Prevent work section pixels from peeking in */
+  overflow: hidden;
 
-  /* Padding: top/bottom and left/right */
-  /* First value = vertical (top & bottom) padding */
-  /* clamp(2rem, 8vw, 4rem) = responsive top/bottom padding */
-  /* Second value = horizontal (left & right) padding */
-  /* clamp(1.5rem, 5vw, 5.25rem) = responsive left/right padding that aligns with nav-script */
-  /* TO CHANGE: Adjust values to add/remove breathing room around hero content */
-  /* padding: clamp(2rem, 8vw, 4rem) clamp(1.5rem, 5vw, 5.25rem); */
-  padding: 0 clamp(5rem, 2.5vw, 3rem);
+  /* Background color (matches new design token) */
+  background: var(--ivory);
 
-  /* Background color (white) */
-  /* TO CHANGE: Replace #FFFFFF with any color (e.g., #F9F9F9 for off-white) */
-  background: #FFFFFF;
-
-  /* Display as flex container */
-  /* Allows child elements to stack vertically */
+  /* Display as flex container for layout */
   display: flex;
 
   /* Stack items vertically (top to bottom) */
   flex-direction: column;
 
-  /* Space between child elements */
-  /* clamp(2rem, 6vw, 4rem) = responsive gap between intro/name/description 
-  gap: clamp(2rem, 6vw, 4rem);*/
+  /* Vertical alignment: space-between keeps content in center, CTA at bottom */
+  justify-content: space-between;
+  align-items: stretch;
 
-  /* Minimum height: taller on desktop, shorter on mobile */
-  /* clamp(600px, 80vh, 1024px) = min 600px, preferred 80% viewport height, max 1024px */
-  /* This makes the hero section take up most of the initial screen view */
-  /* TO CHANGE: Increase first value to make hero taller on small screens 
-  min-height: clamp(600px, 80vh, 1024px);*/
+  /* No margin - hero starts right below navbar */
+  margin-top: 0;
 
-  /* Vertical alignment of items inside */
-  /* 'center' centers items, 'flex-start' aligns to top, 'flex-end' aligns to bottom */
-  /* This centers the content vertically within the min-height space */
-  /* TO CHANGE: Use 'flex-start' to align all content to top */
+  /* Padding for top/bottom spacing (full-bleed background still extends edge-to-edge) */
+  padding: clamp(2rem, 5vw, 3rem) 0;
+
+  /* Stacking context for background motifs and content */
+  z-index: 1;
+}
+
+/* ─── Hero Container (Part 1 container system) ─── */
+.face-hero .container {
+  /* Flex-grow to take available space and center content vertically */
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* No top margin - hero starts right below navbar */
-  /* Navbar is sticky/fixed at top, so no gap needed */
-  margin-top: 0;
+  flex-grow: 1;
+  /* Enable overflow for large content */
+  overflow: visible;
+  /* Relative positioning for stacking context */
+  position: relative;
+  z-index: 2;
 }
 
 /* ─── Hero Intro Text: "Hello, I'm" ─── */
@@ -374,38 +374,169 @@
   font-weight: 600;
 }
 
-/* ─── CTA Text: "Check out my works 🡓" ─── */
-.work-hero__cta {
-  /* Font: Be Vietnam (consistent with bio text) */
+/* ─── Hero Logo Mark (Centered placeholder) ─── */
+.hero-logo-mark {
+  /* Centered at top of hero */
+  width: 56px;
+  height: 62px;
+  margin: 0 auto 28px;
+  opacity: 0.9;
+  /* Ensure it's above background motifs */
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── Hero Background Motifs (Decorative orchids) ─── */
+.hero-bg-motif {
+  /* Absolute positioning for background layer */
+  position: absolute;
+  opacity: 0.85;
+  z-index: 1;
+  /* Ensure they don't interfere with clickable content */
+  pointer-events: none;
+}
+
+.hero-bg-motif--top-right {
+  /* Top-right corner positioning */
+  top: 6%;
+  right: 8%;
+  width: 340px;
+  transform: rotate(6deg);
+}
+
+.hero-bg-motif--bottom-left {
+  /* Bottom-left corner positioning */
+  bottom: 4%;
+  left: 6%;
+  width: 220px;
+  opacity: 0.5;
+  /* Mirrored and rotated */
+  transform: rotate(-14deg) scaleX(-1);
+}
+
+/* ─── Thai Name Caption ─── */
+.hero-thai-caption {
+  /* Cormorant Garamond italic */
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 80;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+/* ─── Main Headline ─── */
+.hero-headline {
+  /* Moderate size, not oversized */
+  font-size: 150px;
+  line-height: 1.1;
+  font-family: 'Jellyka Saint-Andrews Queen';
+  font-weight: 500;
+  letter-spacing: 1.5;
+  color: var(--walnut);
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+/* ─── Body Paragraph ─── */
+.hero-body {
+  /* Constrained width for readability */
+  max-width: 650px;
+  font-size: 16px;
   font-family: 'Be Vietnam', sans-serif;
+  font-weight: 250;
+  line-height: 1.5;
+  color: var(--walnut-soft);
+  margin: 0 auto 40px;
+  text-align: center;
+}
 
-  /* Font size: smaller than body text */
-  /* clamp(0.8rem, 1.2vw, 1rem) = responsive size */
-  /* TO CHANGE: Increase values to make CTA more prominent */
-  font-size: clamp(0.8rem, 1.2vw, 1rem);
+/* ─── Contact Links Row ─── */
+.hero-contact-links {
+  /* Horizontal row layout */
+  display: flex;
+  flex-direction: row;
+  gap: 28px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
 
+.hero-contact-link {
+  /* Link styling */
+  font-size: 17px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -0.5px;
+  color: var(--walnut);
+  text-decoration: none;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.hero-contact-link:hover {
+  /* Hover state: change color and add underline */
+  color: var(--orchid);
+  border-bottom-color: var(--orchid);
+}
+
+/* ─── CTA Text: "Check out my works 🡓" (Scroll Hint) ─── */
+.work-hero__cta {
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -0.5px;
   /* Line height */
   line-height: 1.5;
 
-  /* Text color: gray (less prominent than body text) */
-  /* TO CHANGE: Use var(--work-black) to make more bold/visible */
-  color: var(--work-gray);
+  /* Text color: matches walnut-soft for subtlety */
+  color: var(--jade);
 
   /* Tight letter spacing */
-  letter-spacing: -0.01em;
+  /* Positioned at bottom of hero section */
+  /* Aligned to container padding (matches .container width) */
+  padding: clamp(1.5rem, 3vw, 2rem) var(--container-pad) 0;
 
-  /* Space above CTA (separates it from bio text) */
-  /* clamp(2rem, 4vw, 3rem) = responsive margin top */
-  /* TO CHANGE: Increase to push CTA further down */
-  margin-top: clamp(2rem, 4vw, 3rem);
+  /* Center text horizontally */
+  text-align: center;
+
+  /* Shrink to not push content down */
+  flex-shrink: 0;
+
+  /* Margin reset - padding handles spacing */
+  margin: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PROJECT CARDS SECTION
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Section divider: Wave-and-dot SVG */
+.section-divider {
+  /* Background matches previous section (ivory from hero) */
+  background: var(--ivory);
+  /* Center the SVG */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Padding for spacing around divider */
+  padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 5vw, 5.25rem);
+}
+
+.section-divider svg {
+  /* SVG sizing */
+  width: clamp(160px, 100%, 200px);
+  height: auto;
+  /* Subtle color for divider */
+  opacity: 1;
+}
+
 /* Cards section container */
 .cards-section {
+  /* Matching background color with hero for unified appearance */
+  background: var(--ivory);
+
   /* CSS variable for gap between cards (masonry columns and card rows) */
   --card-gap: clamp(0.75rem, 1.5vw, 1rem);
 
@@ -413,137 +544,249 @@
   /* First two values = top (2-4rem) and bottom (3-6rem) padding */
   /* Last value = left/right padding (matches hero content) */
   padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 5vw, 5.25rem) clamp(3rem, 8vw, 6rem);
-
 }
 
-/* ─── Masonry Grid Layout ─── */
-.masonry-grid {
-  /* Flex layout for columns */
-  display: flex;
-
-  /* Gap between columns */
-  gap: var(--card-gap);
-
-  /* Align columns at top */
-  align-items: flex-start;
-
-  /* Full width */
-  width: 100%;
-
-  /* No padding or margin */
-  margin: 0;
-  padding: 0;
-}
-
-/* Individual masonry column */
-.masonry-column {
-  /* Stack cards vertically */
+/* ─── Single Column Grid Layout (Part 5) ─── */
+.single-column-grid {
+  /* Flex layout for vertical stacking */
   display: flex;
   flex-direction: column;
 
-  /* Gap between cards (uses CSS variable defined in .cards-section) */
-  gap: var(--card-gap);
+  /* Gap between cards: 56px */
+  gap: 56px;
 
-  /* Flex: equal width columns */
-  flex: 1;
-
-  /* Min width to prevent zero-width on narrow screens */
-  min-width: 0;
-}
-
-/* ─── Individual Project Card ─── */
-.project-card {
-  /* Position relative allows absolute children */
-  position: relative;
-
-  /* Include padding in width calculation (better sizing) */
-  box-sizing: border-box;
-
-  /* Stack content vertically */
-  display: flex;
-  flex-direction: column;
-
-  /* Gap between media and title */
-  gap: clamp(0.5rem, 1vw, 0.75rem);
-
-  /* Fully visible by default (entrance animation removed for now) */
-  opacity: 1;
-  transform: translateY(0);
-
-  /* Smooth transitions for hover */
-  transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              border-color 0.3s ease,
-              transform 0.3s ease;
-
-  /* Show pointer cursor on hover (indicates clickable) */
-  cursor: pointer;
-
-  /* Background color: transparent (media and title have their own backgrounds) */
-  background: transparent;
-  
-}
-
-/* When intersection observer detects card in viewport, add "is-visible" class */
-.project-card.is-visible {
-  /* Class still exists for future fade animations */
-}
-
-/* Hover effect when mouse hovers over card */
-/* Only the overlay fade on media section - no card lift or border glow */
-.project-card:hover {
-  /* No visual changes to the card itself */
-  /* Overlay fade handled separately in .project-card:hover .project-card__overlay */
-}
-
-/* ─── Card Media Area: Fills entire top, edge-to-edge ─── */
-.project-card__media {
-  /* Position relative for overlay */
-  position: relative;
-
-  /* Fill entire width */
+  /* Constrained width for better reading */
+  max-width: 720px;
   width: 100%;
-
-  /* No margin or padding */
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
+}
 
-  /* Allow ribbon to extend beyond edges */
+/* Card wrapper for consistent spacing */
+.card-wrapper {
+  width: 100%;
+}
+
+/* ─── Card Shell (Part 5) ─── */
+.card {
+  /* Position relative for absolute children (media-stage contents) */
+  position: relative;
+  /* Rounded corners */
+  border-radius: var(--radius-md);
+  /* Glass background */
+  background: var(--glass-bg);
+  /* Glass border */
+  border: 1px solid var(--glass-border);
+  /* Blur effect */
+  backdrop-filter: blur(10px);
+  /* Subtle shadow */
+  box-shadow: var(--shadow-lg);
+  /* Allow pills/preview to escape bounds */
   overflow: visible;
+  /* Padding inside card */
+  padding: 18px;
+  /* Cursor pointer */
+  cursor: pointer;
+}
 
-  /* Include padding in size calculations */
-  box-sizing: border-box;
+/* Hover state: lift card to higher z-index for stacking */
+.card:hover {
+  z-index: 20;
+}
 
-  /* Rounded corners on all sides */
-  border-radius: 3px;
+/* ─── Media Stage: Container for background, preview, pills, and arrow ─── */
+.media-stage {
+  /* Position relative for absolute children (media, preview, pills, arrow) */
+  position: relative;
+  /* Fixed height for consistent layout */
+  height: 340px;
+  /* Allow pills/preview to extend beyond card bounds */
+  overflow: visible;
+  /* No margin - body padding handles spacing */
+}
 
-  /* Thin black border at 10% opacity */
-  border: 0.5px solid rgba(0, 0, 0, 0.31);
+/* ─── Background Media (scales on hover) ─── */
+.media {
+  /* Absolute positioning to fill media-stage */
+  position: absolute;
+  inset: 0;
+  /* Rounded corners */
+  border-radius: 12px;
+  /* Hide overflow */
+  overflow: hidden;
+  /* Scale from bottom center — grows upward only, bottom edge stays fixed */
+  transform-origin: center bottom;
+  /* Prepare for hover scale transition */
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.6s ease;
+}
 
-  /* Use flexbox to center media if needed */
+.media img,
+.media video {
+  /* Fill container */
+  width: 100%;
+  height: 100%;
+  /* Fit without distortion */
+  object-fit: cover;
+  /* Display as block */
+  display: block;
+}
+
+/* Scale and lift media on card hover */
+.card:hover .media {
+  transform: scale(1.45);
+  box-shadow: 0 30px 70px rgba(43,35,28,0.28);
+  z-index: 5;
+}
+
+/* ─── Tag Pills (hidden at rest, positioned at corners on hover) ─── */
+.card-pill {
+  /* Absolute positioning at center by default */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Transform to center and scale down at rest */
+  transform: translate(-50%, -50%) rotate(0deg) scale(0.4);
+  /* Hidden at rest */
+  opacity: 0;
+  /* Pill styling with ivory background */
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  background: var(--ivory);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  /* Pointer events disabled at rest */
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+  /* Smooth transitions for corner reveal with stagger */
+  transition: left 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+              top 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.35s ease;
+}
+
+/* Pill color variants */
+.card-pill.gold { color: var(--pill-text-gold); }
+.card-pill.jade { color: var(--pill-text-jade); }
+.card-pill.orchid { color: var(--pill-text-orchid); }
+
+/* Pill corner anchors derived from .media's 1.45× scale with center-bottom transform-origin */
+/* Media height: 340px → 493px on hover, so top moves up 153px; width scales ±22.5% with 20px gap */
+/* If media scale or height changes, these values must be recalculated */
+
+.card:hover .card-pill:nth-child(2) {
+  left: calc(-22.5% - 20px);
+  top: calc(-153px - 20px);
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
+  pointer-events: auto;
+  transition-delay: 0.02s;
+}
+
+.card:hover .card-pill:nth-child(3) {
+  left: calc(100% + 22.5% + 20px);
+  top: calc(-153px - 20px);
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
+  pointer-events: auto;
+  transition-delay: 0.06s;
+}
+
+.card:hover .card-pill:nth-child(4) {
+  left: calc(-22.5% - 20px);
+  top: calc(340px + 20px);
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
+  pointer-events: auto;
+  transition-delay: 0.10s;
+}
+
+.card:hover .card-pill:nth-child(5) {
+  left: calc(100% + 22.5% + 20px);
+  top: calc(340px + 20px);
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
+  pointer-events: auto;
+  transition-delay: 0.14s;
+}
+
+/* ─── Arrow Badge (hidden at rest) ─── */
+.arrow-badge {
+  /* Absolute positioning at center */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Round badge styling */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  /* Transform to center and scale down */
+  transform: translate(-50%, -50%) scale(0.6);
+  /* Hidden at rest */
+  opacity: 0;
+  /* Badge styling with ivory background */
+  background: var(--ivory);
+  /* Font styling */
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Background fallback if media fails to load */
-  background: #f0f4fa;
-
-  /* Height determined by media's natural aspect ratio */
-  /* No fixed height - let media dictate the height */
+  font-size: 16px;
+  box-shadow: 0 8px 20px rgba(43,35,28,0.15);
+  /* Pointer events disabled at rest */
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+  /* Smooth transitions for hover reveal */
+  transition: opacity 0.3s ease,
+              transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Images and videos inside card media */
-.project-card__media img,
-.project-card__media video {
-  /* Display as block to avoid inline spacing */
-  display: block;
+/* Reveal arrow badge last on card hover */
+.card:hover .arrow-badge {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  transition-delay: 0.2s;
+}
 
-  /* Width: fill container width */
-  width: 100%;
+/* ─── Card Body: Title and description (no hover effects) ─── */
+.card-body {
+  /* Padding to space from media-stage */
+  padding: 18px 6px 6px;
+  /* Full opacity at rest and on hover — body stays visually unchanged */
+  opacity: 1;
+}
 
-  /* Height: auto to preserve aspect ratio */
-  height: auto;
+.tag-static {
+  /* Metadata tags styling */
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--jade);
+  margin-bottom: 8px;
+}
 
-  /* No object-fit needed since we're using natural aspect ratio */
+.card-title {
+  /* Serif heading using Cormorant Garamond */
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: 28px;
+  /* Color: dark walnut */
+  color: var(--walnut);
+  /* Spacing */
+  margin: 0 0 8px 0;
+}
+
+.card-description {
+  /* Body text styling */
+  font-family: 'DM Sans', 'Be Vietnam', sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  /* Color: soft walnut */
+  color: var(--walnut-soft);
+  /* Spacing */
+  margin: 0;
 }
 
 /* ─── Ribbon: Award badge on top-right corner ─── */
@@ -574,7 +817,7 @@
   inset: 0;
 
   /* Semi-transparent dark background */
-  background: rgba(0, 0, 0, 0.593);
+  background: var(--overlay-bg);
 
   /* Starting state: invisible and not interactive */
   opacity: 0;
@@ -606,7 +849,7 @@
   line-height: 1.5;
 
   /* Text color: white */
-  color: #ffffff;
+  color: var(--white);
 
   /* Margin: no default spacing */
   margin: 0;
@@ -631,7 +874,7 @@
   /* Minimal button styling */
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--white);
   font-size: clamp(1.2rem, 2vw, 1.5rem);
 
   /* Cursor pointer */
@@ -661,7 +904,7 @@
   /* Minimal button styling */
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--white);
   font-family: 'Be Vietnam', sans-serif;
   font-size: clamp(0.8rem, 1vw, 0.95rem);
   font-weight: 500;
@@ -744,7 +987,7 @@
   inset: 0;
 
   /* Semi-transparent dark background */
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--overlay-bg);
 
   /* Flex layout for centering */
   display: flex;
@@ -779,7 +1022,7 @@
   overflow: hidden;
 
   /* Box shadow for depth */
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-modal);
 
   /* Smooth scale-in animation */
   animation: scaleIn 0.3s ease;
@@ -795,7 +1038,7 @@
   /* Minimal styling */
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--white);
   font-size: 1.5rem;
 
   /* Cursor */
@@ -844,7 +1087,7 @@
   background: #f0f4fa;
 
   /* Rounded corners */
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 
   /* Flex: center content */
   display: flex;
@@ -954,7 +1197,7 @@
   transform: translateY(calc(-100% - 14px));
 
   /* Background: dark transparent */
-  background: rgba(0, 0, 0, 0.78);
+  background: var(--overlay-bg);
 
   /* Text color: white */
   color: #fff;
@@ -1014,37 +1257,11 @@
    ANIMATIONS
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Fade up animation (used by cards and labels) */
-@keyframes fadeUp {
-  from { /* Start state */
-    opacity: 0; /* Invisible */
-    transform: translateY(20px); /* Shifted down 20px */
-  }
-  to { /* End state */
-    opacity: 1; /* Fully visible */
-    transform: translateY(0); /* In normal position */
-  }
-}
+/* Scroll-reveal animation moved to shared.css as scrollRevealUp */
 
-/* Hero fade up animation */
-.face-hero {
-  animation: fadeUp 0.6s ease both 0.2s;
-}
+/* Hero animations removed - redesigned in Part 2 */
 
-/* Intro text fade up animation */
-.work-hero__intro {
-  animation: fadeUp 0.5s ease both 0.3s;
-}
-
-/* Name fade up animation */
-.work-hero__name {
-  animation: fadeUp 0.5s ease both 0.4s;
-}
-
-/* Bios fade up animation */
-.work-hero__bios {
-  animation: fadeUp 0.5s ease both 0.5s;
-}
+/* Hero animations updated for Part 2 - kept typewriter, removed entrance animations for redesigned layout */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MOBILE RESPONSIVENESS
