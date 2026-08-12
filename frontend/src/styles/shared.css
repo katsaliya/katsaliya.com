@@ -62,8 +62,8 @@ body {
   font-family: '42dot Sans', sans-serif;
   /* Background color (usually white, but can be overridden per page) */
   background: var(--page-bg);
-  /* Default text color (#1A1A1A is very dark gray, almost black) */
-  color: #1A1A1A;
+  /* Default text color */
+  color: var(--walnut);
   /* min-height: 100vh ensures the body takes up at least full viewport height */
   /* This prevents footer from floating if page content is short */
   min-height: 100vh;
@@ -93,6 +93,59 @@ body {
   --surface-light: rgba(0, 162, 198, 0.03);   /* Barely visible teal background */
   --surface-subtle: rgba(0, 162, 198, 0.08);  /* Slightly visible teal background */
   --border-light: rgba(0, 162, 198, 0.12);    /* Light teal border */
+
+  /* Redesign tokens — Part 1 */
+  --ivory: #FAF8F3;
+  --ivory-deep: #F3EFE4;
+  --walnut: #2B231C;
+  --walnut-soft: #55493c;
+  --walnut-faint: rgba(43,35,28,0.5);
+  --gold: #C9A227;
+  --orchid: #A8558F;
+  --jade: #2F6E64;
+  --border-alpha: rgba(43,35,28,0.1);
+  --glass-bg: rgba(255,255,255,0.5);
+  --glass-border: rgba(255,255,255,0.7);
+
+  --container-max: 1280px;
+  --container-pad: clamp(40px, 8vw, 120px);
+
+  /* Spacing Scale */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+  --space-2xl: 96px;
+
+  /* Radius Scale */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* Motion Tokens */
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 0.3s;
+  --duration-med: 0.5s;
+  --duration-slow: 0.6s;
+
+  /* Pill Text Colors */
+  --pill-text-gold: #6b551a;
+  --pill-text-jade: #1c443d;
+  --pill-text-orchid: #6e3a5b;
+
+  /* Shadow Scale */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 20px rgba(43, 35, 28, 0.12);
+  --shadow-lg: 0 20px 40px rgba(43, 35, 28, 0.06);
+
+  /* Semantic Shadows */
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  /* Overlay Background */
+  --overlay-bg: rgba(0, 0, 0, 0.65);
 }
 
 /* Teal text utility class */
@@ -138,55 +191,90 @@ body {
 
 /* Main navigation container */
 .main-nav {
-  /* position: relative by default (not sticky on other pages) */
-  position: relative;
+  /* Sticky positioning - stays at top when scrolling */
+  position: sticky;
+  top: 0;
   /* z-index: 100 = keep nav on top of page content */
-  /* Higher numbers = more "on top" */
   z-index: 100;
-  /* inherit background = match the background of whatever page this is on */
-  background: inherit;
+  /* Matching page background color */
+  background: var(--ivory);
+  /* No border by default */
+  border-bottom: none;
   /* Flexbox layout to manage child elements */
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   /* Center items vertically in the nav */
   align-items: center;
   /* Fixed height = 52px for nav bar */
   height: 52px;
+  /* Smooth transition for scrolled state */
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, border-bottom 0.4s ease, height 0.4s ease;
 }
 
-/* Navigation links container (holds "Kataliya!" logo and WORK/ABOUT/CONTACT links) */
+/* Frosted glass state when scrolled past hero */
+.main-nav.scrolled {
+  /* Frosted glass background (ivory at 0.72 opacity) */
+  background: rgba(250, 248, 243, 0.72); /* var(--ivory) with glass opacity */
+  /* Blur effect */
+  backdrop-filter: blur(16px);
+  /* Border separator */
+  border-bottom: 1px solid var(--border-alpha);
+  /* Slightly reduced height for visual "settling" */
+  height: 44px;
+}
+
+/* Navigation links container */
 .nav-links {
   position: relative;
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-end;
-  gap: clamp(1rem, 3vw, 1.5rem);
-  height: 52px;
-  padding: 0;
+  gap: 40px;
+  height: 100%;
+  padding: 0 clamp(20px, 5vw, 60px) 6px 0;
   margin: 0;
-  right: clamp(1rem, 2.5vw, 3rem);
+  width: 100%;
 }
 
 /* Individual nav links styling */
-.nav-links a {
-  font-family: 'Be vietnam', sans-serif;
-  font-size: clamp(0.8rem, 1.3vw, 1.0rem);
+.nav-links a,
+.nav-link {
+  position: relative;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
   font-weight: 400;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  letter-spacing: -0.5px;
   text-decoration: none;
-  color: var(--black);
+  color: var(--walnut);
   transition: color 0.2s ease;
+  display: inline-block;
+  padding: 0;
 }
 
-.nav-links a:hover {
-  color: var(--teal);
+/* Gold underline effect (::after pseudo-element) */
+.nav-links a::after,
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 100%;
+  height: 1px;
+  background: var(--gold);
+  transition: right 0.3s ease;
 }
 
-.nav-links a.active {
-  color: var(--teal);
-  font-weight: 600;
+/* Underline on hover */
+.nav-links a:hover::after,
+.nav-link:hover::after {
+  right: 0;
+}
+
+/* Active section indicator - underline slides in */
+.nav-links a.active-section::after,
+.nav-link.active-section::after {
+  right: 0;
 }
 
 /* Page nav-script: K.Sun logo on Work, About, Play pages */
@@ -220,25 +308,49 @@ body {
   padding: 0;
 }
 
+/* ─── Scroll-Reveal Animation ─── */
+@keyframes scrollRevealUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal {
+  animation: scrollRevealUp var(--duration-med) var(--ease-smooth) forwards;
+}
+
 /* Individual navigation links */
 
 /* ─── Mobile Responsiveness (screens under 900px) ─── */
 @media (max-width: 900px) {
-  /* Reduce nav height slightly on smaller screens */
-  .nav-links {
+  /* Reduce nav height on smaller screens */
+  .main-nav {
     height: 48px;
-    /* Reduce padding on very small screens */
-    padding: 0 1rem;
+  }
+
+  .main-nav.scrolled {
+    height: 40px;
+  }
+
+  /* Adjust nav-wordmark size on mobile */
+  .nav-wordmark {
+    font-size: 18px;
   }
 
   /* Make nav links smaller on mobile */
-  .nav-links a {
+  .nav-links a,
+  .nav-link {
     font-size: 0.9rem;
   }
 
-  /* Adjust gap between right-side links */
-  .nav-links__right {
-    gap: 2px;
+  /* Adjust gap between links */
+  .nav-links {
+    gap: 1rem;
   }
 }
 
@@ -336,8 +448,8 @@ body {
   border: none;
   /* Small padding */
   padding: 0 5px 10px;
-  /* White background */
-  background: #fff;
+  /* Unified background with page sections */
+  background: var(--ivory);
   /* Center aligned */
   text-align: center;
   /* Relative positioning for z-index */
@@ -496,7 +608,7 @@ body {
   /* Lift the card up slightly (lift effect) */
   transform: translateY(-6px);
   /* Add shadow beneath it (depth effect) */
-  box-shadow: 0 16px 40px rgba(0, 162, 198, 0.1);
+  box-shadow: 0 16px 40px rgba(47, 110, 100, 0.08); /* jade-based shadow */
 }
 
 /* Small pill-shaped badge (for tags/labels) */
@@ -511,8 +623,8 @@ body {
   border: 1.5px solid var(--accent-primary);
   /* Fully rounded (pill shape) */
   border-radius: 4px;
-  /* Very light teal background */
-  background: rgba(0, 162, 198, 0.05);
+  /* Very light jade background */
+  background: rgba(47, 110, 100, 0.05);
   /* Monospace font (technical look) */
   font-family: 'Courier Prime Code', monospace;
   /* Small text */
@@ -593,11 +705,11 @@ body {
 /* Responsive container (constrains content width) */
 .container {
   /* Maximum width to keep content readable on very wide screens */
-  max-width: 1280px;
+  max-width: var(--container-max);
   /* Center it horizontally */
   margin: 0 auto;
-  /* Padding on sides: responsive from 1.5rem to 5rem */
-  padding: 0 clamp(1.5rem, 5vw, 5rem);
+  /* Padding on sides: responsive */
+  padding-inline: var(--container-pad);
 }
 
 /* ─────────────────────────────────────────
@@ -639,9 +751,9 @@ body {
   padding: 1.5rem 1rem;
 
   /* Background: white with subtle shadow */
-  background: #ffffff;
+  background: var(--white);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 
   /* Minimum width */
   min-width: 48px;
@@ -768,7 +880,7 @@ body {
 /* Collapsed tab */
 .floating-social-widget__tab {
   /* Minimal button styling */
-  background: #ffffff;
+  background: var(--white);
   border: none;
   cursor: pointer;
   padding: 1rem 0.5rem;
