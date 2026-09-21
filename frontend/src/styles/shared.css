@@ -33,20 +33,41 @@
   src: url('/fonts/Datatype-Regular.ttf') format('truetype');
 }
 
+/* Coneria Script Slanted — licensed (commercial), used for the Home hero
+   name. Used under a purchased license, not the free-for-personal-use
+   tier this file is otherwise distributed under. */
+@font-face {
+  font-family: 'Coneria Script Slanted';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/ConeriaScriptSlanted.ttf') format('truetype');
+}
+
 /* ─────────────────────────────────────────
    RESET & BASE STYLES
    Remove default browser styles and set global baseline
    ───────────────────────────────────────── */
 
+/* Named layer order, declared once so it's unambiguous regardless of file
+   load order: reset is lowest priority, utilities highest. Without this,
+   this reset (plain/unlayered CSS) would beat every Tailwind utility class
+   sitewide — unlayered rules always win over layered ones in the cascade,
+   regardless of selector specificity or source order. Concretely: every
+   Tailwind padding and margin utility class was silently a no-op until
+   this fix. */
+@layer reset, theme, utilities;
+
 /* Reset ALL elements (*, *::before, *::after = all pseudo-elements too) */
-*, *::before, *::after {
-  /* box-sizing: border-box makes padding/border part of the width calculation */
-  /* Without this, padding adds to width, often causing unwanted layout breaks */
-  box-sizing: border-box;
-  /* Remove default margins that browsers add */
-  margin: 0;
-  /* Remove default padding that browsers add */
-  padding: 0;
+@layer reset {
+  *, *::before, *::after {
+    /* box-sizing: border-box makes padding/border part of the width calculation */
+    /* Without this, padding adds to width, often causing unwanted layout breaks */
+    box-sizing: border-box;
+    /* Remove default margins that browsers add */
+    margin: 0;
+    /* Remove default padding that browsers add */
+    padding: 0;
+  }
 }
 
 /* HTML-level settings */
@@ -95,20 +116,63 @@ body {
   --border-light: rgba(0, 162, 198, 0.12);    /* Light teal border */
 
   /* Redesign tokens — Part 1 */
-  --ivory: #FAF8F3;
-  --ivory-deep: #F3EFE4;
+  --ivory: #ffffff;
+  --ivory-deep: #efefef;
   --walnut: #2B231C;
   --walnut-soft: #55493c;
   --walnut-faint: rgba(43,35,28,0.5);
   --gold: #C9A227;
   --orchid: #A8558F;
+  --orchid-clear: rgba(134, 1, 77, 0.436);
   --jade: #2F6E64;
   --border-alpha: rgba(43,35,28,0.1);
   --glass-bg: rgba(255,255,255,0.5);
   --glass-border: rgba(255,255,255,0.7);
 
-  --container-max: 1280px;
-  --container-pad: clamp(40px, 8vw, 120px);
+  /* Layout — the site has exactly two widths, deliberately.
+     Content lives on --container-max; expressive moments (the Home hero,
+     and the /work ring, which is a full-viewport canvas by nature) get
+     --hero-max instead. That contrast is what makes the constrained
+     column read as a decision rather than a default — see .shell /
+     .shell-hero below.
+
+     --hero-pad is deliberately much tighter than --container-pad: at
+     laptop widths the viewport is close enough to --container-max that
+     the two shells would otherwise resolve to nearly the same width, and
+     the hierarchy break would only appear on large displays. The 53px
+     ceiling is the padding the hero and nav were already hand-set to, so
+     nothing moves at the reference window. */
+  /* 1216, matched to adamhickey.com. His shell reads max-width: 1280px, but
+     that is an outer box holding his 32px gutters, so the column inside it
+     is 1216 — and this token IS the column (see the note on .shell: the cap
+     there adds the gutters back). At 1440 both sites now start their content
+     at x=112 and run 1216 wide. Setting 1280 here would have rendered 42px
+     wider than the site being matched. */
+  --hero-max: 1216px;
+  --hero-pad: clamp(24px, 4vw, 53px);
+
+  /* The content column now DERIVES from the hero column rather than being a
+     narrower one of its own. Everything on the page — nav, Disciplines,
+     Where I've been — therefore shares one side edge with the hero's
+     "01 TLDR;" block, which is what was asked for.
+
+     They were deliberately different before: a 1280 column inside an 1800
+     hero, so display moments owned the viewport and content sat on a
+     narrower measure. That distinction is gone now by choice. Re-narrowing
+     is a one-line change here — give --container-max/-pad their own values
+     again and every .shell follows, no component edits. Line length is no
+     longer protected by this column, so anything running as prose needs
+     --prose-max (see below); the wide sections are tables and image rows,
+     which do not have a measure problem. */
+  --container-max: var(--hero-max);
+  --container-pad: var(--hero-pad);
+
+  /* Reading measure for running prose, distinct from --container-max: that
+     is a layout column, this is a line-length limit. 725px comes from the
+     Figma "How I got here" frame and holds ~67 characters at the body tier,
+     which is inside the 60-75 band where prose reads most comfortably. */
+  --prose-max: 725px;
+
 
   /* Spacing Scale */
   --space-xs: 8px;
@@ -202,11 +266,14 @@ body {
   border-bottom: none;
   /* Flexbox layout to manage child elements */
   display: flex;
-  justify-content: center;
+  /* Space between logo and links */
+  justify-content: space-between;
   /* Center items vertically in the nav */
   align-items: center;
   /* Fixed height = 52px for nav bar */
   height: 52px;
+  /* Horizontal padding */
+  padding: 0 clamp(20px, 5vw, 60px);
   /* Smooth transition for scrolled state */
   transition: background 0.4s ease, backdrop-filter 0.4s ease, border-bottom 0.4s ease, height 0.4s ease;
 }
@@ -221,20 +288,49 @@ body {
   border-bottom: 1px solid var(--border-alpha);
   /* Slightly reduced height for visual "settling" */
   height: 44px;
+  /* Keep padding consistent */
+  padding: 0 clamp(20px, 5vw, 60px);
 }
 
-/* Navigation links container */
+/* Logo on the left */
+.nav-logo {
+  position: relative;
+  z-index: 100;
+  width: 32px;
+  height: 36px;
+  color: var(--walnut);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.nav-logo svg,
+.nav-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+/* Navigation links on the right */
 .nav-links {
   position: relative;
   z-index: 100;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-end;
   gap: 40px;
-  height: 100%;
-  padding: 0 clamp(20px, 5vw, 60px) 6px 0;
+  padding: 0;
   margin: 0;
+  flex-shrink: 0;
+}
+
+/* Work page variant: no logo, links spread evenly across the full nav width */
+.nav-links--spread {
   width: 100%;
+  justify-content: space-between;
 }
 
 /* Individual nav links styling */
@@ -242,7 +338,7 @@ body {
 .nav-link {
   position: relative;
   font-family: 'DM Sans', sans-serif;
-  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  font-size: 17px;
   font-weight: 400;
   letter-spacing: -0.5px;
   text-decoration: none;
@@ -250,6 +346,7 @@ body {
   transition: color 0.2s ease;
   display: inline-block;
   padding: 0;
+  line-height: 1;
 }
 
 /* Gold underline effect (::after pseudo-element) */
@@ -277,21 +374,6 @@ body {
   right: 0;
 }
 
-/* Page nav-script: K.Sun logo on Work, About, Play pages */
-.page-nav-script {
-  position: absolute;
-  left: clamp(1rem, 2.5vw, 3rem);
-  top: 0;
-  line-height: 52px;
-  z-index: 101;
-  font-family: 'Jellyka Saint-Andrews Queen', cursive;
-  font-weight: 300;
-  font-size: 45px;
-  color: var(--black);
-  white-space: nowrap;
-  opacity: 1;
-  transition: opacity 0.18s ease;
-}
 
 /* Right side links container (WORK/ABOUT/PLAY/CONTACT) */
 .nav-links__right {
@@ -331,6 +413,7 @@ body {
   /* Reduce nav height on smaller screens */
   .main-nav {
     height: 48px;
+    padding: 0 clamp(16px, 4vw, 40px);
   }
 
   .main-nav.scrolled {
@@ -702,6 +785,87 @@ body {
   color: rgba(0, 0, 0, 0.6);  /* Semi-transparent black (60% opacity) */
 }
 
+/* ─────────────────────────────────────────
+   LAYOUT SHELLS
+   The one edge rule for the site. .shell is the content column that
+   everything readable sits on; .shell-hero is the wider one for display
+   moments. Both center themselves and carry their own gutter, so a
+   section is full-bleed (background, color) with its content on a shell,
+   rather than the section itself being width-capped.
+
+   max-width is content + both gutters, so --container-max/--hero-max are
+   the real content widths. (The reset sets box-sizing: border-box
+   globally, so a bare max-width would have padding eat into the column
+   instead — a 1280 cap would render a 1040 column.)
+   ───────────────────────────────────────── */
+.shell {
+  width: 100%;
+  max-width: calc(var(--container-max) + var(--container-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* THE SHARED BAR IS GLASS. Same recipe as the case study's section nav and
+   the cursor tag — one glass on the site, not three near-misses.
+
+   NO HAIRLINE UNDERNEATH, deliberately. On a case study the section nav pins
+   directly below this one, and a rule between them cut the pair into two
+   stacked slabs. Without it the two translucent bars read as one continuous
+   band, which is the intent — the only edge is the one at the bottom of the
+   lower bar, terminating the whole thing against the page. */
+.site-nav {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+/* Without backdrop-filter a half-transparent bar just looks unfinished, so it
+   falls back to the solid ground it used to have. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-nav {
+    background: var(--ivory);
+  }
+}
+
+/* Nav wordmark — the same script lockup the Home hero docks into, so every
+   page carries one mark. Sized and spaced to match Home's nav slot. */
+.nav-wordmark {
+  font-family: 'Coneria Script Slanted', cursive;
+  font-size: 21.38px;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: var(--walnut);
+  text-decoration: none;
+}
+
+/* The page you are on: the orchid in place of that link. */
+.nav-current {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-current img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+/* DragStrip: a real overflow scroller, just without the chrome. The bar is
+   hidden rather than the element being made non-scrollable, so trackpad and
+   keyboard scrolling still work — see components/DragStrip.jsx. */
+.drag-strip::-webkit-scrollbar { display: none; }
+.drag-strip.is-dragging { cursor: grabbing; }
+
+.shell-hero {
+  width: 100%;
+  max-width: calc(var(--hero-max) + var(--hero-pad) * 2);
+  margin-inline: auto;
+  padding-inline: var(--hero-pad);
+}
+
+/* Legacy — only pages/Work.jsx (the pre-carousel masonry page, no longer
+   routed) still uses this. Left alone rather than folded into .shell:
+   its max-width is border-box, so the two are not interchangeable. */
 /* Responsive container (constrains content width) */
 .container {
   /* Maximum width to keep content readable on very wide screens */

@@ -29,6 +29,10 @@ import App from './App'
 /* This file must load first so page-specific CSS can override it if needed */
 import './styles/shared.css'
 
+/* Tailwind (utilities only, no Preflight) — scoped in practice to the new
+   Work-carousel/Home/About pages; the rest of the site stays plain CSS. */
+import './styles/tailwind.css'
+
 /* ─────────────────────────────────────────────────────────────────────────
    MOUNT THE APP TO THE HTML PAGE
    ───────────────────────────────────────────────────────────────────────── */

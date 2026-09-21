@@ -1,0 +1,2299 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CASE-STUDY.CSS — the whole case study template
+
+   Replaces this file's previous 524 lines plus bluecore.css (441) and
+   known.css (462). Those three were one design that had been forked twice;
+   nothing here is per-project, so there is nothing left to drift.
+
+   TYPE. Every size is one of the home page's tiers, and no size is invented:
+
+     micro       16px fixed        labels, ledger rows, captions
+     meta        15px fixed        the smallest running text
+     aside       clamp(1rem, 1.48vw, 1.25rem)
+     body        clamp(1.1rem, 1.6vw, 1.35rem)
+     entry       clamp(1.3rem, 1.9vw, 1.75rem)
+     pull-quote  clamp(1.4rem, 2.2vw, 2rem)
+     section     clamp(1.75rem, 2.6vw, 2.4rem)
+     numeral     clamp(4.5rem, 9vw, 11rem)
+
+   A clamp IS the responsive rule — its min is the small-screen size — so
+   there is no breakpoint here that re-declares a size. The only media queries
+   change LAYOUT.
+
+   COLOUR. Walnut on ivory, exactly as the home page. There is no per-project
+   palette: BlueCore's navy and electric blue belong to BlueCore's product,
+   not to the page describing it, and the old file put them on the page.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-page {
+  /* THE VERTICAL RHYTHM. Every gap on this page is one of three values.
+     Before, each block invented its own clamp — 2.5/5/4, 3/6/5, 2/4/3 —
+     which is how a page ends up looking unevenly spaced even when no single
+     value is wrong. Three steps, used consistently, is the whole trick. */
+  --cs-gap-sm: clamp(1rem, 1.8vw, 1.5rem);
+  --cs-gap-md: clamp(2rem, 3.5vw, 3rem);
+  --cs-gap-lg: clamp(3rem, 5vw, 4.5rem);
+
+  /* THE DISPLAY TIER, which is also the page title's size. 112px at 1512. */
+  --cs-display: clamp(2.4rem, 8vw, 7rem);
+
+  /* Section numerals are DECORATION and must stay under the title, or the
+     page reads as eight competing headlines. 75px at 1512 vs the title's
+     112px. The rail is wider than the glyph because the script slants and
+     two digits overhang their em box. */
+  /* ═══════════════════════════════════════════════════════════════════════
+     TYPE SCALE — the About/Home ladder
+
+     These are the site's own steps, measured off /about rather than derived:
+     37.4 / 27.4 / 21.6 / 20 / 16 / 12 at the 1440 reference window. The case
+     study briefly ran a scale anchored to the hero instead, which was
+     internally consistent — a strict 1.2 from the masthead down — but made
+     this page read as a different typographic system to every other page.
+     Matching the site beats matching itself.
+
+     --cs-t-marquee is the exception and stays where it is: it was set one
+     step under the hero to stop section titles rendering larger than the
+     project's own name, which is a relationship this page has and the others
+     do not.
+     ═══════════════════════════════════════════════════════════════════════ */
+  --cs-t-marquee: clamp(2.3rem, 5.833vw, 5.42rem);
+
+  --cs-t-numeral: clamp(1.75rem, 3.2vw, 3rem);
+  --cs-t-h1:      clamp(1.75rem, 2.6vw, 2.4rem);
+  --cs-t-h2:      clamp(1.3rem, 1.9vw, 1.75rem);
+  --cs-t-h3:      clamp(1.1rem, 1.6vw, 1.35rem);
+  --cs-t-body:    clamp(1rem, 1.48vw, 1.25rem);
+  --cs-t-meta:    16px;
+  --cs-t-micro:   12px;
+
+  --cs-numeral: clamp(1.75rem, 5vw, 5rem);
+  --cs-rail: calc(var(--cs-numeral) * 1.45);
+  --cs-rail-gap: clamp(1.25rem, 2.5vw, 2.5rem);
+  /* JOURNEY PHASE TONES. Two come straight from the site palette; two did
+     not exist and are added here rather than hardcoded into the SVG, so the
+     chain has a single place to be recoloured.
+
+     There is no theme.css in this project — the palette lives in shared.css,
+     and it carries gold, jade, orchid and walnut but no coral and no navy.
+     Clay is a warm terracotta that sits with walnut; navy is BlueCore's own,
+     which is what the Build & Ship phase produced. */
+  --cs-clay: #A85C46;
+  --cs-navy: #2E4B7A;
+  /* BlueCore's own active-state blue, lifted from the product. The chosen
+     panel is labelled with the product's name, so the edge that marks it as
+     chosen is the colour that product uses to mark a selection. */
+  --cs-bluecore: #2563EB;
+
+  /* One accent across the page. --cs-plum-tint is the hex at 28% over white,
+     which is what a Figma layer at that opacity resolves to; --cs-plum is the
+     same hue solid, used wherever the tint would be text. */
+  --cs-plum: #693E5E;
+  --cs-plum-tint: color-mix(in srgb, var(--cs-plum) 28%, #ffffff);
+  /* The impact movement's own ground. Pitched at the same lightness as
+     --ivory-deep rather than the mid-tone the mock shows, because there is no
+     white card under the table any more: the ledger sits straight on this, so
+     it has to hold walnut text at full contrast. Orchid is the flower motif's
+     own hue, so the section reads as tinted rather than as a new colour. */
+  --cs-mauve-ground: var(--cs-plum-tint);
+  --jm-research: var(--cs-clay);
+  --jm-prototype: var(--gold);
+  --jm-reposition: var(--jade);
+  --jm-build: var(--cs-navy);
+
+  /* A light wash of the orchid the flower motif is drawn from. */
+  --cs-mauve: var(--cs-plum-tint);
+
+  --cs-sans: 'DM Sans', sans-serif;
+  --cs-script: 'Coneria Script Slanted', cursive;
+
+  background: var(--ivory);
+  color: var(--walnut);
+  font-family: var(--cs-sans);
+  overflow-x: clip;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO
+   The home page's opening, in the same order: the name at the container's
+   full width, then the matter that qualifies it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* A landing, not a masthead. Full viewport with the name centred in it and
+   the tldr; settling lower-left, which is the home page's own composition.
+   Padding rather than pure centring so the name clears the fixed nav on a
+   short window. */
+/* A masthead, not a landing. No min-height: the hero is exactly as tall as
+   the wordmark plus its facts, so the Overview begins immediately under the
+   table rather than a full screen later. */
+.cs-hero {
+  /* A full viewport, and svh rather than vh: on mobile, vh is the height with
+     browser chrome RETRACTED, so a 100vh hero is taller than the screen on
+     first paint and the meta table starts below the fold. */
+  min-height: 60svh;
+  /* The masthead is the LAST thing in a justify-end column, so this padding
+     IS its offset from the bottom edge — Home parks its tldr; at 6% and this
+     is the same figure. The top padding only matters on a window short enough
+     that the block would otherwise reach the nav. */
+  padding-top: clamp(7rem, 14vh, 11rem);
+  padding-bottom: clamp(2.5rem, 6vh, 5rem);
+}
+
+@supports not (height: 100svh) {
+  .cs-hero { min-height: 60svh; }
+}
+
+/* The CAP BELONGS TO THE TABLE, not the block. Meta rows are label/value
+   pairs pushed apart by space-between, so at full width "Tools" and its list
+   end up a metre apart — they need roughly half the shell. The wordmark does
+   not: capped with them, "BlueCore AI" broke across two lines at 100px. */
+.cs-masthead .cs-meta {
+  max-width: min(100%, 560px);
+}
+
+/* The PRODUCT's typeface. Size is its own tier — it has to out-rank every
+   heading below it without reaching the script display sizes, which belong
+   to the site rather than to the project. */
+.cs-brand {
+  margin: 0 0 var(--cs-gap-md);
+  font-size: clamp(2.75rem, 7vw, 6.5rem);
+  line-height: 0.95;
+}
+
+/* The wordmark yields room to the motif — but ONLY where the motif exists.
+   It is `hidden lg:block`, so capping the name below 1024px broke it across
+   two lines to clear something that was not on screen. */
+@media (min-width: 1024px) {
+  .cs-brand { max-width: 58%; }
+}
+
+@media (min-width: 1024px) {
+  .cs-masthead .cs-meta { max-width: 560px; }
+}
+
+/* Copy left, metadata right — the standard case-study hero, and the reason
+   is mechanical: a ledger row is `justify-content: space-between`, so at the
+   full 1406px "Role" and its value end up a metre apart with nothing between
+   them. Roughly 45% of the column keeps each pair readable as a pair. */
+@media (min-width: 900px) {
+  }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEDGER — the hairline label/value rows Disciplines uses for its areas.
+   The hero's meta grid and Known's workflow are the same object.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-meta,
+.cs-ledger dl {
+  margin: 0;
+}
+
+/* A BLOCK'S BOTTOM MARGIN SEPARATES IT FROM THE NEXT BLOCK. On the last one
+   there is no next block, so it stops being rhythm and becomes padding —
+   stacking on the movement's own 96px and closing the overview on 168px of
+   dead space. Same fault at the end of the approach section. The section's
+   padding is the section's to set. */
+.cs-content > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Section-level rhythm. Every other block-to-block gap in a section is the
+   large step; this was the one at the medium step, which made the takeaways
+   look tacked onto the table rather than following it. */
+.cs-ledger {
+  margin-block: var(--cs-gap-lg);
+}
+
+/* Nested in a disclosure the ledger is the only thing in the panel, so its
+   margin is acting as padding — the large step is too much there. */
+.cs-disclosure-inner .cs-ledger {
+  margin-block: var(--cs-gap-md);
+}
+
+.cs-ledger .cs-label {
+  margin-bottom: 1rem;
+}
+
+.cs-ledger-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-alpha);
+}
+
+/* NOT diagram type. The outcomes table is the substance of the impact
+   section, not a label inside a drawing, so it sits on the body tier with
+   the rest of the page's prose rather than down with the small steps. */
+.cs-ledger-row dt {
+  flex-shrink: 0;
+  font-size: var(--cs-t-body);
+  line-height: 1.54;
+  color: var(--walnut);
+}
+
+.cs-ledger-row dd {
+  margin: 0;
+  font-size: var(--cs-t-body);
+  line-height: 1.54;
+  text-align: right;
+  color: var(--walnut-soft);
+}
+
+/* ── the WIDE variant: a what/why table ─────────────────────────────────
+   The narrow ledger pushes term and value apart, which only works when both
+   are short. When the value is a sentence it has to left-align and take the
+   room, or every row ends up ragged against the right edge. */
+.cs-ledger--wide .cs-ledger-row {
+  align-items: baseline;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  padding: clamp(0.9rem, 1.6vw, 1.25rem) 0;
+}
+
+.cs-ledger--wide .cs-ledger-row dt {
+  /* A fixed column is what makes these read as a table rather than as pairs
+     that happen to be stacked. */
+  flex: 0 0 clamp(9rem, 22%, 16rem);
+  font-weight: 500;
+}
+
+.cs-ledger--wide .cs-ledger-row dd {
+  flex: 1;
+  text-align: left;
+}
+
+.cs-ledger-head {
+  display: flex;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-alpha);
+  font-size: var(--cs-t-meta);
+  line-height: 1.54;
+  color: var(--walnut-faint);
+}
+
+.cs-ledger-head span:first-child {
+  flex: 0 0 clamp(9rem, 22%, 16rem);
+}
+
+.cs-ledger--wide .cs-caption {
+  margin-top: var(--cs-gap-sm);
+}
+
+/* On a phone the fixed term column leaves nothing for the sentence, so the
+   pair stacks. */
+@media (max-width: 640px) {
+  .cs-ledger--wide .cs-ledger-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cs-ledger--wide .cs-ledger-row dt { flex: none; }
+  .cs-ledger-head { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COVER — full width of the hero shell, magnified on hover
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Spacing comes from the utility classes on the element (mb-10 md:mb-14),
+   matching how the home movements space their own marquees. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTIONS — a RAIL, not a split
+
+   The rail is the width of the numeral and nothing more. A 1fr rail beside a
+   numeral leaves half the page empty and squeezes everything in the section
+   to half width, which is what a `1fr 1fr` copied from Disciplines does here:
+   Disciplines earns its 1:1 because its left column carries a numeral AND a
+   title AND a description. This one carries a numeral.
+
+   Because the rail is a known width rather than max-content, a block can
+   reclaim it with a negative margin — see .cs-bleed.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Each movement carries its OWN .cs-sections, so the counter resets per
+   movement and the rail numerals run 01, 02, 03 inside each one — the way
+   Disciplines numbers its four services under marquee 02 rather than
+   continuing a page-wide count. Outer padding belongs to the movement
+   wrapper now. */
+.cs-sections {
+  counter-reset: cs-section;
+}
+
+.cs-section {
+  counter-increment: cs-section;
+  padding-bottom: clamp(3.5rem, 6vw, 6.5rem);
+}
+
+/* The movement wrapper already pads its own bottom. */
+.cs-section:last-child {
+  padding-bottom: 0;
+}
+
+.cs-rail {
+  margin-bottom: var(--cs-gap-sm);
+}
+
+/* The numeral is a counter, so there is no number in the markup to keep in
+   order by hand and none to renumber when a section moves. */
+.cs-numeral::before {
+  content: counter(cs-section, decimal-leading-zero);
+}
+
+.cs-numeral {
+  display: block;
+  /* The same step the phase numerals run at, so 01/02 in impact and
+     01-04 in approach read as one series rather than two. */
+  font-size: var(--cs-t-numeral);
+  line-height: 0.8;
+  /* Same ink as .cs-phase-numeral. Both are counters marking a position, not
+     headings — full walnut made the impact pair read as the loudest thing in
+     their sections while the approach ones sat back. */
+  color: var(--walnut-faint);
+}
+
+.cs-section-title {
+  max-width: var(--prose-max);
+  margin: 0 0 var(--cs-gap-sm);
+  font-size: var(--cs-t-h1);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--walnut);
+}
+
+@media (min-width: 900px) {
+  .cs-section {
+    display: grid;
+    grid-template-columns: var(--cs-rail) minmax(0, 1fr);
+    column-gap: var(--cs-rail-gap);
+    align-items: start;
+  }
+
+  /* Sticky through the section, so the number stays with what it labels on a
+     long one. `top` clears the fixed nav. */
+  .cs-rail {
+    position: sticky;
+    top: 120px;
+    margin-bottom: 0;
+  }
+
+  .cs-rail .cs-label {
+    margin-top: 1rem;
+  }
+
+  /* Media BREAKS the rail. A photo run or a wide figure is the one thing
+     that wants the whole page, and the rail is a known width, so it can be
+     given back exactly. */
+  .cs-bleed {
+    margin-left: calc(-1 * (var(--cs-rail) + var(--cs-rail-gap)));
+  }
+}
+
+/* Below the breakpoint the rail lies down: numeral and label on one line. */
+@media (max-width: 899px) {
+  .cs-rail {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .cs-rail .cs-label { margin-bottom: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TYPE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The site's micro-label — the "+ (label)" device Disciplines and How I got
+   here use. The plus and brackets are CSS rather than markup so the
+   convention lives in one place. */
+.cs-label {
+  display: block;
+  font-family: var(--cs-sans);
+  font-weight: 400;
+  font-size: var(--cs-t-meta);
+  line-height: 1.54;
+  color: var(--walnut-soft);
+  margin-bottom: 14px;
+}
+
+.cs-label::before { content: '+ ('; }
+.cs-label::after  { content: ')'; }
+
+.cs-prose {
+  max-width: var(--prose-max);
+}
+
+.cs-body {
+  max-width: var(--prose-max);
+  margin: 0 0 1.1em;
+  font-size: var(--cs-t-h3);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--walnut-soft);
+}
+
+.cs-body:last-child { margin-bottom: 0; }
+
+/* The one place on the page where the type is the event. Walnut rather than
+   walnut-soft, and the pull-quote tier — the same treatment the hero's tldr;
+   gets, because it is doing the same job. */
+.cs-statement {
+  max-width: 900px;
+  margin-block: var(--cs-gap-lg);
+  font-size: var(--cs-t-h1);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+.cs-word {
+  display: inline-block;
+  will-change: opacity, transform, filter;
+}
+
+/* ── stats ──────────────────────────────────────────────────────────────
+   The figure sits INLINE, as the sentence's first word. It used to be a flex
+   row with a hairline under it — figure in one cell, claim in another — which
+   pinned the sentence into a narrow column beside a very large number and
+   read as a caption to it rather than as one statement. */
+
+.cs-stat {
+  margin-block: var(--cs-gap-md);
+}
+
+/* TWO PEER FIGURES SIT SIDE BY SIDE. Stacked, the second reads as a footnote
+   to the first; in a row they read as a pair. */
+.cs-stat--row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cs-gap-md);
+}
+
+/* Both lines need the overshoot clearance now, not just the first. The rule
+   below reserves it on :first-child because stacked lines only have one line
+   at the top of the block; in a row BOTH are at the top, and the second one's
+   script figure would paint up into whatever sits above it. */
+.cs-stat--row .cs-stat-line {
+  margin-bottom: 0;
+  padding-top: 1.35em;
+}
+
+.cs-stat-line {
+  margin: 0 0 0.6em;
+  /* The claim carries real weight — this is the page's headline number, and
+     at body size the sentence lost to the figure beside it. */
+  font-size: var(--cs-t-h2);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+.cs-stat-line:last-child { margin-bottom: 0; }
+
+/* THE FIGURE OVERSHOOTS ITS BOX. line-height: 0 keeps the sentence's leading
+   tight, but it also removes the leading that would normally absorb a script
+   face's ascender — and Coneria at 2.6em overshoots well past its em box. The
+   glyph painted about 40px above where its box claimed to be and landed on
+   the paragraph above it, which no box measurement catches: getBoundingClient
+   Rect reports the collapsed line box, not the ink.
+
+   Reserved in em of the STAT LINE, not px, so the clearance scales with the
+   type rather than being a number that only works at one size. */
+.cs-stat-line:first-child {
+  padding-top: 1.35em;
+}
+
+.cs-stat-figure {
+  /* Inline, so text flows after it and wraps beneath. Its own line-height is
+     collapsed to 0 so a 3x-size glyph does not blow the paragraph's leading
+     apart on the line it sits in — see the padding above for the cost. */
+  display: inline;
+  margin-right: 0.12em;
+  font-size: 2.6em;
+  line-height: 0;
+  color: var(--walnut);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DEVICE — a drawn phone frame
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-device {
+  width: 100%;
+  max-width: 300px;
+  margin-block: var(--cs-gap-md);
+  aspect-ratio: 9 / 19.5;
+  padding: 0.7rem 0.6rem;
+  border-radius: 2.6rem;
+  background: var(--walnut);
+  /* The bezel's own edge, so the frame reads as an object rather than as a
+     dark rectangle behind the screen. */
+  box-shadow: 0 0 0 1px rgba(43, 35, 28, 0.55), 0 18px 40px -24px rgba(43, 35, 28, 0.5);
+}
+
+.cs-device-screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: var(--ivory-deep);
+}
+
+.cs-device-screen img,
+.cs-device-screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-device-placeholder {
+  padding: 0 1.5rem;
+  font-size: var(--cs-t-meta);
+  line-height: 1.5;
+  text-align: center;
+  color: var(--walnut-faint);
+}
+
+/* Inside a split column the frame sits at the column's inner edge rather than
+   centred, so it lines up with the paragraph above it. */
+.cs-split-col .cs-device {
+  margin-inline: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CARDS — insights and takeaways
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-cards-wrap {
+  margin-block: var(--cs-gap-lg);
+}
+
+.cs-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--cs-gap-md);
+}
+
+@media (min-width: 700px) {
+  .cs-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* A sequence stays one column at every width — see Cards `stack`. */
+  .cs-cards--stack { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Was --prose-max, which held the takeaways at 725 inside a 1076 column
+   while the table above them ran the full width. They read as one section,
+   so they take one measure. */
+.cs-cards--stack .cs-card-body { max-width: none; }
+
+.cs-card {
+  padding-top: var(--cs-gap-sm);
+  border-top: 1px solid var(--border-alpha);
+}
+
+.cs-card-index {
+  display: block;
+  margin-bottom: 0.35em;
+  /* Was clamp(2rem, 3.4vw, 3.2rem) = 51px at 1512, nearly twice its own
+     28px card title. An index is a marker, not the headline — it has to land
+     BELOW the title it indexes, not just nearer to it. */
+  font-size: var(--cs-t-h3);
+  line-height: 0.9;
+  color: var(--walnut-faint);
+}
+
+.cs-card-title {
+  margin: 0 0 0.6em;
+  font-size: var(--cs-t-h2);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+.cs-card-body {
+  margin: 0;
+  font-size: var(--cs-t-body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--walnut-soft);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPLIT — a labelled pair
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cs-gap-lg);
+  margin-bottom: var(--cs-gap-lg);
+}
+
+@media (min-width: 800px) {
+  .cs-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+
+/* THE FIGURE HANGS FROM THE BOTTOM OF ITS COLUMN. Grid stretches both
+   columns to the taller one, which is the prose — so a figure shorter than
+   that leaves empty column beneath it, and the ground below the split reads
+   as that much deeper on one side than the other. Bottom-aligning lands both
+   columns on one line, so the space under the split is the movement's
+   padding and nothing else. The slack moves above the figure, between the
+   paragraph and the screen, where it separates two different things instead
+   of pretending to be section padding. */
+.cs-split-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Prose inside a column takes the COLUMN's measure, not the page's. The
+   725px cap is right for a full-width run and far too wide for half of one —
+   it simply would not bind, and the paragraph would run the whole column. */
+.cs-split-col .cs-body,
+.cs-split-col .cs-prose {
+  max-width: none;
+}
+
+.cs-split-col > .cs-label {
+  margin-bottom: var(--cs-gap-sm);
+}
+
+/* THE STAT BREAKS ITS COLUMN. In the design it starts about a third into the
+   left column and runs past its right edge into the gutter, so the headline
+   number sits between the two columns rather than tucked under one. Flush
+   left it read as a third paragraph of the problem; offset, it reads as the
+   answer to both.
+
+   Percentage indent rather than a fixed inset so the overhang stays
+   proportional — the block is always the column's width, just moved. */
+@media (min-width: 800px) {
+  .cs-split-col .cs-stat {
+    /* width MUST be explicit. A margin alone just squeezes the block — it
+       stayed inside the column and never reached the gutter. Pinned to the
+       column's own width, the margin pushes it out instead, which is the
+       overhang the design has. */
+    width: 100%;
+    margin-left: 26%;
+    margin-top: var(--cs-gap-lg);
+  }
+}
+
+/* A figure inside a column stays inside it — no rail to reclaim.
+
+   IT ALSO HANGS FROM THE COLUMN'S FLOOR. Grid stretches both columns to the
+   taller one, which here is the prose, so a figure shorter than that left
+   empty column beneath it — 72px of it, which is .cs-figure's own
+   margin-block-end sitting inside the column and holding the image up off
+   the bottom. The result was 120px of ground under the phone against 48
+   under the paragraph beside it, on a page where both should read as one
+   edge. auto takes the slack above the image, where it separates the
+   paragraph from the screen instead of impersonating section padding, and
+   the end margin goes so the image lands flush.
+
+   Set HERE rather than in a rule of its own: this selector is (0,2,0) and
+   sits later in the file, so anything equally specific written earlier — as
+   the first attempt at this was — loses to it on order. */
+.cs-split-col .cs-figure {
+  margin-inline: 0;
+  /* auto alone gave up the whole gap the moment the column had no slack to
+     spare — the screen ended up touching the paragraph. The padding is the
+     floor the margin cannot go below; auto still takes any slack on top. */
+  margin-block-start: auto;
+  margin-block-end: 0;
+  padding-block-start: var(--cs-gap-md);
+}
+
+/* Same problem the feature media has: a ~0.47:1 phone screenshot at the
+   column's full width renders taller than the column is wide and swamps the
+   paragraph above it. Capped and centred; the bezel is in the asset. */
+.cs-figure--phone .cs-magnified {
+  display: flex;
+  justify-content: center;
+  background: none;
+}
+
+.cs-figure--phone img,
+.cs-figure--phone video {
+  width: auto;
+  max-width: min(100%, 240px);
+  max-height: 52vh;
+  border-radius: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BARE SECTION — no numeral rail
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 900px) {
+  .cs-section--bare {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Nothing to reclaim once the rail is gone. */
+  .cs-section--bare .cs-bleed {
+    margin-left: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STEPS — the process rail
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The panel the rail lives in. Same tint and radius as the method cards, so
+   the section's two boxed objects are one family.
+
+   NOTE: the design shows this in a mauve. Every other panel on the site is
+   the page's own deep ivory, and a single lilac block would be the one
+   colour on the portfolio that belongs to nothing — so it takes the system's
+   tint. One token if you want the mauve back. */
+.cs-steps-panel {
+  padding: var(--cs-gap-md);
+  margin-bottom: var(--cs-gap-lg);
+  border-radius: 10px;
+  background: var(--cs-mauve);
+}
+
+@supports not (background: color-mix(in srgb, red 10%, white)) {
+  .cs-steps-panel { background: #f3eaf0; }
+}
+
+.cs-steps-title {
+  max-width: 26ch;
+  margin: 0 auto 0.5em;
+  font-size: var(--cs-t-h1);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+.cs-steps-sub {
+  max-width: 46ch;
+  margin: 0 auto var(--cs-gap-lg);
+  font-size: var(--cs-t-body);
+  font-style: italic;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--walnut-soft);
+  text-wrap: balance;
+}
+
+.cs-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cs-gap-md);
+}
+
+.cs-step {
+  text-align: center;
+}
+
+.cs-step-node {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1.2vw, 1rem);
+  margin-bottom: clamp(0.9rem, 1.8vw, 1.35rem);
+}
+
+.cs-step-node::before,
+.cs-step-node::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-alpha);
+}
+
+/* visibility, not display: the segment must still take its flex space, or the
+   first and last marks would sit off-centre from the rest. */
+.cs-step:first-child .cs-step-node::before,
+.cs-step:last-child .cs-step-node::after {
+  visibility: hidden;
+}
+
+/* NO FILL. The connector segments are siblings that stop at this edge rather
+   than a line running behind it, so there is nothing to mask — which is what
+   lets the mark sit on either of the two movement grounds without carrying a
+   background that would be wrong on one of them. */
+.cs-step-mark {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: clamp(3.25rem, 5vw, 4.5rem);
+  aspect-ratio: 1;
+  border: 1px solid var(--border-alpha);
+  border-radius: 50%;
+  color: var(--walnut);
+}
+
+.cs-step-icon {
+  width: 46%;
+  height: 46%;
+}
+
+/* The numeral, bare. It was a filled chip with a ring — the reference's
+   badge — and that carried a real cost: an opaque fill has to match whatever
+   ground it lands on, which tied the whole block to the ivory movement. With
+   no fill there is nothing to match, so a steps block now works on either
+   movement ground unchanged.
+
+   Placed OUTSIDE the ring, and that took measuring rather than eyeballing.
+   The mark's bounding-box corner is outside the inscribed circle, but the
+   numeral's own box is inset from that corner by its own width and height —
+   at the first offsets I used its near corner sat 27px from the centre
+   against a 32px radius, i.e. straight through the stroke. These offsets put
+   it at 38px, clear of the arc with room for the script's overhang.
+
+   Two digits, matching every other numeral on the site: the section rails,
+   the card indices and the marquees all count 01, 02, 03. */
+.cs-step-badge {
+  position: absolute;
+  right: -1.1rem;
+  bottom: -0.9rem;
+  font-family: var(--cs-script);
+  font-size: var(--cs-t-body);
+  line-height: 1;
+  color: var(--walnut);
+}
+
+.cs-step-title {
+  margin: 0 0 0.45em;
+  font-size: var(--cs-t-h3);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+.cs-step-note {
+  margin: 0;
+  font-size: var(--cs-t-meta);
+  line-height: 1.5;
+  color: var(--walnut-soft);
+  text-wrap: balance;
+}
+
+@media (min-width: 900px) {
+  .cs-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /* Zero, deliberately. Any column gap would break the rail into four
+       disconnected stubs; breathing room comes from the step's own inline
+       padding so the line stays continuous across it. */
+    gap: 0;
+  }
+  .cs-step {
+    padding-inline: clamp(0.5rem, 1.4vw, 1.25rem);
+  }
+}
+
+/* Stacked, the rail has nothing to connect — four horizontal stubs under four
+   headings read as a mistake. The mark goes inline with the text instead. */
+@media (max-width: 899px) {
+  .cs-step {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: clamp(0.9rem, 3vw, 1.25rem);
+    text-align: left;
+  }
+  .cs-step-node {
+    grid-row: 1 / span 2;
+    margin-bottom: 0;
+  }
+  .cs-step-node::before,
+  .cs-step-node::after { display: none; }
+  .cs-step-title { align-self: end; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASES — the approach, opened out
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-phases {
+  list-style: none;
+  margin: 0 0 var(--cs-gap-lg);
+  padding: 0;
+}
+
+/* THE PHASE IS THE GRID. Column one holds the hanging numeral, column two
+   holds the title, the lead and every block of evidence — so all of it sits
+   on one edge without anything computing an indent. The old build indented
+   twice: the title by the numeral's width, the evidence by centring a
+   narrower column inside the page. At 1440 those two landed 4px apart, which
+   reads as a mistake rather than as either intention.
+
+   row-gap carries ALL vertical spacing inside a phase, so head-to-evidence
+   and block-to-block are the same measure by construction instead of by four
+   separate margins that had drifted to 72/48/72/48. */
+.cs-phase {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: clamp(0.9rem, 2vw, 1.5rem);
+  row-gap: var(--cs-gap-md);
+  padding-block: var(--cs-gap-md);
+  border-top: 1px solid var(--border-alpha);
+}
+
+/* Everything rides column two; only the numeral is allowed out into one. */
+.cs-phase > * {
+  grid-column: 2;
+  align-self: start;
+}
+
+.cs-phase-numeral,
+.cs-phase-body {
+  grid-row: 1;
+  align-self: baseline;
+}
+
+.cs-phase-numeral { grid-column: 1; }
+
+.cs-phase:first-child { padding-top: var(--cs-gap-md); }
+.cs-phase:last-child  { padding-bottom: 0; }
+
+.cs-phase-body { min-width: 0; }
+
+/* THE NUMERAL STOPS HANGING ON PHONES. A hanging column costs 70px of a
+   327px page, which drops the lead to about 33 characters a line — well
+   under the 45 where prose stops being comfortable. Below 640 the grid
+   collapses to one column and the paragraph gets the width back. */
+@media (max-width: 639px) {
+  .cs-phase {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--cs-gap-md);
+  }
+
+  .cs-phase > *,
+  .cs-phase-numeral { grid-column: 1; }
+
+  .cs-phase-numeral,
+  .cs-phase-body { grid-row: auto; }
+
+  /* One row-gap has to serve two different relationships once the grid is a
+     single column: the numeral and its title are a lockup and want almost no
+     air, everything below is block-to-block and wants the medium step. The
+     numeral pulls its own row closed rather than the gap being set small for
+     everything. */
+  .cs-phase-numeral {
+    min-width: 0;
+    margin-bottom: calc(0.35rem - var(--cs-gap-md));
+  }
+}
+
+/* Under the section numerals, over the detail titles — it marks a step
+   inside a section rather than a section. */
+.cs-phase-numeral {
+  flex-shrink: 0;
+  /* A FIXED COLUMN, not shrink-to-fit. In the script face "01" is 11px
+     narrower than "03", so letting each numeral size itself put the four
+     phase titles on four different left edges — 136, 145, 147, 147 — which
+     reads as a wobble down the page rather than as a hanging margin. 2em of
+     the numeral's own size clears the widest of them and scales with the
+     clamp. */
+  min-width: 2em;
+  font-size: var(--cs-t-numeral);
+  line-height: 1;
+  color: var(--walnut-faint);
+}
+
+.cs-phase-title {
+  margin: 0 0 0.5rem;
+  font-size: var(--cs-t-h1);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+/* Italic, and it is doing work: the lead is the one place in a phase where
+   she is narrating rather than reporting, and the slant separates it from
+   the findings underneath without needing a rule or a second colour. */
+/* Wider than --prose-max, and only just. The 725px measure is the site's
+   reading cap and it left the lead visibly narrow against the 1100px column
+   of evidence beneath it — the two read as belonging to different layouts.
+   60rem takes it to roughly 88 characters a line, which is past the classic
+   45-75. Measured, not estimated: this runs about 110 characters a line at
+   the full column, which is past where the return sweep is comfortable. Set
+   at her direction so the lead squares with the evidence beneath it — the
+   1.7 line-height is what keeps it navigable at this measure. */
+.cs-phase-lead {
+  max-width: none;
+  margin: 0;
+  font-size: var(--cs-t-h3);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--walnut-soft);
+}
+
+/* Same grid as .cs-phase-details, so the photograph's edges line up with
+   the card beneath it instead of floating on its own measure. Width and
+   vertical spacing both come from the phase grid now — see .cs-phase. */
+.cs-phase-artifact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cs-gap-md);
+}
+
+@media (min-width: 800px) {
+  .cs-phase-artifact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+  }
+}
+
+.cs-phase-artifact figure {
+  margin: 0;
+}
+
+/* Images only. This used to name svg as well, which caught the little X
+   inside the verdict panel and stretched it to the full column — the panel
+   grew to 394px beside a 204px photograph. The drawn figures size
+   themselves; nothing here needs to reach in. */
+.cs-phase-artifact img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* aspect-ratio is what makes this the photograph's twin: the image beside it
+   is 491x307, so at equal column width the two boxes resolve to the same
+   height without either being cropped or padded to match. */
+.cs-verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 491 / 307;
+  border-radius: 10px;
+  color: var(--cs-clay);
+  background: color-mix(in srgb, var(--cs-clay) 7%, var(--ivory));
+  border: 1px solid color-mix(in srgb, var(--cs-clay) 22%, transparent);
+}
+
+.cs-verdict-mark {
+  width: clamp(58px, 23%, 112px);
+  height: auto;
+}
+
+/* The trailing letter-space after the D is real width, so a centred box puts
+   the glyphs half of it left of the axis. The margin gives it back. */
+.cs-verdict-word {
+  margin: 1.1em 0 0 0.24em;
+  font-size: var(--cs-t-h3);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.cs-verdict-line {
+  margin: 0.85em 0 0;
+  padding-inline: 1em;
+  font-size: var(--cs-t-meta);
+  line-height: 1.4;
+  text-align: center;
+  color: var(--walnut-soft);
+}
+
+.cs-phase-artifact figcaption {
+  margin-top: var(--cs-gap-sm);
+  font-size: var(--cs-t-meta);
+  line-height: 1.5;
+  color: var(--walnut-faint);
+}
+
+.cs-phase-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cs-gap-md);
+}
+
+@media (min-width: 800px) {
+  .cs-phase-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+  }
+}
+
+/* A CARD, not a bare column. The methods are peers you scan across, and a
+   tinted panel with its own edge is what makes four of them read as a set
+   rather than as four paragraphs that happen to be beside each other. */
+.cs-detail {
+  padding: var(--cs-gap-md);
+  border-radius: 10px;
+  background: var(--ivory-deep);
+}
+
+/* On the ivory-deep movements the tint disappears against the ground, so the
+   card falls back to a hairline frame instead. */
+.cs-movement--deep .cs-detail {
+  background: none;
+  border: 1px solid var(--border-alpha);
+}
+
+.cs-detail-art {
+  margin-block: var(--cs-gap-sm);
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--ivory);
+}
+
+.cs-detail-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Drawn artifacts sit on the page's own ivory so the hairlines read against
+   something, and inherit `color` so every stroke and fill is walnut without
+   the SVG naming a colour — the palettes are the one exception and set their
+   own fills. */
+.cs-detail-art--drawn {
+  padding: clamp(0.5rem, 1.2vw, 0.9rem);
+  background: var(--ivory);
+  color: var(--walnut);
+}
+
+.cs-detail-art--drawn svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* THE CARDS RUN ON THE THREE SMALLEST TIERS. They are small panels holding a
+   diagram, so their text should not reach into the same steps the phase
+   headings use — title on body's 20, bullets on meta's 16, subtitle on
+   micro's 12. That also restores a hierarchy the cards had lost: title and
+   bullets were both sitting on 20. */
+.cs-detail-title {
+  margin: 0;
+  font-size: var(--cs-t-body);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--walnut);
+}
+
+.cs-detail-sub {
+  margin: 0.2em 0 0.9em;
+  font-size: var(--cs-t-micro);
+  line-height: 1.54;
+  color: var(--walnut-faint);
+}
+
+.cs-detail-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cs-detail-points li {
+  position: relative;
+  padding-left: 1.35em;
+  margin-bottom: 0.55em;
+  font-size: var(--cs-t-meta);
+  line-height: 1.55;
+  color: var(--walnut-soft);
+}
+
+.cs-detail-points li:last-child { margin-bottom: 0; }
+
+/* The site's own mark rather than a disc bullet — the same gold dot the
+   accolade list used, at the size the micro-labels run at. */
+.cs-detail-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.4em;
+  height: 0.4em;
+  border-radius: 50%;
+  background: var(--cs-plum);
+}
+
+/* A movement can claim its own ground instead of taking its turn in the
+   ivory/ivory-deep alternation. It keeps --deep as well, so everything that
+   styles itself against a tinted ground — detail cards, the themes panel,
+   the rejected decision panel — still resolves correctly. */
+.cs-movement--mauve,
+.cs-movement--plum {
+  background: var(--cs-plum-tint);
+}
+
+.cs-caption-link {
+  color: var(--walnut);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.cs-caption-link:hover { color: var(--orchid); }
+
+/* The closing space of a movement, on the scale rather than on a Tailwind
+   step. 96px left the sections bottom-heavy — with the ground changing and a
+   marquee opening the next movement, the colour break does the separating and
+   the air does not have to. */
+.cs-movement {
+  padding-bottom: var(--cs-gap-lg);
+}
+
+/* The overview closes on a split whose two columns end at very different
+   heights — the prose runs out well above the phone beside it — so the same
+   padding reads as more air here than it does under a full-width block. It
+   gets the medium step instead. */
+.cs-movement--overview {
+  padding-bottom: var(--cs-gap-md);
+}
+
+/* A DISCLOSURE THAT ASKS TO BE OPENED. The default is a hairline and a plus,
+   which is right for an aside and wrong for the one piece of engineering
+   evidence on the page — it was being scrolled past. Gold edge, gold wash,
+   and the star: the same mark the awards carry, so the two read as related
+   claims. */
+/* Doubled class for (0,2,0). The base .cs-disclosure sets border-top and
+   sits 600 lines further down, so a single-class rule here loses the top
+   edge to it on source order and paints three gold sides and one walnut. */
+.cs-disclosure.cs-disclosure--starred {
+  border: 1px solid color-mix(in srgb, var(--gold) 50%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--gold) 9%, var(--ivory));
+}
+
+/* And .cs-disclosure:last-of-type sets border-bottom at the same (0,2,0),
+   also further down — which left three gold sides and one walnut. Adding the
+   pseudo-class here takes it to (0,3,0). */
+.cs-disclosure.cs-disclosure--starred:last-of-type {
+  border-bottom-color: color-mix(in srgb, var(--gold) 50%, transparent);
+}
+
+.cs-disclosure--starred .cs-disclosure-toggle {
+  padding-inline: var(--cs-gap-sm);
+}
+
+.cs-disclosure--starred .cs-disclosure-summary {
+  font-weight: 500;
+}
+
+.cs-disclosure--starred .cs-disclosure-inner {
+  padding-inline: var(--cs-gap-sm);
+}
+
+/* A LOGO IN THE MASTHEAD. Sized by height so any wordmark's own aspect
+   decides its width, and pitched to sit alongside the set-type version
+   rather than under it. */
+.cs-brand--logo {
+  margin: 0 0 var(--cs-gap-md);
+  line-height: 1;
+}
+
+.cs-brand--logo img {
+  display: block;
+  /* Pitched to BlueCore's masthead mass rather than to its font-size: set
+     type at 100.8px renders "BlueCore" about 380px wide, and this wordmark's
+     560x289 aspect reaches that at roughly 195px tall. The image is 560 wide
+     natively, so it is still downscaled at this size. */
+  height: clamp(3.5rem, 13.5vw, 12rem);
+  width: auto;
+  max-width: 100%;
+}
+
+/* A CLIP MOTIF HAS TO CLEAR THE NAV. The orb is centred in the hero box,
+   which starts at y=0 — behind the shared bar. At the orb's size that never
+   showed, but a 622px clip in a 690px hero had 27px of its top cut off. The
+   margin pushes the centring axis below the bar, and the clip trims to 46vh
+   so the bottom still clears the section nav underneath. */
+.cs-hero-motif--clip {
+  margin-top: 79px;
+}
+
+/* ── AWARDS — under the name, above the facts ────────────────────────── */
+.cs-awards {
+  margin: 0 0 var(--cs-gap-md);
+  padding: 0;
+  list-style: none;
+}
+
+.cs-awards li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55em;
+  margin-bottom: 0.4em;
+  font-size: var(--cs-t-meta);
+  line-height: 1.45;
+  color: var(--walnut-soft);
+}
+
+/* Baseline-aligned by hand: an inline SVG sits on the baseline by its box,
+   not its ink, so it rides high next to text without the nudge. */
+.cs-star {
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  transform: translateY(0.12em);
+  fill: var(--gold);
+}
+
+/* On the disclosure it is the thing drawing the eye to a row that is
+   otherwise a hairline and a plus, so it runs larger than the text it sits
+   beside rather than matching it. */
+.cs-disclosure-star {
+  width: 1.35em;
+  height: 1.35em;
+  margin-right: 0.5em;
+  transform: translateY(0.22em);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OUTRO — the writing, on its own ground
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* A step deeper than the impact movement's 15%, not a new hue. The page ends
+   by intensifying the colour it is already in, which reads as a close; a
+   fresh colour this late reads as a different page. */
+.cs-outro {
+  background: var(--ivory);
+  padding-block: var(--cs-gap-lg);
+}
+
+/* Script, but NOT chalked. The texture filter's displacement is tuned as a
+   ratio of type size — it reads as chalk around 200px and eats the letterform
+   by 21px. At the marquee step it would shred a face that is already fragile,
+   so this one stays clean. */
+.cs-outro-title {
+  margin: 0 0 var(--cs-gap-md);
+  font-size: var(--cs-t-marquee);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--cs-plum);
+}
+
+.cs-outro-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--cs-plum);
+}
+
+/* One entry point per row, read top to bottom. Four cards made four boxes
+   competing for the same glance; this is a bibliography, so it is listed. */
+.cs-outro-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.2em 1.5em;
+  padding-block: var(--cs-gap-sm);
+  border-bottom: 1px solid var(--cs-plum);
+  text-decoration: none;
+  transition: background-color 0.25s ease;
+}
+
+/* Narrow: the meta takes its own row above the title, so the title keeps the
+   full width. Without the span it landed in column one and collapsed the row
+   to 0px. */
+.cs-outro-meta {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 700px) {
+  .cs-outro-link {
+    grid-template-columns: 13rem minmax(0, 1fr) auto;
+    align-items: baseline;
+  }
+
+  .cs-outro-meta {
+    grid-column: auto;
+  }
+}
+
+.cs-outro-link:hover,
+.cs-outro-link:focus-visible {
+  background: color-mix(in srgb, var(--ivory) 45%, transparent);
+}
+
+.cs-outro-meta {
+  font-size: var(--cs-t-micro);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--cs-plum);
+}
+
+.cs-outro-name {
+  font-size: var(--cs-t-h3);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--cs-plum);
+}
+
+.cs-outro-go {
+  font-size: var(--cs-t-body);
+  color: var(--cs-plum);
+}
+
+.cs-outro-link:hover .cs-outro-go,
+.cs-outro-link:hover .cs-outro-name { color: var(--orchid); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DECISION — the fork, drawn
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Same panel as the journey diagram and Gap Mapping, so the three read as one
+   family of drawings rather than three unrelated boxes. */
+.cs-fork {
+  display: grid;
+  grid-template-columns: clamp(40px, 6%, 72px) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--cs-gap-sm) 0;
+  padding: var(--cs-gap-md);
+  border-radius: 10px;
+  background: var(--cs-plum-tint);
+}
+
+.cs-fork-rail {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: stretch;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--walnut-faint);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.cs-fork-row {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9em;
+  padding: var(--cs-gap-sm);
+  border-radius: 8px;
+  background: var(--ivory);
+}
+
+.cs-fork-mark {
+  display: flex;
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.cs-fork-mark svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cs-fork-name {
+  font-size: var(--cs-t-body);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.cs-fork-status {
+  font-size: var(--cs-t-micro);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+/* Set down, not struck out — a reader has to be able to read what was turned
+   down for the decision to mean anything. It keeps its own row and its own
+   ground; only the ink steps back. */
+.cs-fork-row--rejected {
+  color: var(--walnut-faint);
+  background: color-mix(in srgb, var(--ivory) 55%, transparent);
+}
+
+.cs-fork-row--chosen {
+  color: var(--walnut);
+  box-shadow: inset 0 0 0 1px var(--cs-bluecore);
+}
+
+.cs-fork-row--chosen .cs-fork-mark,
+.cs-fork-row--chosen .cs-fork-status {
+  color: var(--cs-bluecore);
+}
+
+@media (max-width: 639px) {
+  .cs-fork {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--cs-gap-sm);
+  }
+
+  /* The rail needs two rows beside it to fork between; stacked, it has
+     nothing to point at. */
+  .cs-fork-rail { display: none; }
+
+  .cs-fork-row {
+    grid-column: 1;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .cs-fork-status { grid-column: 2; }
+}
+
+/* ── a note carried by one card in the grid ──────────────────────────── */
+.cs-detail-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The card above it is a list of what was done; this is an aside about
+   getting hold of it, so it sits on the page ground rather than inside the
+   tint and takes the italic the phase leads use for narration. */
+.cs-detail-note {
+  margin: var(--cs-gap-sm) 0 0;
+  font-size: var(--cs-t-meta);
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--walnut-soft);
+}
+
+.cs-detail-note a {
+  color: var(--walnut);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── a disclosure closing the phase it belongs to ────────────────────── */
+.cs-phase-disclosure { min-width: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEMES — quotes, and the question they produced
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* A PANEL, NOT A ROW OF COLUMNS. The clusters are not a fourth and fifth
+   method — they are the output of the two above them, and left bare they
+   read as more of the same. The tinted frame and its title say "this is a
+   different kind of object": the methods went in, this came out.
+
+   Two grounds deep, deliberately. The tint holds the whole exhibit together
+   and the white card inside it holds the quotes, so the mariners' own words
+   sit on paper rather than on the frame. */
+/* SAME PANEL AS THE JOURNEY DIAGRAM. This used to be a walnut-tinted frame
+   holding a white card holding the columns — two grounds and two radii to
+   present three lists. The other diagram on this page is one mauve panel
+   with its title inside it, so this is that: same tint, same radius, same
+   padding, and the columns sit straight on it. */
+.cs-themes-panel {
+  padding: var(--cs-gap-md);
+  border-radius: 10px;
+  background: var(--cs-mauve);
+}
+
+@supports not (background: color-mix(in srgb, red 10%, white)) {
+  .cs-themes-panel { background: #f3eaf0; }
+}
+
+/* Diagram type, so the same three smallest tiers the phase cards use: panel
+   title on 20, everything inside on 16. Weight and the rule above the
+   question carry the hierarchy that size used to. */
+.cs-themes-title {
+  margin: 0 0 var(--cs-gap-sm);
+  font-size: var(--cs-t-body);
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--walnut);
+}
+
+@media (min-width: 800px) {
+  .cs-themes-title {
+    margin-bottom: var(--cs-gap-md);
+  }
+}
+
+.cs-themes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cs-gap-md);
+}
+
+@media (min-width: 800px) {
+  .cs-themes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+  }
+}
+
+/* Bare columns. The panel around all three is the only frame there is now —
+   giving each its own edge would put three boxes back inside a box, which is
+   what this diagram was just simplified out of. */
+.cs-theme {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-theme-title {
+  margin: 0 0 var(--cs-gap-sm);
+  font-size: var(--cs-t-meta);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+/* flex:1 so the rule below lands at the same height in every column even
+   when one cluster carries three quotes and another carries two. */
+.cs-theme-quotes {
+  flex: 1;
+}
+
+.cs-theme-quote {
+  margin: 0 0 0.8em;
+  font-size: var(--cs-t-meta);
+  line-height: 1.5;
+  color: var(--walnut-soft);
+}
+
+/* Everything above the rule is theirs; the line below it is the team's. */
+.cs-theme-question {
+  margin: var(--cs-gap-sm) 0 0;
+  padding-top: var(--cs-gap-sm);
+  border-top: 1px solid var(--border-alpha);
+  font-size: var(--cs-t-meta);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NOTE — a labelled aside
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-note {
+  max-width: var(--prose-max);
+  margin-block: var(--cs-gap-lg);
+  padding: var(--cs-gap-md);
+  background: var(--ivory-deep);
+  border-radius: 6px;
+}
+
+/* Same fallback as .cs-detail — see above. */
+.cs-movement--deep .cs-note {
+  background: none;
+  border: 1px solid var(--border-alpha);
+}
+
+.cs-note-text {
+  margin: 0;
+  font-size: var(--cs-t-body);
+  line-height: 1.6;
+  color: var(--walnut-soft);
+}
+
+.cs-note .cs-inline-links {
+  margin-top: var(--cs-gap-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION NAV — the case study's own bar
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-secnav {
+  position: sticky;
+  /* Clears the shared bar: 17px pad + 48px wordmark + 14px pad = 79. */
+  top: 79px;
+  z-index: 40;
+  /* Glass, matching the shared bar above it — see .site-nav. Nothing divides
+     the two, so they read as one continuous band; the border-bottom here is
+     the only edge, closing that band against the page rather than splitting
+     it. Same glass as the cursor tag and the ring's View pill. */
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--border-alpha);
+}
+
+/* Without backdrop-filter the half-transparent ground just looks unfinished,
+   so it falls back to solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cs-secnav { background: var(--ivory); }
+}
+
+.cs-secnav-inner {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3.5vw, 3rem);
+  height: 46px;
+}
+
+.cs-secnav-link {
+  text-decoration: none;
+  font-family: var(--cs-sans);
+  font-size: var(--cs-t-micro);
+  font-weight: 500;
+  line-height: 1.54;
+  /* Caps need tracking. At 13px with none, uppercase DM Sans sets tight
+     enough that the words read as one run. */
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--walnut-faint);
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.cs-secnav-link:hover { color: var(--walnut); }
+
+/* Current carries a rule as well as the colour, so the state does not rest
+   on telling walnut from walnut-faint. */
+.cs-secnav-link.is-current {
+  color: var(--walnut);
+  box-shadow: inset 0 -1px 0 0 var(--orchid);
+}
+
+/* Below 640px the three labels run past the shell, so the bar scrolls
+   sideways rather than wrapping to two rows and doubling its height for the
+   whole page. */
+@media (max-width: 640px) {
+  .cs-secnav-inner {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cs-secnav-inner::-webkit-scrollbar { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   JOURNEY MILESTONES — the approach as a chain
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.jm-chain {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Each phase group sets `color` once; every circle, bar and rail segment
+   inside it paints with currentColor, so a phase is recoloured by one token
+   and the SVG never names a hex. */
+.jm-phase--research   { color: var(--jm-research); }
+.jm-phase--prototype  { color: var(--jm-prototype); }
+.jm-phase--reposition { color: var(--jm-reposition); }
+.jm-phase--build      { color: var(--jm-build); }
+
+/* 22.15 UNITS, NOT 20. This is SVG text: the viewBox is 1240 wide and draws
+   into a 1120px panel, so every value here is multiplied by 0.903. 21 units
+   was rendering 19px — on no tier at all. 22.15 lands on --cs-t-body's 20.
+   The two label runs are already 13.3, which reaches --cs-t-micro's 12 the
+   same way. */
+.jm-phase-name {
+  font-size: 22.15px;
+  font-weight: 500;
+  font-style: italic;
+  fill: var(--walnut);
+}
+
+/* VIEWBOX UNITS, NOT PIXELS. These sit inside an SVG whose 1240-unit
+   viewBox is drawn into the content column, so every value here is scaled by
+   whatever that column happens to be. At the old 1800 column the chain drew
+   at 1238 and 12 units landed at 12px; against the 1216 column it draws at
+   1120, a scale of 0.903, and the same 12 rendered at 10.8px — under the
+   floor where a two-line label is still readable. 13.3 restores the 12px the
+   chain was designed with. The tightest same-side label gap is 66 units, so
+   the wider glyphs still clear each other with room to spare. */
+.jm-label {
+  font-size: 13.3px;
+  font-weight: 400;
+  fill: var(--walnut-soft);
+}
+
+.jm-marker {
+  font-size: 13.3px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--walnut-faint);
+}
+
+/* ── the stacked rendering ─────────────────────────────────────────────
+   Not a squeezed chain. At phone width the horizontal version would put
+   eleven circles about 20px apart with 12px two-line labels on top of each
+   other; the phases stack instead, which is the same information in the
+   shape a narrow column can hold. */
+.jm-stack { display: none; }
+
+@media (max-width: 899px) {
+  .jm-chain { display: none; }
+
+  .jm-stack {
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .jm-group + .jm-group {
+    margin-top: var(--cs-gap-md);
+  }
+
+  .jm-group-name {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    /* Real DOM in the phone stack, so this one takes the token directly —
+       nothing scales it. */
+    font-size: var(--cs-t-body);
+    font-weight: 500;
+    font-style: italic;
+    color: var(--walnut);
+  }
+
+  .jm-group-bar {
+    display: block;
+    width: 46px;
+    height: 3px;
+    margin: 0.45rem 0 0.85rem;
+    border-radius: 1.5px;
+    background: currentColor;
+  }
+
+  .jm-group-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .jm-group-items li {
+    position: relative;
+    padding-left: 1.35em;
+    margin-bottom: 0.5em;
+    font-size: var(--cs-t-meta);
+    line-height: 1.5;
+    color: var(--walnut-soft);
+  }
+
+  /* The key moments keep their emphasis here too — ringed in the chain,
+     filled and darker in the stack. */
+  .jm-group-items li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 0.42em;
+    height: 0.42em;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+  }
+
+  .jm-group-items li.is-key {
+    color: var(--walnut);
+    font-weight: 500;
+  }
+
+  .jm-group-items li.is-key::before {
+    background: currentColor;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DISCLOSURE — Disciplines' expand/collapse, for a case study's long detail
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-disclosure {
+  border-top: 1px solid var(--border-alpha);
+}
+
+.cs-disclosure:last-of-type {
+  border-bottom: 1px solid var(--border-alpha);
+}
+
+.cs-disclosure-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  width: 100%;
+  padding: clamp(1.1rem, 2vw, 1.5rem) 0;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--walnut);
+  font-family: var(--cs-sans);
+}
+
+.cs-disclosure-summary {
+  font-size: var(--cs-t-h3);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+/* The hint earns its own weight class: it says what is inside, so it has to
+   be readable, but it must not compete with the summary it qualifies. */
+.cs-disclosure-hint {
+  flex: 1;
+  font-size: var(--cs-t-meta);
+  font-weight: 400;
+  line-height: 1.54;
+  color: var(--walnut-soft);
+}
+
+.cs-disclosure-plus {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 1.4em;
+  line-height: 1;
+  color: var(--walnut-soft);
+  transition: transform 0.5s ease-out, color 0.3s;
+}
+
+.cs-disclosure.is-open .cs-disclosure-plus {
+  transform: rotate(45deg);
+  color: var(--walnut);
+}
+
+.cs-disclosure-toggle:hover .cs-disclosure-plus {
+  color: var(--orchid);
+}
+
+/* Height and opacity are driven by GSAP; these are the resting states so the
+   panel is closed before any JS runs rather than flashing open on load. */
+.cs-disclosure-panel {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.cs-disclosure-inner {
+  padding-bottom: var(--cs-gap-md);
+}
+
+/* Blocks inside a panel should not add the outer margin they carry when they
+   sit alone in a section — the panel already provides the inset. */
+.cs-disclosure-inner > *:first-child { margin-block-start: 0; }
+.cs-disclosure-inner > *:last-child  { margin-block-end: 0; }
+
+/* On a phone the row wraps, and the ORDER of the wrap is what decides its
+   height. Left in source order — summary, hint, plus — the hint takes a full
+   row of its own and pushes the plus onto a THIRD line, giving a 151px
+   control for a single line of label. Pulling the plus up beside the summary
+   makes it two lines: title and affordance on one, description under it. */
+@media (max-width: 640px) {
+  .cs-disclosure-toggle { flex-wrap: wrap; }
+  .cs-disclosure-plus { order: 1; margin-left: auto; }
+  .cs-disclosure-hint { order: 2; flex: 0 0 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FEATURE — media and text as a pair, alternating down the page.
+   The Where I've been arrangement: text-led, media supporting.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-feature {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--cs-gap-md);
+  margin-block: var(--cs-gap-lg);
+  align-items: center;
+}
+
+@media (min-width: 800px) {
+  /* Text-led, as on the home page: the image supports the sentence rather
+     than the sentence captioning the image. */
+  .cs-feature {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--cs-gap-md);
+  }
+  .cs-feature .cs-feature-text  { grid-column: 1; grid-row: 1; }
+  .cs-feature .cs-feature-media { grid-column: 2; grid-row: 1; }
+
+  .cs-feature.is-flipped .cs-feature-text  { grid-column: 2; }
+  .cs-feature.is-flipped .cs-feature-media { grid-column: 1; }
+
+  .cs-feature.is-textonly { grid-template-columns: minmax(0, 1fr); }
+}
+
+.cs-feature-media img,
+.cs-feature-media video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.cs-feature-heading {
+  margin: 0 0 0.5em;
+  font-size: var(--cs-t-h1);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--walnut);
+  text-wrap: balance;
+}
+
+.cs-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border: 1px dashed var(--border-alpha);
+  border-radius: 6px;
+  background: var(--ivory-deep);
+  font-size: var(--cs-t-meta);
+  color: var(--walnut-faint);
+}
+
+/* The masthead's live orb. LogoOrb is a whole hero composition — a canvas,
+   decorative rings offset well outside their box, and an <h1> — so in the
+   masthead it is cropped to the canvas and the heading is removed. Without
+   that the page carries two <h1>s and the rings hang across the wordmark. */
+.cs-hero-motif--live {
+  /* NO `display` HERE. This is a plain class, so it beat Tailwind's `hidden`
+     in the cascade and the orb stayed mounted below lg — a canvas animating
+     every frame for a viewport that never shows it. It needs no centring
+     anyway: `bare` LogoOrb renders exactly size x size, and the wrapper is
+     given the same box inline. */
+  overflow: visible;
+}
+
+.cs-hero-motif--live h1,
+.cs-hero-motif--live p {
+  display: none;
+}
+
+/* LogoOrb is a full-page HERO composition, not a media component. It ships
+   its own <h1>BlueCore</h1> at 4rem in Unbounded with a hard-coded navy, and
+   decorative rings offset to top:-80/left:-100. Dropped into a feature column
+   that h1 is a SECOND page heading, the navy is the one colour I took off
+   this page, and the rings hang 76px outside the viewport on a phone.
+
+   So it is cropped to a box like any other product shot. The page already
+   names the project 112px above, so the internal heading goes — display:none
+   rather than a visual hide, because it has to leave the a11y tree too. */
+.cs-orb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* width FIRST. With only aspect-ratio + min-height the browser satisfies
+     the minimum by growing the box WIDER (320 x 4/3 = 427px) and it burst out
+     of a 342px column. Pinning the width makes height the derived axis. */
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  /* The orb's canvas is a fixed 280px; the box can never be shorter. */
+  min-height: 320px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--ivory-deep);
+}
+
+.cs-orb h1 { display: none; }
+
+.cs-inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.cs-inline-links a {
+  font-size: var(--cs-t-meta);
+  line-height: 1.54;
+  color: var(--walnut);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-alpha);
+  padding-bottom: 2px;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.cs-inline-links a:hover {
+  color: var(--orchid);
+  border-color: var(--orchid);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STRIP — DragStrip, with the ring's momentum
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── FIGURE — one image carrying its own argument ───────────────────── */
+.cs-figure {
+  /* margin-block-end, not the `margin` shorthand — the shorthand also writes
+     margin-left: 0 and would cancel .cs-bleed's rail reclaim, exactly as it
+     did for .cs-strip-block. */
+  margin-block-end: var(--cs-gap-lg);
+  margin-inline-end: 0;
+}
+
+.cs-figure video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cs-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* For artwork that must not be cropped or bled to the edge — a diagram, a
+   board, anything with type in it. */
+.cs-figure img.is-contained {
+  background: var(--ivory-deep);
+  padding: clamp(1rem, 3vw, 2.5rem);
+  object-fit: contain;
+}
+
+/* ── phone screenshots ──────────────────────────────────────────────────
+   ~0.47:1. At the media column's full width these render over 1000px tall,
+   which turns a supporting image into the whole section. Capped by height,
+   centred, on the page's deep ivory so the dark bezel has something to sit
+   against. */
+.cs-feature-media--phone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  background: var(--ivory-deep);
+}
+
+.cs-feature-media--phone img {
+  width: auto;
+  max-width: min(100%, 280px);
+  max-height: 62vh;
+  border-radius: 0;
+}
+
+.cs-strip-block {
+  /* margin-block, NOT the `margin` shorthand. The shorthand also writes
+     margin-left: 0, and it sits later in this file than .cs-bleed at equal
+     specificity — which silently cancelled the rail reclaim. */
+  margin-block: var(--cs-gap-lg);
+}
+
+/* Runs past the right edge so it is visibly longer than the window, which is
+   the only honest way to say "there is more, drag it". */
+.cs-strip {
+  margin-right: calc(-1 * var(--hero-pad));
+}
+
+.cs-caption {
+  margin: 1rem 0 0;
+  font-size: var(--cs-t-meta);
+  line-height: 1.54;
+  color: var(--walnut-faint);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LINKS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-links {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-block: var(--cs-gap-md);
+  border-top: 1px solid var(--border-alpha);
+}
+
+.cs-link-card {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1rem, 2vw, 1.75rem);
+  padding: clamp(1.1rem, 2vw, 1.6rem) 0;
+  border-bottom: 1px solid var(--border-alpha);
+  text-decoration: none;
+  color: var(--walnut);
+  transition: color 0.3s;
+}
+
+.cs-link-card:hover { color: var(--orchid); }
+
+.cs-link-index {
+  flex-shrink: 0;
+  /* Same correction as .cs-card-index: was 38px beside a 21.6px label. */
+  font-size: var(--cs-t-body);
+  line-height: 0.9;
+  color: var(--walnut-faint);
+  transition: color 0.3s;
+}
+
+.cs-link-card:hover .cs-link-index { color: var(--orchid); }
+
+.cs-link-label {
+  flex: 1;
+  font-size: var(--cs-t-h3);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.cs-link-detail {
+  font-size: var(--cs-t-meta);
+  line-height: 1.54;
+  color: var(--walnut-soft);
+}
+
+.cs-link-arrow {
+  flex-shrink: 0;
+  font-size: var(--cs-t-meta);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAGNIFIED — the work page's glass lens, over media
+
+   position: relative is all CursorTag needs to place its pill; the lens
+   itself is a backdrop-filter on the tag, so nothing here has to know about
+   the displacement map.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-magnified {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BACK LINK — the dark CTA the home page uses
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cs-footer-link {
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+.cs-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  background: var(--walnut);
+  color: var(--ivory);
+  text-decoration: none;
+  font-family: var(--cs-sans);
+  font-weight: 500;
+  font-size: var(--cs-t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.3s;
+}
+
+.cs-back-link:hover { opacity: 0.8; }
+
+/* Screen-reader-only, for the h1 the marquee cannot be. */
+.cs-page .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

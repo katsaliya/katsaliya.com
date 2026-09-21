@@ -1,0 +1,40 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORK-CAROUSEL.CSS — page-scoped overrides for the /work ring page
+
+   The reference app applies overflow:hidden and overscroll-behavior:none to
+   html/body globally (it's a single-page app with nothing else to scroll).
+   This site has other pages that need normal scrolling, so the same rules
+   are scoped to .page-work-carousel-body instead, set/cleared by the page
+   component on mount/unmount — same pattern the rest of this site uses for
+   page-specific body classes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.page-work-carousel-body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #fafafa;
+}
+
+.page-work-carousel-body canvas {
+  display: block;
+}
+
+/* Nav floats above the WebGL canvas on this page */
+.page-work-carousel-body .main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
+}
+
+.page-work-carousel-body .main-nav.scrolled {
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
+}

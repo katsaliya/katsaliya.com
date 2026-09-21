@@ -24,14 +24,20 @@ import { Routes, Route } from 'react-router-dom'
 /* This makes scrolling feel premium and polished instead of jerky */
 import Lenis from 'lenis'
 
+/* GSAP + ScrollTrigger, driven by Lenis's ticker rather than a separate raf
+   loop — see the note below. Needed here (not just in the components that
+   use ScrollTrigger) because this is where that wiring has to happen once,
+   globally. */
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
 /* ─── IMPORT ALL PAGE COMPONENTS ─── */
 /* Each import loads a different page that users can navigate to */
 
-/* Work page (home/portfolio page) */
-import Work from './pages/Work'
-
-/* About page (biography/background) */
-import About from './pages/About'
+/* Home page (bio hero) + About (scrolled-into section of the same page) */
+import Home from './pages/Home'
 
 /* Play page (experiments/creative projects) */
 import Play from './pages/Play'
@@ -45,8 +51,15 @@ import Bluecore from './pages/Bluecore'
 /* Known case study page */
 import Known from './pages/Known'
 
-/* Floating social bubble (draggable, expandable) */
-import FloatingSocialBubble from './components/FloatingSocialBubble'
+/* Work carousel page — the ring, ported from the Viscose-carousel reference */
+import WorkCarousel from './pages/WorkCarousel'
+
+/* The chalky-edge SVG filter, mounted once here rather than inside any one
+   page: an SVG filter id is document-global, and the elements referencing it
+   (Home's hero name, the nav wordmark, the Disciplines marquee) sit in
+   different components. See components/ChalkTexture.jsx. */
+import ChalkTexture from './components/ChalkTexture'
+import GlassLens from './components/GlassLens'
 
 /* ─────────────────────────────────────────────────────────────────────────
    MAIN APP COMPONENT
@@ -99,25 +112,40 @@ export default function App() {
       touchMultiplier: 2,
     })
 
-    /* Set up animation loop for Lenis */
-    /* requestAnimationFrame calls raf function before each screen refresh */
-    /* This keeps Lenis smooth scrolling synchronized with screen refreshes */
-    function raf(time) {
-      /* Update Lenis with current frame time */
-      /* Lenis calculates smooth scroll position for this frame */
-      lenis.raf(time)
+    /* Lenis is a virtual/JS-driven scroller — it doesn't move window.scrollY
+       via the browser's native scroll mechanism, so GSAP's ScrollTrigger
+       (which by default watches the native scroll position) never finds out
+       a scroll happened unless the two are explicitly wired together. This
+       is GSAP's own documented integration pattern for Lenis:
+         - Lenis's per-frame update rides GSAP's ticker instead of its own
+           requestAnimationFrame loop, so both stay on the same clock.
+         - Every Lenis 'scroll' event tells ScrollTrigger to recalculate.
+       Skipping this means every ScrollTrigger-based reveal on the site
+       (SplitReveal/GhostReveal/ScrollImage, and anything scroll-triggered
+       added later) silently never fires, since ScrollTrigger's internal
+       scroll position never updates.
+       Time is *1000: gsap.ticker hands time in seconds, lenis.raf expects ms.
+       Named (not inline) so cleanup can remove this exact function — ticker
+       .remove() needs the same reference that was added, not just an
+       identical-looking arrow function. */
+    const tickLenis = (time) => lenis.raf(time * 1000)
+    gsap.ticker.add(tickLenis)
+    gsap.ticker.lagSmoothing(0)
+    lenis.on('scroll', ScrollTrigger.update)
 
-      /* Queue up the next animation frame */
-      /* This creates a continuous loop while the page is scrolled */
-      requestAnimationFrame(raf)
-    }
-
-    /* Start the animation loop */
-    requestAnimationFrame(raf)
+    /* Exposed so pages can scroll programmatically (e.g. Home.jsx jumping to
+       the About section on /about) via lenis.scrollTo() — its own official
+       API for this, which updates its internal virtual-scroll state
+       correctly. Plain window.scrollTo()/scrollIntoView() get silently
+       overridden by Lenis's own per-frame update the next tick, since it
+       doesn't know about them. */
+    window.__lenis = lenis
 
     /* Cleanup function: runs when component unmounts (user leaves page) */
     /* This prevents memory leaks and stops unnecessary animations */
     return () => {
+      gsap.ticker.remove(tickLenis)
+      window.__lenis = null
       /* Destroy Lenis instance and clean up resources */
       lenis.destroy()
     }
@@ -129,24 +157,23 @@ export default function App() {
 
   return (
     <>
-      {/* Floating social bubble on all pages */}
-      <FloatingSocialBubble />
+      <ChalkTexture />
+      <GlassLens />
 
       {/* Routes container: holds all page route definitions */}
       <Routes>
 
-        {/* Home page / Work page (portfolio) */}
+        {/* Home page — bio hero + About scrolled below it */}
         {/* path="/" = when URL is "katsaliya.com/" (root) */}
-        {/* element={<Work />} = render the Work component */}
-        {/* This is the landing page users see first */}
-        {/* TO CHANGE: Replace <Work /> with different component to change home page */}
-        <Route path="/" element={<Work />} />
+        <Route path="/" element={<Home />} />
 
-      {/* About page */}
+      {/* Work carousel page — the WebGL ring */}
+      {/* path="/work" = when URL is "katsaliya.com/work" */}
+      <Route path="/work" element={<WorkCarousel />} />
+
+      {/* About — same component as Home, auto-scrolls to the About section */}
       {/* path="/about" = when URL is "katsaliya.com/about" */}
-      {/* element={<About />} = render the About component */}
-      {/* TO CHANGE: Replace <About /> with different component */}
-      <Route path="/about" element={<About />} />
+      <Route path="/about" element={<Home />} />
 
       {/* Play / Experiments page */}
       {/* path="/play" = when URL is "katsaliya.com/play" */}
