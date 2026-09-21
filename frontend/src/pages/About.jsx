@@ -125,8 +125,6 @@ export default function About() {
 
       {/* Main site wrapper */}
       <div className="site-wrapper" id="siteWrapper">
-        {/* Page nav-script: K.Sun logo */}
-        <div className="page-nav-script">K.Sun</div>
 
         {/* Global navigation bar */}
         <Nav />

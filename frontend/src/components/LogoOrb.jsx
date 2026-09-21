@@ -92,7 +92,7 @@ function useAcousticAmplitude(state) {
    Uses 3D math (rotation matrices) to create the illusion of depth.
    ───────────────────────────────────────────────────────────────────── */
 
-function WireframeOrb({ state, ampRef, orbColor }) {
+function WireframeOrb({ state, ampRef, orbColor, size = 280 }) {
   /* Reference to canvas element */
   const canvasRef = useRef(null)
 
@@ -115,8 +115,10 @@ function WireframeOrb({ state, ampRef, orbColor }) {
     /* Cap at 2 to avoid excessive memory usage */
     const DPR = Math.min(window.devicePixelRatio || 1, 2)
 
-    /* Canvas size: 280px (CSS pixels) */
-    const CSS = 280
+    /* Canvas size in CSS pixels. 280 by default — the size this was written
+       against — but the case-study masthead renders it far larger, and a
+       canvas cannot simply be stretched with CSS without going soft. */
+    const CSS = size
 
     /* Set CSS size and actual pixel size for proper scaling */
     canvas.style.width = CSS + 'px'
@@ -133,8 +135,10 @@ function WireframeOrb({ state, ampRef, orbColor }) {
     const CX = CSS / 2
     const CY = CSS / 2
 
-    /* Base radius of sphere */
-    const BASE_R = 82
+    /* Base radius, PROPORTIONAL to the canvas. It was a flat 82, which is
+       correct only at the original 280: at any larger size the orb stayed
+       82px and sat marooned in the middle of an empty canvas. */
+    const BASE_R = 82 * (CSS / 280)
 
     /* Grid dimensions (more rows/cols = smoother sphere) */
     const ROWS = 36 /* Latitude divisions */
@@ -327,7 +331,7 @@ function WireframeOrb({ state, ampRef, orbColor }) {
 
     /* Cleanup on unmount */
     return () => cancelAnimationFrame(frame)
-  }, [orbColor, ampRef])
+  }, [orbColor, ampRef, size])
 
   return <canvas ref={canvasRef} style={{ display: 'block' }} />
 }
@@ -336,7 +340,13 @@ function WireframeOrb({ state, ampRef, orbColor }) {
    MAIN LOGO ORB COMPONENT
    ───────────────────────────────────────────────────────────────────── */
 
-export default function LogoOrb() {
+/* `bare` renders the ORB AND NOTHING ELSE — no wordmark, no decorative
+   gradients, no padded column. The full composition is a page hero: it ships
+   its own <h1>, rings offset well outside their box, and a flex column with
+   42px of padding that flex-shrinks the canvas when the container is only as
+   tall as the orb itself. Embedding it meant fighting all of that from
+   outside with !important. This is the same animation, on its own. */
+export default function LogoOrb({ size = 280, bare = false }) {
   /* State: idle (default), listening (on hover), or speaking */
   const [orbState, setOrbState] = useState('idle')
 
@@ -350,6 +360,18 @@ export default function LogoOrb() {
   useEffect(() => {
     return amp.on('change', (v) => { ampRef.current = v })
   }, [amp])
+
+  if (bare) {
+    return (
+      <div
+        style={{ width: size, height: size, position: 'relative' }}
+        onMouseEnter={() => setOrbState('listening')}
+        onMouseLeave={() => setOrbState('idle')}
+      >
+        <WireframeOrb state={orbState} ampRef={ampRef} orbColor="#25467F" size={size} />
+      </div>
+    )
+  }
 
   return (
     <div style={{
@@ -442,7 +464,7 @@ export default function LogoOrb() {
           }} />
 
           {/* The actual 3D wireframe orb */}
-          <WireframeOrb state={orbState} ampRef={ampRef} orbColor="#25467F" />
+          <WireframeOrb state={orbState} ampRef={ampRef} orbColor="#25467F" size={size} />
         </motion.div>
       </div>
     </div>

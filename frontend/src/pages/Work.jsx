@@ -131,6 +131,17 @@ export default function Work() {
   /* Card data for masonry grid */
   const masonryCards = [
     {
+      projectName: 'EMPORIUM THAI MARKET',
+      media: '/images/cards/demo-aidentity.png',
+      mediaType: 'image',
+      description: `TLDR: Reimagining how immigrant families access legal guidance — built for the communities attorneys can\'t reach.\n
+      ROLE: Team Lead & Product Designer\n
+      TIMELINE: Feb 2026 - Jun 2026\n`,
+      caseStudyLink: '#',
+      handler: handleCardClick,
+      colorTheme: 'hotpink',
+    },
+    {
       projectName: 'BLUECORE AI',
       media: '/images/cards/orbcard.mov',
       mediaType: 'video',
@@ -142,6 +153,18 @@ export default function Work() {
       ribbonImage: '/images/case-studies/bluecore-sfhacks-person.png',
       caseStudyLink: '/bluecore',
       handler: handleBluecoreClick,
+      colorTheme: 'teal',
+    },
+    {
+      projectName: 'AIDENTITY',
+      media: '/images/cards/demo-aidentity.png',
+      mediaType: 'image',
+      description: `TLDR: Reimagining how immigrant families access legal guidance — built for the communities attorneys can\'t reach.\n
+      ROLE: Team Lead & Product Designer\n
+      TIMELINE: Feb 2026 - Jun 2026\n`,
+      caseStudyLink: '#',
+      handler: handleCardClick,
+      colorTheme: 'purple',
     },
     {
       projectName: 'KNOWN',
@@ -149,41 +172,13 @@ export default function Work() {
       mediaType: 'video',
       description: `TLDR: A collection of content, marketing materials, and graphics for an AI-matchmaking startup.\n
       ROLE: Growth Intern --> Growth Associate\n
-      TIMELINE: Jun 2025 - Oct 2025\n 
+      TIMELINE: Jun 2025 - Oct 2025\n
       COMPANY: Known`,
       caseStudyLink: '/known',
       handler: handleKnownClick,
-    },
-    {
-      projectName: 'AIDENTITY',
-      media: '/images/cards/demo-aidentity.png',
-      mediaType: 'image',
-      description: `TLDR: Reimagining how immigrant families access legal guidance — built for the communities attorneys can\'t reach.\n
-      ROLE: Team Lead & Product Designer\n 
-      TIMELINE: Feb 2026 - Jun 2026\n`,
-      caseStudyLink: '#',
-      handler: handleCardClick,
-    },
-    {
-      projectName: 'EMPORIUM THAI MARKET',
-      media: '/images/cards/demo-aidentity.png',
-      mediaType: 'image',
-      description: `TLDR: Reimagining how immigrant families access legal guidance — built for the communities attorneys can\'t reach.\n
-      ROLE: Team Lead & Product Designer\n 
-      TIMELINE: Feb 2026 - Jun 2026\n`,
-      caseStudyLink: '#',
-      handler: handleCardClick,
-    },
-    {
-      projectName: 'KATSALIYA',
-      media: '/images/cards/demo-aidentity.png',
-      mediaType: 'image',
-      description: `TLDR: Reimagining how immigrant families access legal guidance — built for the communities attorneys can\'t reach.\n
-      ROLE: Team Lead & Product Designer\n 
-      TIMELINE: Feb 2026 - Jun 2026\n`,
-      caseStudyLink: '#',
-      handler: handleCardClick,
+      colorTheme: 'darkred',
     }
+
   ]
 
   /* ─── RETURN: Render the page structure ─── */
@@ -194,11 +189,8 @@ export default function Work() {
 
       {/* Main page wrapper */}
       <div className="site-wrapper">
-        {/* Page nav-script: K.Sun logo */}
-        <div className="page-nav-script">K.Sun</div>
-
-        {/* Global navigation bar (appears at top on all pages) */}
-        <Nav />
+        {/* Global navigation bar (appears at top on all pages) — spread variant: no logo, links spread across full width */}
+        <Nav variant="spread" />
 
         {/* Main page content area */}
         <main className="page page-work" id="page-work">
@@ -219,79 +211,78 @@ export default function Work() {
                   HERO SECTION — Large introduction at top of page
                   ═══════════════════════════════════════════ */}
               <div className="face-hero" ref={heroRef}>
+                {/* Diagonal text in upper left corner */}
+                <div className="hero-diagonal-text">who am i?</div>
 
-                {/* Intro text: "Hello, I'm" */}
-                {/* Styled in work.css .work-hero__intro */}
-                {/* TO CHANGE: Edit text in quotes below, change CSS for styling
-                <p className="work-hero__intro">Hello, I am</p> */}
+                {/* Background motifs: PLACEHOLDER — drop brush-stroke-1.png / brush-stroke-2.png into public/images/assets to replace */}
+                <img
+                  className="hero-bg-motif hero-bg-motif--top-right"
+                  src="/images/assets/brush-stroke-1.png"
+                  alt=""
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
 
-                {/* Main name heading with typewriter animation */}
-                  {/* Cycles through: English → Thai → Chinese → repeat */}
-                  {/* Styled in work.css .work-hero__name */}
-                  <h1 className="work-hero__name">
-                  {/* Visually hidden accessible name for screen readers */}
-                  <span className="sr-only">Kataliya Sungkamee</span>
+                <img
+                  className="hero-bg-motif hero-bg-motif--bottom-left"
+                  src="/images/assets/brush-stroke-2.png"
+                  alt=""
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
 
-                  {/* Typewriter text with dynamic script switching */}
-                  <span
-                    className="typewriter-text"
-                    data-script={
-                      displayText.includes('แค') ? 'thai' :
-                      displayText.includes('桑') ? 'chinese' :
-                      'latin'
-                    }
-                  >
-                    {displayText}
-                  </span>
+                <div className="container">
+                  <img className="hero-logo-mark" src="/images/assets/orchid-logo-placeholder.png" alt="" />
 
-                  {/* Cursor - solid while typing/deleting, blinking during pauses */}
-                  <span className={`typewriter-cursor ${isPaused ? 'blinking' : 'solid'}`} />
-                </h1>
+                  {/* Main headline 
+                  <h1 className="hero-headline">Who am I?</h1>*/}
 
-                {/* Decorative dashed line under the name */}
-                {/* Styled in work.css .work-hero__line (width, border style, margin) */}
-                {/* TO CHANGE: Modify CSS border and width for different look 
-                <div className="work-hero__line" />*/}
+                  <p className="hero-body">
+                  Hi, I'm Liya!</p>
+                  
 
-                {/* Container for bio text paragraphs */}
-                <div className="work-hero__bios">
 
-                  {/* First bio paragraph: description of what you do */}
-                  {/* <em> tags make text italic for emphasis */}
-                  {/* Styled in work.css .work-hero__bio */}
-                  {/* TO CHANGE: Edit bio text, adjust colors/fonts in CSS */}
-                  <p className="work-hero__bio">
-                    a multidisciplinary <em>designer, builder, and content creator</em> passionate about creating at the intersection of technology, people, and storytelling.
+                  {/* Body paragraph */}
+                  <p className="hero-body">
+                    A multidisciplinary designer working at the intersection of technology, people, and storytelling — rooted in craft, drawn to the space between design and code. </p>
+                  <p className="hero-body">
+                    Currently leading creative work spanning social, web, in-house material and consumer products for the recent launch of Emporium Thai Market.
                   </p>
 
-                  {/* Second bio paragraph: current work/focus */}
-                  {/* <span className="teal"> makes text appear in teal accent color */}
-                  {/* Styled in work.css .work-hero__bio and .teal */}
-                  {/* TO CHANGE: Update company name and role, edit CSS for color */}
-                  <p className="work-hero__bio">
-                    Driven by user research and aesthetic intention — currently applying both across <span className="teal">content, product, and web at Emporium Thai</span>.
-                  </p>
+                  {/* Contact links row */}
+                  <div className="hero-contact-links">
+                    <a href="mailto:kataliyasun@gmail.com" className="hero-contact-link">mail</a>
+                    <a href="https://linkedin.com/in/katsaliya" target="_blank" rel="noopener noreferrer" className="hero-contact-link">linkedin</a>
+                    <a href="https://github.com/katsaliya" target="_blank" rel="noopener noreferrer" className="hero-contact-link">github</a>
+                  </div>
                 </div>
 
-                {/* CTA text encouraging visitors to scroll down */}
+                {/* CTA text encouraging visitors to scroll down - scroll hint at bottom */}
                 {/* 🡓 is an emoji (downward arrow) */}
                 {/* Styled in work.css .work-hero__cta */}
                 {/* TO CHANGE: Edit text and emoji, adjust color/size in CSS */}
-                <p className="work-hero__cta">some things i've been working on 🡓</p>
+                <p className="work-hero__cta">scroll to see work</p>
+              </div>
+
+              {/* Section divider: Wave-and-dot SVG 
+              <div className="section-divider">
+                <svg viewBox="0 0 160 20" fill="none">
+                  <path d="M0 10 Q13 0 26 10 T52 10 T78 10 T104 10 T130 10 T160 10"
+                        stroke="var(--gold)" strokeWidth="1"/>
+                  <circle cx="80" cy="10" r="2.5" fill="var(--gold)"/>
+                </svg>
               </div>
 
               {/* ═══════════════════════════════════════════
-                  PROJECT CARDS SECTION — Pinterest-style masonry layout
+                  PROJECT CARDS SECTION — Single vertical column layout
                   ═══════════════════════════════════════════ */}
               <div className="cards-section">
-                {/* Masonry grid with bin-packing algorithm */}
-                {/* Cards flow into columns based on current column heights */}
-                {/* Column count and placement update responsively on resize */}
-                <MasonryGrid
-                  cards={masonryCards}
-                  onCaseStudyClick={(link) => navigate(link)}
-                  onComingSoonClick={handleCardClick}
-                />
+                <div className="container">
+                  {/* Single column grid of case-study cards */}
+                  <MasonryGrid
+                    cards={masonryCards}
+                    onCaseStudyClick={(link) => navigate(link)}
+                    onComingSoonClick={handleCardClick}
+                  />
+                </div>
               </div>
 
             </div>

@@ -88,11 +88,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   NAV-SCRIPT STYLING
-   (The "Kataliya!" text that appears when scrolling)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════════════════
    NAV LINKS STYLING (WORK/ABOUT/PLAY/CONTACT on right side)
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -126,6 +121,8 @@
   transform: none;
   /* Don't wait for transform changes (old optimization for scaled canvas) */
   will-change: auto;
+  /* Move container up */
+  margin-top: -3rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -160,7 +157,7 @@
   margin-top: 0;
 
   /* Padding for top/bottom spacing (full-bleed background still extends edge-to-edge) */
-  padding: clamp(2rem, 5vw, 3rem) 0;
+  padding: 0 0;
 
   /* Stacking context for background motifs and content */
   z-index: 1;
@@ -375,14 +372,42 @@
 }
 
 /* ─── Hero Logo Mark (Centered placeholder) ─── */
+/* ─── Diagonal text in upper left corner ─── */
+.hero-diagonal-text {
+  /* Absolute positioning in upper left */
+  position: absolute;
+  top: 145px;
+  left: 0;
+
+  /* Large, bold text */
+  font-family: 'Jellyka Saint-Andrews Queen', cursive;
+  font-size: clamp(4rem, 15vw, 12rem);
+  font-weight: 300;
+  line-height: 1;
+  white-space: nowrap;
+
+  /* Color with transparency */
+  color: #623A4F;
+
+  /* Rotate diagonally */
+  transform: rotate(-25deg);
+
+  /* Ensure it doesn't interfere with interactions */
+  pointer-events: none;
+  z-index: 0;
+}
+
 .hero-logo-mark {
   /* Centered at top of hero */
   width: 56px;
   height: 62px;
-  margin: 0 auto 28px;
+  object-fit: contain;
+  margin: 36px auto;
   opacity: 0.9;
   /* Ensure it's above background motifs */
   position: relative;
+  justify-content: center;
+  align-items: center;
   z-index: 2;
 }
 
@@ -390,6 +415,7 @@
 .hero-bg-motif {
   /* Absolute positioning for background layer */
   position: absolute;
+  height: auto;
   opacity: 0.85;
   z-index: 1;
   /* Ensure they don't interfere with clickable content */
@@ -430,7 +456,7 @@
 /* ─── Main Headline ─── */
 .hero-headline {
   /* Moderate size, not oversized */
-  font-size: 150px;
+  font-size: 75px;
   line-height: 1.1;
   font-family: 'Jellyka Saint-Andrews Queen';
   font-weight: 500;
@@ -491,7 +517,7 @@
   line-height: 1.5;
 
   /* Text color: matches walnut-soft for subtlety */
-  color: var(--jade);
+  color:  rgba(134, 1, 77, 0.436);
 
   /* Tight letter spacing */
   /* Positioned at bottom of hero section */
@@ -553,7 +579,7 @@
   flex-direction: column;
 
   /* Gap between cards: 56px */
-  gap: 56px;
+  gap: 90px;
 
   /* Constrained width for better reading */
   max-width: 720px;
@@ -572,7 +598,7 @@
   /* Position relative for absolute children (media-stage contents) */
   position: relative;
   /* Rounded corners */
-  border-radius: var(--radius-md);
+  border-radius: 2px;
   /* Glass background */
   background: var(--glass-bg);
   /* Glass border */
@@ -594,6 +620,52 @@
   z-index: 20;
 }
 
+/* ─── Card Color Variants ─── */
+/* Hot Pink - Emporium Thai */
+.card--hotpink {
+  background: rgb(180, 64, 122) !important;
+  transition: background 0.4s ease, border 0.4s ease;
+}
+
+.card--hotpink:hover {
+  background: rgb(180, 64, 122) !important;
+  border: 1px solid rgba(255, 105, 180, 0.4) !important;
+}
+
+/* Teal - BlueCore */
+.card--teal {
+  background: rgb(60, 131, 147) !important;
+  transition: background 0.4s ease, border 0.4s ease;
+}
+
+.card--teal:hover {
+  background: rgb(60, 131, 147) !important;
+  border: 1px solid rgb(60, 131, 147) !important;
+}
+
+/* Purple - AIdentity */
+.card--purple {
+  background: rgb(116, 80, 130) !important;
+  transition: background 0.4s ease, border 0.4s ease;
+}
+
+.card--purple:hover {
+  background: rgb(116, 80, 130) !important;
+  border: 1px solid rgb(116, 80, 130) !important;
+}
+
+/* Dark Red - Known */
+.card--darkred {
+  background: rgb(170, 44, 44) !important;
+  border: 1px solid rgba(139, 35, 50, 0.15) !important;
+  transition: background 0.4s ease, border 0.4s ease;
+}
+
+.card--darkred:hover {
+  background: rgb(170, 44, 44) !important;
+  border: 1px solid rgb(170, 44, 44) !important;
+}
+
 /* ─── Media Stage: Container for background, preview, pills, and arrow ─── */
 .media-stage {
   /* Position relative for absolute children (media, preview, pills, arrow) */
@@ -605,38 +677,54 @@
   /* No margin - body padding handles spacing */
 }
 
-/* ─── Background Media (scales on hover) ─── */
+/* ─── Media Positioner: fills media-stage, has NO background/frame of its own — just
+   centers whatever size .media-frame naturally ends up being. Bottom-anchored so the
+   frame's bottom edge always lines up with media-stage's bottom (for the tuck-under
+   effect with .card-body, and as the hover scale anchor). ─── */
 .media {
-  /* Absolute positioning to fill media-stage */
   position: absolute;
   inset: 0;
-  /* Rounded corners */
+  overflow: visible;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* ─── Media Frame: sized in JS (ProjectCard.jsx) to exactly the media's own contain-fit
+   box — its box IS the media's particular size, no letterboxing, no leftover frame
+   outside the content. This is the only thing with a background, and the only thing
+   that scales on hover; pills/arrow are children of it so they position relative to
+   its exact box. max-width/max-height are just a fallback for the brief moment before
+   JS has measured the media (first paint / before load fires). ─── */
+.media-frame {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
   border-radius: 12px;
-  /* Hide overflow */
-  overflow: hidden;
-  /* Scale from bottom center — grows upward only, bottom edge stays fixed */
+  background: var(--white);
   transform-origin: center bottom;
-  /* Prepare for hover scale transition */
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
               box-shadow 0.6s ease;
 }
 
-.media img,
-.media video {
-  /* Fill container */
+.media-frame img,
+.media-frame video {
+  /* Frame is already sized exactly to the media's aspect ratio, so this just fills it */
+  display: block;
   width: 100%;
   height: 100%;
-  /* Fit without distortion */
-  object-fit: cover;
-  /* Display as block */
-  display: block;
+  border-radius: 12px;
 }
 
-/* Scale and lift media on card hover */
+/* Lift the frame's stacking context so it (and its pills) paint above sibling cards */
 .card:hover .media {
+  z-index: 5;
+}
+
+/* Scale and lift the frame itself on card hover — this is the only element that grows */
+.card:hover .media-frame {
   transform: scale(1.45);
   box-shadow: 0 30px 70px rgba(43,35,28,0.28);
-  z-index: 5;
 }
 
 /* ─── Tag Pills (hidden at rest, positioned at corners on hover) ─── */
@@ -672,13 +760,13 @@
 .card-pill.jade { color: var(--pill-text-jade); }
 .card-pill.orchid { color: var(--pill-text-orchid); }
 
-/* Pill corner anchors derived from .media's 1.45× scale with center-bottom transform-origin */
-/* Media height: 340px → 493px on hover, so top moves up 153px; width scales ±22.5% with 20px gap */
-/* If media scale or height changes, these values must be recalculated */
+/* Pill corner anchors: 0%/100% of .media-frame's own box (its actual, natural-aspect-ratio
+   size) plus a fixed 20px gap — so these automatically track whatever size/shape the
+   uploaded media renders at, per card, with no hardcoded dimensions to recalculate. */
 
 .card:hover .card-pill:nth-child(2) {
-  left: calc(-22.5% - 20px);
-  top: calc(-153px - 20px);
+  left: calc(0% - 20px);
+  top: calc(0% - 20px);
   opacity: 1;
   transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
   pointer-events: auto;
@@ -686,8 +774,8 @@
 }
 
 .card:hover .card-pill:nth-child(3) {
-  left: calc(100% + 22.5% + 20px);
-  top: calc(-153px - 20px);
+  left: calc(100% + 20px);
+  top: calc(0% - 20px);
   opacity: 1;
   transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
   pointer-events: auto;
@@ -695,8 +783,8 @@
 }
 
 .card:hover .card-pill:nth-child(4) {
-  left: calc(-22.5% - 20px);
-  top: calc(340px + 20px);
+  left: calc(0% - 20px);
+  top: calc(100% + 20px);
   opacity: 1;
   transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
   pointer-events: auto;
@@ -704,8 +792,8 @@
 }
 
 .card:hover .card-pill:nth-child(5) {
-  left: calc(100% + 22.5% + 20px);
-  top: calc(340px + 20px);
+  left: calc(100% + 20px);
+  top: calc(100% + 20px);
   opacity: 1;
   transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.05);
   pointer-events: auto;
@@ -757,14 +845,19 @@
   padding: 18px 6px 6px;
   /* Full opacity at rest and on hover — body stays visually unchanged */
   opacity: 1;
+  /* Sits in normal DOM flow above .media (no z-index needed at rest), pulled up
+     so it tucks over the white media frame's bottom edge instead of butting against it */
+  position: relative;
+  margin-top: -14px;
 }
 
 .tag-static {
-  /* Metadata tags styling */
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--jade);
-  margin-bottom: 8px;
+  /* Tags using DM Sans (like hero contact links) */
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  letter-spacing: -0.5px;
+  color: var(--ivory-deep);
+  margin-bottom: 12px;
 }
 
 .card-title {
@@ -773,18 +866,19 @@
   font-weight: 500;
   font-size: 28px;
   /* Color: dark walnut */
-  color: var(--walnut);
+  color: var(--ivory);
   /* Spacing */
   margin: 0 0 8px 0;
 }
 
 .card-description {
-  /* Body text styling */
-  font-family: 'DM Sans', 'Be Vietnam', sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
+  /* Body text using Be Vietnam (like hero body) */
+  font-family: 'Be Vietnam', sans-serif;
+  font-size: 16px;
+  font-weight: 250;
+  line-height: 1.5;
   /* Color: soft walnut */
-  color: var(--walnut-soft);
+  color: var(--ivory-deep);
   /* Spacing */
   margin: 0;
 }
@@ -1251,6 +1345,50 @@
     opacity: 0;
     transform: translateY(calc(-100% - 14px));
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOOTER STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.work-footer {
+  background: var(--ivory);
+  border-top: none;
+  padding: clamp(3rem, 8vw, 6rem) clamp(1rem, 5vw, 5.25rem);
+}
+
+.work-footer__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.work-footer__left,
+.work-footer__right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.work-footer__left {
+  align-items: flex-start;
+}
+
+.work-footer__right {
+  align-items: flex-end;
+}
+
+.work-footer__left span,
+.work-footer__right span {
+  font-family: 'dm sans', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  color: var(--walnut-soft);
+  margin: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

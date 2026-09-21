@@ -54,20 +54,20 @@ export default function Footer({ showHeadline = false }) {
         {/* Left half */}
         <div className="work-footer__left">
           {/* Personal message and CTA */}
-          <span>LinkedIn</span>
-          <span>GitHub</span>
-          <span>Mail</span>
+          <span>linkedin</span>
+          <span>github</span>
+          <span>email</span>
           
         </div>
 
         {/* Right half */}
         <div className="work-footer__right">
           {/* Sign-off message */}
-          <span>Thanks for visiting ❤︎</span>
+          <span>thanks for visiting ❤︎</span>
           {/* Visitor counter */}
-          <span className="teal">You are visitor # {visitorCount ?? '...'}</span>
+          <span className="teal">you are visitor # {visitorCount ?? '...'}</span>
           {/* Last update date */}
-          <span>Last updated: 05 01 26</span>
+          <span>last updated: 05 01 26</span>
         </div>
 
       </div>
