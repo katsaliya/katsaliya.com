@@ -3,7 +3,7 @@
 
    This is the central hub of the entire website.
    It defines:
-   - What pages exist (routes like /work, /about, /contact)
+   - What pages exist (routes like /work, /bluecore, /contact)
    - Which page component loads for each URL
    - Smooth scrolling behavior across all pages
 
@@ -17,7 +17,7 @@ import { useEffect } from 'react'
 /* Import Routes and Route from React Router */
 /* Routes = container for all page routes */
 /* Route = individual page mapping (URL path → component) */
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 /* Import Lenis library for smooth scrolling */
 /* Lenis provides smooth, physics-based scrolling animation */
@@ -134,7 +134,7 @@ export default function App() {
     lenis.on('scroll', ScrollTrigger.update)
 
     /* Exposed so pages can scroll programmatically (e.g. Home.jsx jumping to
-       the About section on /about) via lenis.scrollTo() — its own official
+       a section on load) via lenis.scrollTo() — its own official
        API for this, which updates its internal virtual-scroll state
        correctly. Plain window.scrollTo()/scrollIntoView() get silently
        overridden by Lenis's own per-frame update the next tick, since it
@@ -171,9 +171,15 @@ export default function App() {
       {/* path="/work" = when URL is "katsaliya.com/work" */}
       <Route path="/work" element={<WorkCarousel />} />
 
-      {/* About — same component as Home, auto-scrolls to the About section */}
-      {/* path="/about" = when URL is "katsaliya.com/about" */}
-      <Route path="/about" element={<Home />} />
+      {/* /about is an alias for /, not a second page. It used to render Home
+          and scroll into an About section; that section was removed, so the
+          two URLs had become byte-identical — same component, same scroll
+          position, two addresses. It redirects rather than being deleted
+          because /about is the kind of link that ends up in a CV or an email
+          signature, and there is no catch-all route here, so dropping it
+          would render a blank page instead of a 404. `replace` keeps it out
+          of history, so Back does not bounce through the redirect. */}
+      <Route path="/about" element={<Navigate to="/" replace />} />
 
       {/* Play / Experiments page */}
       {/* path="/play" = when URL is "katsaliya.com/play" */}

@@ -35,6 +35,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MarqueeTitle from './MarqueeTitle'
+import MicroLabel from './MicroLabel'
 import CursorTag from './CursorTag'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -44,8 +45,22 @@ gsap.registerPlugin(ScrollTrigger)
 const FONT = "'DM Sans', sans-serif"
 const SCRIPT_FONT = "'Coneria Script Slanted', cursive"
 
-/* Accent per discipline, cycling this site's three accent tokens. Four
-   disciplines against three accents means one repeat; they sit far enough
+/* THESE ARE CSS VALUES, NOT TOKEN NAMES. Each one is dropped straight into
+   style={{ background: d.accent }}, so it has to be something CSS can parse:
+   'var(--jade-ink)', not 'jade-ink'. Getting that wrong fails silently in
+   both directions — React does not validate inline style values, and the
+   browser discards a declaration it cannot parse without logging anything,
+   so the only symptom is a dot that renders as a transparent circle.
+
+   Accent per discipline, one each. This cycled three tokens across four
+   disciplines, so Product Strategy and Brand & Strategy both came out jade;
+   --aqua was added to close that. It matters more than it used to, because
+   the accent is no longer only this dot — Selected work tints each card's
+   micro-label and its hover with the SAME discipline's accent, so colour is
+   what ties a card in (01) to its row in (04), and a repeat is two cards
+   claiming one discipline. Change one here and change the matching `ink` in
+   SelectedWork.jsx, which carries the text-safe version of the same colour.
+   The old note still applies if a fifth is ever added: they sit far enough
    apart vertically that it does not read as a mistake. Adding a fourth
    accent token would remove the repeat if that ever matters. */
 const DISCIPLINES = [
@@ -53,7 +68,7 @@ const DISCIPLINES = [
     numeral: '1',
     category: 'Product',
     title: 'Product Strategy & Design',
-    accent: 'var(--jade)',
+    accent: 'var(--jade-ink)',
     rows: [
       ['Research', 'User interviews & insight mapping'],
       ['Systems', 'Design tokens, components & documentation'],
@@ -61,13 +76,13 @@ const DISCIPLINES = [
       ['Handoff', 'Specs, redlines & dev collaboration'],
     ],
     blurb:
-      'I work from research to system — turning what people actually said into flows, components and decisions a team can build against.',
+      ' ',
   },
   {
     numeral: '2',
     category: 'Engineering',
     title: 'Front-End Development',
-    accent: 'var(--orchid)',
+    accent: 'var(--orchid-ink)',
     rows: [
       ['Interfaces', 'React, Swift & component architecture'],
       ['Motion', 'GSAP timelines, ScrollTrigger & Lenis'],
@@ -75,13 +90,13 @@ const DISCIPLINES = [
       ['Ship', 'Vite, Vercel, Xcode & deploy workflow'],
     ],
     blurb:
-      'I build the front end I design — for web and native, with real motion built in.',
+      ' ',
   },
   {
     numeral: '3',
     category: 'Content',
     title: 'Social & Content',
-    accent: 'var(--gold)',
+    accent: 'var(--gold-ink)',
     rows: [
       ['Direction', 'Concept, storyboards & shot planning'],
       ['Edit', 'CapCut, Final Cut Pro, pacing & sound'],
@@ -89,13 +104,13 @@ const DISCIPLINES = [
       ['Social', 'Short-form formats, hooks & series design'],
     ],
     blurb:
-      'I direct and cut my own content — concept through publish, made for the platform it actually lives on.',
+      ' ',
   },
   {
     numeral: '4',
     category: 'Brand',
     title: 'Brand & Strategy',
-    accent: 'var(--jade)',
+    accent: 'var(--aqua-ink)',
     rows: [
       ['Identity', 'Marks, type systems & visual language'],
       ['Positioning', 'Audience, voice & differentiation'],
@@ -103,24 +118,9 @@ const DISCIPLINES = [
       ['Measure', 'Analytics, iteration & reporting'],
     ],
     blurb:
-      'I build brand systems that outlast the launch — identity, positioning, and the content that carries them at scale.',
+      ' ',
   },
 ]
-
-/* The "+ (Label)" device the reference uses for every micro-label. Worth
-   keeping: this site already has the same convention in the hero's
-   "01 TLDR;", so it grafts on rather than importing a foreign one. */
-function MicroLabel({ children }) {
-  return (
-    <div
-      className="flex items-center gap-2 text-[16px] leading-[1.54] text-[var(--walnut-soft)]"
-      style={{ fontFamily: FONT, fontWeight: 400 }}
-    >
-      <span aria-hidden="true">+</span>
-      <span>({children})</span>
-    </div>
-  )
-}
 
 function Block({ d, reduceMotion }) {
   const ref = useRef(null)
@@ -298,18 +298,18 @@ export default function Disciplines({ reduceMotion = false }) {
   return (
     <section
       id="disciplines"
-      className="relative w-full overflow-hidden bg-[var(--ivory-deep)] pt-10 md:pt-12 pb-16 md:pb-24"
+      className="relative w-full overflow-hidden bg-[var(--ivory-deep)] seam-under-ivory pt-10 md:pt-12 pb-16 md:pb-24"
     >
       <MarqueeTitle
         script="Disciplines"
-        number="02"
+        number="04"
         sans="by Kataliya Sungkamee"
-        ariaLabel="Disciplines, section two, by Kataliya Sungkamee"
+        ariaLabel="Disciplines, section four, by Kataliya Sungkamee"
         reduceMotion={reduceMotion}
         className="mb-8 md:mb-10"
       />
 
-      <div className="shell">
+      <div className="page-content-shell">
         {/* The section's premise, stated before the evidence rather than
             after it.
 
