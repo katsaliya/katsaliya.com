@@ -1,9 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   HOME.JSX — / and /about
+   HOME.JSX — /
 
-   Both "/" and "/about" render this component and land on the hero. The
-   About section that "/about" used to scroll into has been removed and is
-   being rebuilt; until it returns, the two routes are indistinguishable.
+   The site root, and the about page: the bio hero, the disciplines, where
+   she has been, how she got here. There is no separate About route — /about
+   redirects here (see App.jsx). It briefly rendered this same component and
+   scrolled into an About section; that section was removed, which left two
+   URLs doing exactly the same thing, so one of them went.
 
    Replaces the old pages/Work.jsx (masonry grid moved to /work, where the
    WorkCarousel now lives) and pages/About.jsx (content ported in below,
@@ -23,12 +25,12 @@ import { Link, useLocation } from 'react-router-dom'
 import gsap from 'gsap'
 import Nav, { NAV_NAME_FONT_SIZE } from '../components/Nav'
 import SideSocial from '../components/SideSocial'
+import SelectedWork from '../components/SelectedWork'
 import Disciplines from '../components/Disciplines'
 import HowIGotHere from '../components/HowIGotHere'
 import WhereIveBeen from '../components/WhereIveBeen'
 import SiteFooter from '../components/SiteFooter'
 import { CHALK_TEXTURE } from '../components/ChalkTexture'
-import CursorTag from '../components/CursorTag'
 import LineReveal from '../components/LineReveal'
 
 /* ─── Font — matches the Work page (Nav, carousel labels, project list all
@@ -48,16 +50,22 @@ const SCRIPT_FONT = "'Coneria Script Slanted', cursive"
    growing/moving into its natural hero position. ─── */
 const NAME_LOADER_SCALE = 0.42
 
-/* ─── tldr; copy — held here rather than inline in the JSX because it is
+/* ─── Intro copy — held here rather than inline in the JSX because it is
    rendered split into per-word spans (the paragraph's entrance staggers
    across words, see the hero-scene timeline), and a single source keeps
-   the in-hero version and the narrow-viewport fallback from drifting. ─── */
+   the in-hero version and the narrow-viewport fallback from drifting.
+
+   THE NAME TLDR_COPY IS HISTORICAL. The label above this paragraph read
+   "TLDR;" until it became "+ (Liya)"; the constant, the refs (tldrRef,
+   tldrLabelRef) and the .tldr-word class the timeline selects on all still
+   carry the old word. They are renamed together or not at all — .tldr-word
+   in particular is a GSAP selector, so changing it here without changing
+   the hero-scene timeline silently drops the paragraph's stagger. ─── */
 const TLDR_COPY =
-  'A multidisciplinary creative passionate about working at the intersection of people, storytelling, and technology. I believe in designing between essentialism and beauty, and creating social & content that makes people feel FOMO.'
+  'A versatile creative based in Los Angeles. A recent graduate with dual degrees in Computer Science and Marketing, my work spans strategy, design, and growth.'
 
 export default function Home() {
   const { pathname } = useLocation()
-  const heroRef = useRef(null)
   const nameGroupRef = useRef(null)
   const navNameSlotRef = useRef(null)
   const navLinksGroupRef = useRef(null)
@@ -70,7 +78,7 @@ export default function Home() {
   const [heroLanded, setHeroLanded] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
 
-  /* ─── Page setup: body class + reduced-motion + drop into About on /about ─── */
+  /* ─── Page setup: body class + reduced-motion + land at the top ─── */
   useEffect(() => {
     document.body.className = 'page-home-body'
 
@@ -85,9 +93,9 @@ export default function Home() {
     // exactly this. Wait a frame first: App's effect (which creates it)
     // runs after this one on initial mount (children fire before parents),
     // but both are flushed synchronously before the next animation frame.
-    /* Always the top now. The About section this used to scroll into has
-       been removed pending a rebuild, so /about currently lands on the hero
-       like / does — see the note where that section used to be. */
+    /* Always the top. This used to scroll into an About section on /about;
+       that section is gone and /about now redirects here, so there is only
+       ever one landing position. */
     requestAnimationFrame(() => {
       window.__lenis?.scrollTo(0, { immediate: true })
     })
@@ -112,10 +120,13 @@ export default function Home() {
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  /* The scroll cue is for someone who has not worked out that the page
-     scrolls. The moment they do, it has said everything it has to say — and
-     hasScrolled never resets, so it is gone for the rest of the visit rather
-     than reappearing every time they return to the top. */
+  /* hasScrolled is the page's "they have worked out that this scrolls"
+     signal. It drove two things and now drives one: the hover pill that used
+     to follow the cursor across the hero is gone, and the nav links below
+     are what is left. It never resets, so whatever it gates is one-way for
+     the rest of the visit rather than reappearing on every return to the
+     top. The listener is `once`, so it costs nothing after the first
+     scroll. */
   /* The landing runs on a bare timeline rather than inside an effect, so
      nothing cleans it up on its own. */
   useEffect(() => () => landingRef.current?.kill(), [])
@@ -126,11 +137,12 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onFirstScroll)
   }, [])
 
-  /* The nav links arrive on the first scroll, on the same signal that retires
-     the "Scroll" tag — the cue leaves as the navigation appears, which is the
-     one moment where both are saying the same thing. One-way, like everything
-     else on this page: scrolling back to the top does not take them away
-     again. Held behind heroLanded so they cannot beat the landing to it. */
+  /* The nav links arrive on the first scroll. That used to be a handover —
+     the "Scroll" pill retired on the same signal, so the cue left exactly as
+     the navigation appeared — and with the pill removed this is simply when
+     the links show up. One-way, like everything else on this page: scrolling
+     back to the top does not take them away again. Held behind heroLanded so
+     they cannot beat the landing to it. */
   useEffect(() => {
     const links = navLinksGroupRef.current
     if (!links || !heroLanded || !hasScrolled) return
@@ -172,8 +184,13 @@ export default function Home() {
       container.style.fontSize = `${containerWidth / maxRatio}px`
     }
 
+    const fitAndRepark = () => {
+      fit()
+      parkAtLoaderStateRef.current?.()
+    }
+
     fit()
-    const ro = new ResizeObserver(fit)
+    const ro = new ResizeObserver(fitAndRepark)
     ro.observe(container)
 
     /* The observer above catches viewport resizes and nothing else — and it
@@ -186,7 +203,7 @@ export default function Home() {
        badly — measured at 2560px: 2812px of name in an 1800px column. A warm
        cache hides this completely, which is what makes it so easy to miss. */
     let alive = true
-    document.fonts?.ready.then(() => { if (alive) fit() })
+    document.fonts?.ready.then(() => { if (alive) fitAndRepark() })
 
     return () => {
       alive = false
@@ -210,6 +227,7 @@ export default function Home() {
      just an offset and a scale from the same reference. ─── */
   const naturalRef = useRef(null)
   const landingRef = useRef(null)
+  const landingStartedRef = useRef(false)
 
   /* Where the name sits at rest, and how big it is there. Read before any
      transform is applied, since a transformed rect would describe the
@@ -243,6 +261,33 @@ export default function Home() {
     }
   }
 
+  /* RE-PARK AFTER A RE-FIT, not just re-fit. fit() changes the font-size,
+     which changes the natural box that every measurement here is expressed
+     from — so any fit running after the starting transform was set leaves
+     the name parked against a box that no longer exists. Measured on a cold
+     cache at 1024px: the name held 49px left of centre, because it had been
+     centred against a 1324px natural width that became 1088px the moment
+     Coneria replaced the fallback face. A warm cache hides it, which is what
+     made it survive this long.
+
+     Guarded on the flight: once that starts, its tween owns the transform
+     and re-parking would snatch the name back to the middle mid-travel. */
+  const parkAtLoaderState = () => {
+    if (landingStartedRef.current || reduceMotion) return
+    const container = nameGroupRef.current
+    if (!container) return
+    const nat = measureNatural()
+    if (!nat) return
+    naturalRef.current = nat
+    gsap.set(container, { ...loaderState(nat), transformOrigin: 'left center' })
+  }
+
+  /* The fit effect runs with [] deps, so a direct reference would freeze
+     render zero's closure — and with it a stale reduceMotion. The ref is
+     re-pointed every render, so the effect always calls the current one. */
+  const parkAtLoaderStateRef = useRef(null)
+  parkAtLoaderStateRef.current = parkAtLoaderState
+
   useLayoutEffect(() => {
     const container = nameGroupRef.current
     if (!container) return
@@ -250,10 +295,7 @@ export default function Home() {
       setHeroLanded(true)
       return
     }
-    const nat = measureNatural()
-    if (!nat) return
-    naturalRef.current = nat
-    gsap.set(container, { ...loaderState(nat), transformOrigin: 'left center' })
+    parkAtLoaderState()
   }, [reduceMotion])
 
   /* ─── The landing. One timeline, fired when the per-character reveal
@@ -284,6 +326,8 @@ export default function Home() {
      is one-way for free, because a timeline that is never reversed never
      reverses. ─── */
   const onNameRevealComplete = () => {
+    /* From here the timeline owns the transform — see parkAtLoaderState. */
+    landingStartedRef.current = true
     const nameGroup = nameGroupRef.current
     const navSlot = navNameSlotRef.current
     const navLinksGroup = navLinksGroupRef.current
@@ -329,6 +373,10 @@ export default function Home() {
 
     const tl = gsap.timeline()
 
+    /* Disable scroll during the name morph animation */
+    const lenis = window.__lenis
+    if (lenis) lenis.stop()
+
     tl.to(nameGroup, { ...to, duration: 1.15, ease: 'power3.inOut' }, 0)
     /* Handoff at the end of the travel: the name is already sitting exactly
        on the slot by now, so this is a pure crossfade and nothing moves. */
@@ -353,6 +401,11 @@ export default function Home() {
         0.97,
       )
     }
+
+    /* Re-enable scroll after the morph animation completes (1.15s) */
+    tl.call(() => {
+      if (lenis) lenis.start()
+    }, null, 1.15)
 
     landingRef.current = tl
   }
@@ -379,7 +432,6 @@ export default function Home() {
               HOME — full-width script name hero, matching the Figma redesign
               ═══════════════════════════════════════════════════════ */}
           <div
-            ref={heroRef}
             /* No overflow-hidden. The flower deliberately runs ~121px past
                the hero's bottom edge, and clipping it there guillotined it
                along the exact line where the page turns grey — the worst
@@ -387,35 +439,37 @@ export default function Home() {
                eye straight to it. Letting it bleed reads as one composition
                crossing a section boundary instead.
 
-               Safe to drop here specifically: the hero's z-[1] beats the
+               NO z-index ON THE HERO. It carried z-[1], which made it a
+               stacking context and pinned everything inside it below the
+               nav's z-50 — which is why the name flew UNDER the bar. Raising
+               the hero above 50 instead does not work: it paints an opaque
+               --ivory background, so it would cover the nav whole and hide
+               the wordmark the name hands off to. The z-[1] moved to the
+               flower wrapper, the only part that needed it, and the name
+               lifts itself to z-[60].
+
+               Safe to drop here specifically: the flower wrapper's z-[1] beats the
                Disciplines section's z-auto, so the overflow paints OVER the
                grey rather than under it; the bleed lands in that section's
                128px of top padding, so it never reaches the marquee; body
                already carries overflow-x:hidden for the sideways spill; and
                while the hero is pinned it is position:fixed at viewport
                height, so anything below its box is off-screen anyway. */
-            className="relative w-full min-h-screen bg-[var(--ivory)] flex flex-col justify-center z-[1] py-28 md:py-0"
+            className="relative w-full min-h-screen bg-[var(--ivory)] flex flex-col justify-center py-28 md:py-0"
           >
-            {/* The same glass pill the disciplines and the footer use, rather
-                than a one-off text follower — one cursor object across the
-                whole site. Gated on hasScrolled so it retires once its job is
-                done, and CursorTag is pointer-only, so the static touch cue
-                below is what serves a phone. */}
-            <CursorTag targetRef={heroRef} label="Scroll" enabled={!hasScrolled} />
-
             {/* .shell-hero, not .shell — the readability cap exists to
                 protect measure, and there is no prose here, just a two-line
                 wordmark. It doubles as the name's size ceiling: the fit
                 effect below solves font-size from this element's own
                 clientWidth, so capping the shell at --hero-max is what stops
                 a script face growing unbounded on an ultrawide display. */}
-            <div className="shell-hero">
+            <div className="page-content-shell">
               {/* ─── Name — sized to fill the full container width (see the
                   fit useLayoutEffect above; clamp() alone can't solve this
                   for an arbitrary script font's glyph metrics) ─── */}
               <div
                 ref={nameGroupRef}
-                className="leading-[1.14] tracking-[-0.01em] text-[var(--walnut)] text-[clamp(3rem,15vw,14rem)] will-change-[transform,opacity]"
+                className="relative z-[60] pointer-events-none leading-[1.14] tracking-[-0.01em] text-[var(--walnut)] text-[clamp(3rem,15vw,14rem)] will-change-[transform,opacity]"
                 style={{ fontFamily: SCRIPT_FONT, filter: CHALK_TEXTURE }}
               >
                 <LineReveal
@@ -510,7 +564,7 @@ export default function Home() {
                 edge, and past --hero-max the shell is centered and no longer
                 sits there. */}
             <div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 z-[1] pointer-events-none"
               /* Clipped on three sides only. The flower is meant to spill
                  40px off the right (that crop is the composition) and 121px
                  past the bottom (so it crosses into the grey section rather
@@ -527,7 +581,7 @@ export default function Home() {
                  outside this wrapper. */
               style={{ clipPath: 'inset(0px 0px -240px 0px)' }}
             >
-              <div className="shell-hero h-full">
+              <div className="page-content-shell h-full">
                 <div className="relative h-full">
                   <img
                     ref={flowerImgRef}
@@ -540,11 +594,10 @@ export default function Home() {
                   {/* ─── tldr; — settles in lower-left on the same screen as
                       the nav-dock + flower, not a section further down (see
                       the scroll effect above: fades in on the same scrubbed
-                      timeline). "01" prefix matches the site's established
-                      numbered-list convention. ─── */}
+                      timeline). ─── */}
                   <div
                     ref={tldrRef}
-                    className="hidden xl:block absolute left-0 bottom-[6%] w-[594px] max-w-full opacity-0"
+                    className="hidden xl:block absolute left-0 bottom-[6%] w-[594px] max-w-full pl-4 opacity-0"
                   >
                     {/* The label and each word carry their own opacity-0 as
                         well as the container: the hidden resting state has to
@@ -553,18 +606,71 @@ export default function Home() {
                         for the first couple of seconds of a load. Anything
                         relying on the effect alone is simply on screen until
                         then. gsap writes inline styles, which win over these. */}
-                    <div ref={tldrLabelRef} className="flex items-baseline gap-3 mb-5 opacity-0">
+                    {/* HANGING "+", where a hanging "01" used to be. The
+                        numeral went because the numbered series now starts
+                        at the first marquee title (Disciplines = 01) and
+                        this intro sits outside the count — it is the
+                        preamble, not the first item. The marker itself
+                        stays, as the site's "+ (Label)" micro-label glyph:
+                        see MicroLabel.jsx, whose own comment cites this
+                        block as the precedent it grafts onto. So the two
+                        point at each other rather than at a numbering
+                        scheme neither of them uses any more.
+
+                        THE HANG IS WHAT KEEPS THE BODY ALIGNED TO THE LABEL
+                        RATHER THAN TO THE MARKER — "(Liya)" and the
+                        paragraph share a left edge while the "+" sits out in
+                        the margin. Three parts, and they only work together:
+                        pl-4 on this block, -ml-4 on this row, w-4 on the
+                        marker. Drop any one and the label lands a rem off
+                        the paragraph it heads.
+
+                        This is also the one place the micro-label hangs.
+                        Disciplines and Selected work both set "+ (Label)"
+                        flush with the content under it; here the content is
+                        a paragraph rather than a heading, and a marker in
+                        the margin keeps the text block's edge unbroken.
+
+                        w-4 = 16px, against a "+" measured at 8.8px here, so
+                        the gap after it lands at ~7px — the 8px that
+                        MicroLabel sets with gap-2, near enough that the two
+                        read as one device. It was w-8 for "01", which is
+                        twice the glyph and was a numeral's gap, not this
+                        one's.
+
+                        ITEMS-CENTER, NOT ITEMS-BASELINE. The row held a
+                        numeral before, and digits belong on a baseline. A
+                        "+" does not — it is centred on the maths axis, so
+                        sitting it on the baseline of a 28px word dropped it
+                        4.3px below that word's optical middle. That
+                        mismatch is gone now that both runs are 16px — the
+                        label is "(Liya)", not a 28px "TLDR;" — so centring
+                        and baseline resolve identically here. It stays
+                        centred because it is the arrangement that survives
+                        the label being restyled again.
+
+                        THE TWO RUNS MATCH, which is the point: this is the
+                        site's "+ (Label)" micro-label, the same device as
+                        MicroLabel.jsx, and it reads as one phrase only while
+                        the glyph and the word share size, weight and colour.
+                        It is written out here rather than importing
+                        MicroLabel because this is the one instance that
+                        HANGS — the "+" sits in the margin so the paragraph
+                        below aligns to "(Liya)" and not to the marker, and
+                        MicroLabel has no hang. */}
+                    <div ref={tldrLabelRef} className="-ml-4 flex items-center mb-5 opacity-0">
                       <span
-                        className="text-[16px] leading-[1.54] text-[var(--walnut-faint)]"
+                        aria-hidden="true"
+                        className="w-4 shrink-0 text-[16px] leading-[1.54] text-[var(--walnut-soft)]"
                         style={{ fontFamily: FONT, fontWeight: 400 }}
                       >
-                        01
+                        +
                       </span>
                       <span
-                        className="text-[32px] leading-[1.54] text-[var(--walnut)]"
-                        style={{ fontFamily: FONT, fontWeight: 700 }}
+                        className="text-[16px] leading-[1.54] text-[var(--walnut-soft)]"
+                        style={{ fontFamily: FONT, fontWeight: 400 }}
                       >
-                        TLDR;
+                        (Kataliya Sungkamee)
                       </span>
                     </div>
                     {/* Split per word so the paragraph resolves in a stagger
@@ -574,8 +680,14 @@ export default function Home() {
                         at the end of an inline-block sits at the edge of its
                         own line box and gets collapsed away, which would run
                         every word together. */}
+                    {/* 25 against the label's 28 — a step the eye reads as
+                        hierarchy without the sentence losing presence. Weight
+                        already separates the two (700 vs 500); this is the
+                        size doing the same thing quietly rather than dropping
+                        a whole tier, which at 21.6 would have made the one
+                        paragraph on the first screen look like a caption. */}
                     <p
-                      className="text-[32px] leading-[1.54] text-[var(--walnut)]"
+                      className="text-[25px] leading-[1.5] text-[var(--walnut)]"
                       style={{ fontFamily: FONT, fontWeight: 500 }}
                     >
                       {TLDR_COPY.split(' ').map((word, i, all) => (
@@ -598,33 +710,64 @@ export default function Home() {
               presented differently. Plain static block, no scroll-tied
               reveal. */}
           <div className="xl:hidden relative w-full bg-[var(--ivory)] py-16">
-            <div className="shell">
-            <div className="flex items-baseline gap-3 mb-4">
-              <span className="text-sm text-[var(--walnut-faint)]" style={{ fontFamily: FONT }}>01</span>
-              <span className="text-sm text-[var(--walnut)]" style={{ fontFamily: FONT, fontWeight: 600 }}>
-                TLDR;
-              </span>
+            <div className="page-content-shell">
+            {/* Same "+" and the same hang as the xl version above, at the
+                same w-4: the marker is 16px there and 14px here, and the
+                box is a hair generous at both rather than two values to
+                keep in step for a 1px difference in the glyph. Centred
+                rather than on the baseline, same as above. */}
+            <div className="pl-4">
+              <div className="-ml-4 flex items-center mb-4">
+                <span aria-hidden="true" className="w-4 shrink-0 text-sm text-[var(--walnut-soft)]" style={{ fontFamily: FONT }}>+</span>
+                <span className="text-sm text-[var(--walnut-soft)]" style={{ fontFamily: FONT, fontWeight: 400 }}>
+                  (Liya)
+                </span>
+              </div>
+              <p
+                className="text-[clamp(1.3rem,5vw,1.8rem)] leading-[1.4] text-[var(--walnut)]"
+                style={{ fontFamily: FONT, fontWeight: 400 }}
+              >
+                {TLDR_COPY}
+              </p>
             </div>
-            <p
-              className="text-[clamp(1.3rem,5vw,1.8rem)] leading-[1.4] text-[var(--walnut)]"
-              style={{ fontFamily: FONT, fontWeight: 400 }}
-            >
-              {TLDR_COPY}
-            </p>
             </div>
           </div>
 
-          {/* Disciplines — the rebuilt replacement for the old Skills &
-              Toolbox list. Everything else that used to sit below the hero
-              (the rest of About, and the site footer) is still removed
-              pending its own rebuild. */}
-          <Disciplines reduceMotion={reduceMotion} />
-          {/* Record before narrative. "How I got here" closes on a grateful
-              sign-off that is written as an ending — stranded mid-page it
-              reads oddly, and it only works as the last thing on the page. */}
-          <WhereIveBeen reduceMotion={reduceMotion} />
+          {/* PROOF, PERSON, RECORD, CAPABILITY — then the ask.
+
+              This ran Disciplines -> Where I've been -> How I got here, which
+              opened a portfolio on a capability matrix and put no work on the
+              home page at all. Three things changed together and each depends
+              on the others:
+
+                01 Selected work   new. One project per discipline.
+                02 How I got here  moved UP, so the narrative runs before the
+                                   receipts. It used to sit after Where I've
+                                   been, which made a reader traverse the same
+                                   five jobs twice in opposite directions —
+                                   the timeline newest-first, then the prose
+                                   oldest-first — and the second pass read as
+                                   a re-tell.
+                03 Where I've been now backs a story already told.
+                04 Disciplines     moved DOWN, to land beside the footer's
+                                   "Let's work together" as the answer to
+                                   "so what can you do", not as an opening
+                                   assertion.
+
+              THE BACKGROUNDS STILL ALTERNATE AND NO SEAM CHANGED. Each
+              component owns its own fill and seam class, and the sequence
+              needed here is white -> grey -> white -> grey -> white. Selected
+              work is --ivory with no seam (it continues the hero's white
+              field), then How I got here and Disciplines are both
+              --ivory-deep + seam-under-ivory and Where I've been is --ivory +
+              seam-under-deep, so swapping their order preserves the
+              alternation exactly. Insert anything else here and check that
+              still holds. */}
+          <SelectedWork reduceMotion={reduceMotion} />
           <HowIGotHere reduceMotion={reduceMotion} />
-          <SiteFooter reduceMotion={reduceMotion} />
+          <WhereIveBeen reduceMotion={reduceMotion} />
+          <Disciplines reduceMotion={reduceMotion} />
+          <SiteFooter reduceMotion={reduceMotion} seamClassName="seam-under-deep" />
         </main>
       </div>
     </>

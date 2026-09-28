@@ -43,37 +43,22 @@ const IG = (handle) => `https://www.instagram.com/${handle}`
 
 const PARAGRAPHS = [
   {
-    text: 'I recently graduated from SFSU with a dual background in Computer Science and Business Marketing.',
+    text: 'I recently graduated from San Francisco State University as a double major in Computer Science and Business Marketing.',
   },
   {
-    text: 'My path started with creating personal social media content, where I fell in love with ideating videos, fixing aesthetics, and experimenting with new editing styles.',
-    handles: ['alliedglobalmarketing', 'known', 'katsaliya'],
+    text: 'My path started with personal and professional marketing campaigns, where I fell in love with creating content, defining a brand\'s aesthetic, and seeing projects through from research to launch.',
   },
   {
-    text: 'As my coding skills grew, I naturally transitioned into product strategy and design—the perfect bridge to apply my eye for visuals directly to code.',
+    text: 'As my technical skills grew, I naturally transitioned into product and design—the perfect bridge to apply my eye for visuals directly to code.',
   },
   {
-    text: 'After graduating, I returned to Los Angeles to launch the second location of our 26-year-old family restaurant. Working alongside my brother, who runs kitchen and house operations, I manage our entire creative side. On any given day, I’m fixing our website, shaping our branding, designing merch, or running our socials.',
-    handles: ['emporiumthai', 'emporiumthaimarket', 'boothbyet'],
+    text: 'After graduating, I returned to Los Angeles to launch the second location Emporium Thai Market. On any given day, I’m fixing our websites, designing new branding materials, or managing our socials. I recently built a tv box and programmed an photobooth app particularly for the box\'s functionality.',
   },
   {
-    text: 'Falling deep into the hospitality scene inspired my next move: building a community for the next generation of makers of LA.',
+    text: 'Falling deep into the hospitality scene inspired my next move:',
     handles: ['the310table'],
   },
 ]
-
-/* Closing aside. The one place in this section where the type changes:
-   italic, a step down in size, per the Figma spec (DM Sans italic 400 / 20px
-   / 154%). Italic plus the parentheses is what marks it as an aside rather
-   than another paragraph — it is deliberately NOT another body line.
-
-   Sized with its own clamp rather than a flat 20px so it holds the same
-   ratio to the body tier at every width (20 / 21.6 = 0.93) instead of
-   converging with it on narrow screens. */
-/* Non-breaking space before the emoji: without it the line wraps between
-   "way" and the emoji, stranding "🧧)" alone on a second line. */
-const CLOSING_NOTE =
-  '(feeling inspired and grateful for all the opportunities that have come my way\u00A0🧧)'
 
 export default function HowIGotHere({ reduceMotion = false }) {
   const bodyRef = useRef(null)
@@ -106,21 +91,21 @@ export default function HowIGotHere({ reduceMotion = false }) {
   }, [reduceMotion])
 
   return (
-    <section id="how-i-got-here" className="relative w-full overflow-hidden bg-[var(--ivory-deep)] pt-10 md:pt-12 pb-16 md:pb-24">
+    <section id="how-i-got-here" className="relative w-full overflow-hidden bg-[var(--ivory-deep)] seam-under-ivory pt-10 md:pt-12 pb-16 md:pb-24">
       {/* The trailing dash is what separates one cycle from the next, so the
           loop reads "How ❁ I got here - How ❁ I got here -" rather than
           running the two together. */}
       <MarqueeTitle
         script="How"
         sans="I got here"
-        number="04"
+        number="02"
         trailing="-"
         ariaLabel="How I got here"
         reduceMotion={reduceMotion}
         className="mb-8 md:mb-10"
       />
 
-      <div className="shell">
+      <div className="page-content-shell">
         {/* One tier for the whole section — every paragraph identical, no
             lede. The narrative was previously set in the page's PULL-QUOTE
             tier (32px / 500 / --walnut, what the hero's tldr; and the
@@ -164,13 +149,6 @@ export default function HowIGotHere({ reduceMotion = false }) {
               ))}
             </p>
           ))}
-
-          <p
-            className="hgh-p mt-3 italic text-balance text-[clamp(1rem,1.48vw,1.25rem)] leading-[1.54] text-[var(--walnut-soft)]"
-            style={{ fontFamily: FONT, fontWeight: 400 }}
-          >
-            {CLOSING_NOTE}
-          </p>
         </div>
       </div>
     </section>

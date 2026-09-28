@@ -35,7 +35,6 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 import Marquee from './Marquee'
-import { CHALK_TEXTURE } from './ChalkTexture'
 
 const FONT = "'DM Sans', sans-serif"
 const SCRIPT_FONT = "'Coneria Script Slanted', cursive"
@@ -45,10 +44,33 @@ export default function MarqueeTitle({
   script,
   /* The sans half, e.g. "by Kataliya Sungkamee" / "I got here" */
   sans,
-  /* Optional superscript section number, e.g. "02". Fixed at 16px in the
-     frame — a mark, not a scaled superscript, so it stays the same size as
-     every other micro-label on the page. */
+  /* Optional section number, passed bare ("02") and rendered bracketed as
+     "(02)". Fixed at 16px in the frame — a mark, not a scaled superscript,
+     so it stays the same size as every other micro-label on the page.
+
+     THE BRACKETS ARE ADDED HERE, NOT BY CALLERS, for the same reason
+     MicroLabel writes its own: the site has one parenthetical grammar —
+     "+ (Liya)", "+ (Product Strategy & Design)", and now "(02)" — and it
+     only stays one if a single place decides it. Callers pass the digits. */
   number,
+  /* How far the numeral sits after the script word, as a ratio of --m.
+
+     IT IS A PROP BECAUSE THE GAP HAS TO BE OPTICAL, NOT METRIC. This face
+     swashes, and a swash paints well past the glyph's advance width — which
+     is the only width the layout knows about. So a fixed gap puts the
+     numeral in clear space after one word and directly underneath the
+     flourish of another.
+
+     Measured per word by rendering it to a canvas and finding the rightmost
+     non-transparent pixel, then subtracting measureText().width. As a ratio
+     of font size: Disciplines 0.02, Where 0.18, How 0.25, Selected 0.82.
+     The default clears the first three — their overhang is either tiny or at
+     a height the numeral does not occupy, and all three were checked by eye
+     at 1440. "Selected" ends in a d whose ascender sweeps up and to the
+     right through exactly the numeral's band, which buried it; hence the
+     override on that caller. Re-measure the same way before changing any
+     script word. */
+  numberOffset = 0.09,
   /* Optional trailing mark that separates one cycle from the next, e.g. "-" */
   trailing,
   /* Spoken once, since the visible text repeats */
@@ -58,8 +80,7 @@ export default function MarqueeTitle({
   /* Callers that sit under a page title pass their own, so the running
      head cannot end up larger than the name of the thing it heads. */
   size = 'clamp(2.75rem, 11.4vw, 172.533px)',
-  /* Swaps which half gets the script face. Only the faces trade places —
-     both runs stay chalked, as they already were. */
+  /* Swaps which half gets the script face. Only the faces trade places. */
   swapFaces = false,
 }) {
   const firstFace = swapFaces ? FONT : SCRIPT_FONT
@@ -97,18 +118,25 @@ export default function MarqueeTitle({
             paddingRight: 'calc(var(--m) * 1.04)',
           }}
         >
-          {/* Textured per RUN, not on a wrapper around the whole lockup: a
-              filter on the parent would drag the number and the orchid in
-              with it. The number is 16px, and the chalk filter's 10px
-              displacement at that size dismantles the glyph rather than
-              roughening it. */}
+          {/* NO CHALK FILTER ON EITHER RUN. Both were textured through
+              CHALK_TEXTURE until it was removed here deliberately: at
+              marquee scale the displacement roughened the script face into
+              something closer to a scan than a drawn letter, and repeating
+              it across a looping strip multiplied the effect. The texture
+              still belongs to the site — it is what the hero name, the nav
+              wordmark it docks into and the footer's "Let's work together"
+              are built from — so the running heads are now the plain voice
+              between those two chalked moments. Re-adding it means the
+              filter goes on each RUN, never on a wrapper: a filter on the
+              parent drags the number and the orchid in with it, and the
+              number is 16px, where a 10px displacement dismantles the glyph
+              rather than roughening it. */}
           <span
             style={{
               fontFamily: firstFace,
               fontSize: 'var(--m)',
               lineHeight: 1.14,
               letterSpacing: '-0.01em',
-              filter: CHALK_TEXTURE,
             }}
           >
             {script}
@@ -122,10 +150,10 @@ export default function MarqueeTitle({
                 fontSize: 'calc(var(--m) * 0.0927)',
                 lineHeight: 1.54,
                 marginTop: 'calc(var(--m) * 0.1855)',
-                marginLeft: 'calc(var(--m) * 0.09)',
+                marginLeft: `calc(var(--m) * ${numberOffset})`,
               }}
             >
-              {number}
+              ({number})
             </span>
           )}
 
@@ -149,7 +177,6 @@ export default function MarqueeTitle({
               lineHeight: 1.14,
               letterSpacing: '-0.01em',
               marginLeft: 'calc(var(--m) * 0.348)',
-              filter: CHALK_TEXTURE,
             }}
           >
             {sans}

@@ -70,7 +70,7 @@ export default function CaseStudyNav({ movements }) {
 
   return (
     <nav ref={ref} className="cs-secnav" aria-label="Sections of this case study">
-      <div className="shell cs-secnav-inner">
+      <div className="page-content-shell cs-secnav-inner">
         {movements.map((m) => {
           const current = active === m.id
           return (

@@ -1,3 +1,12 @@
 .vercel
 .env*.local
 frontend/public/images/cards/orbcard.mov
+
+# The 158MB build copy of orbcard.mov. The source under public/ is already
+# ignored above, but `vite build` copies it into dist/ — which IS tracked —
+# and GitHub rejects any single file over 100MB, so a push carrying it fails
+# outright rather than warning.
+frontend/dist/images/cards/orbcard.mov
+
+# macOS finder droppings
+.DS_Store

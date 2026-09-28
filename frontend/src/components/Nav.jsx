@@ -28,12 +28,14 @@ const SCRIPT_FONT = "'Coneria Script Slanted', cursive"
 export const NAV_NAME_FONT_SIZE = 21.38
 export const NAV_LINK_FONT_SIZE = 21.34
 
-/* `match` is which paths count as "you are here". Home renders at both / and
-   /about, so About owns the pair. Contact is a mailto and is never current. */
+/* `match` is which paths count as "you are here". ABOUT points at / because
+   the root IS the about page — the bio hero, the disciplines, where she has
+   been. /about is only a redirect to it now, so nothing links there.
+   Contact is a mailto and is never current. */
 const NAV_LINKS = [
-  { to: '/work', label: 'WORKS', match: ['/work'] },
-  { to: '/about', label: 'ABOUT', match: ['/', '/about'] },
-  { href: 'mailto:kataliyasun@gmail.com', label: 'CONTACT', match: [] },
+  { to: '/', label: 'about', match: ['/'] },
+  { to: '/work', label: 'works', match: ['/work'] },
+  { href: 'mailto:kataliyasun@gmail.com', label: 'contact', match: [] },
 ]
 
 export default function Nav({
@@ -53,7 +55,7 @@ export default function Nav({
        upper edge. The offset moved into padding, so the wordmark still sits
        exactly where it did and the ground reaches the top of the screen. */
     <nav className="site-nav fixed top-0 left-0 w-full z-[50] pointer-events-none pt-[17px] pb-[14px]">
-      <div className="shell flex flex-row justify-between items-center">
+      <div className="page-content-shell flex flex-row justify-between items-center">
         <Link
           ref={wordmarkRef}
           to="/"

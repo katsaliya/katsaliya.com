@@ -1073,7 +1073,7 @@ function Decision({ rejected, chosen }) {
 function Outro({ title, items }) {
   return (
     <section className="cs-outro">
-      <div className="shell">
+      <div className="page-content-shell">
         <h2 className="cs-outro-title" style={{ fontFamily: SCRIPT_FONT }}>{title}</h2>
         <ul className="cs-outro-list">
           {items.map((it) => (
@@ -1336,7 +1336,7 @@ export default function CaseStudy({ study, reduceMotion = false }) {
               className="absolute inset-0 pointer-events-none"
               style={{ clipPath: 'inset(0px 0px -240px 0px)' }}
             >
-              <div className="shell-hero h-full">
+              <div className="page-content-shell h-full">
                 {/* Centred with FLEX, not translate. GSAP animates transform
                     on the motif (opacity/scale/y), and an inline transform
                     replaces Tailwind's -translate-y-1/2 outright rather than
@@ -1386,7 +1386,7 @@ export default function CaseStudy({ study, reduceMotion = false }) {
             </div>
           )}
 
-          <div className="shell-hero relative">
+          <div className="page-content-shell relative">
             <div className="cs-masthead">
               {/* Still an <h1> when it is a logo — the page needs one heading
                   and a screen reader needs the name, so the mark carries the

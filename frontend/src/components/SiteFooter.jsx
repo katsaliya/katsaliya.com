@@ -16,7 +16,7 @@
    never refuses the cursor, and it never fails to come back either. Shove it
    as much as you like; it returns to the line every time.
 
-   It reuses chase() and smoothstep() from the ring rather than
+   It reuses chase() from the ring rather than
    reimplementing them, so the footer and the carousel are literally running
    the same easing maths.
 
@@ -35,10 +35,8 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { CHALK_TEXTURE } from './ChalkTexture'
-import CursorTag from './CursorTag'
 import Marquee from './Marquee'
-import { chase, smoothstep } from './WorkCarousel/ring/utils'
+import { chase } from './WorkCarousel/ring/utils'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -72,34 +70,63 @@ const THAI_BLESSING =
   'โชคดี · สุขภาพแข็งแรง · ร่ำรวย · ชุมชนเข้มแข็ง · อยู่ดีมีสุข · เฮงๆ รวยๆ · กินดีอยู่ดี · มิตรภาพ'
 
 const LINKS = [
-  { label: 'Email', href: 'mailto:kataliyasun@gmail.com' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/katsaliya' },
-  { label: 'GitHub', href: 'https://github.com/katsaliya' },
+  { label: 'email', href: 'mailto:kataliyasun@gmail.com' },
+  { label: 'linkedin', href: 'https://linkedin.com/in/katsaliya' },
+  { label: 'github', href: 'https://github.com/katsaliya' },
 ]
 
-/* Cursor response, all in one place. reach is in px; lift and pull are the
-   maximum displacement a character will take at the very centre of it. */
-const REACH = 260
-const LIFT = 18
-const PULL = 0.14
-const GRAB = 0.14 // per 60fps frame, taking up displacement
-const RELEASE = 0.06 // and letting it go — deliberately much slower
+/* How fast the light chases the pointer, per 60fps frame. Slower than the
+   letters ever were: a light that snaps looks like a switch, and the whole
+   point of raking one across a relief is that you watch the shading travel.
+   REST is where it sits with no pointer — see the effect below. */
+const LIGHT_CHASE = 0.08
 
-function Kinetic({ text, className, style }) {
-  return [...text].map((ch, i) => (
+/* `ramp` colours each character individually, [from, to] across the word.
+
+   IT HAS TO BE PER CHARACTER, not a gradient on the parent. The obvious way
+   to colour a word like this is background-image + background-clip:text, and
+   it is silently incompatible with the motion below: the clip is computed
+   from the text where it was LAID OUT, so a character that translates paints
+   against a clip that did not follow it. Measured — with transforms applied
+   the letters stopped appearing to move at all, and the ones displaced
+   furthest vanished outright, glyph and clip no longer overlapping. A colour
+   set on each span travels with that span, so a ramp survives whatever
+   transform the pointer applies. */
+function mix(a, b, t) {
+  const p = (c) => c.match(/[\d.]+/g).map(Number)
+  const [ar, ag, ab, aa = 1] = p(a)
+  const [br, bg, bb, ba = 1] = p(b)
+  const n = (x, y) => Math.round(x + (y - x) * t)
+  return `rgba(${n(ar, br)}, ${n(ag, bg)}, ${n(ab, bb)}, ${(aa + (ba - aa) * t).toFixed(3)})`
+}
+
+function Kinetic({ text, className, style, ramp }) {
+  const chars = [...text]
+  return chars.map((ch, i) => (
     <span
       key={i}
       className={`footer-char inline-block will-change-transform ${className || ''}`}
-      style={style}
+      style={
+        ramp
+          ? { ...style, color: mix(ramp[0], ramp[1], chars.length < 2 ? 0 : i / (chars.length - 1)) }
+          : style
+      }
     >
       {ch === ' ' ? ' ' : ch}
     </span>
   ))
 }
 
-export default function SiteFooter({ reduceMotion = false }) {
+export default function SiteFooter({ reduceMotion = false,
+  /* WHICH SEAM, DECIDED BY THE CALLER. This footer is on Home and on every
+     case study, and what sits above it differs: grey on Home (How I got
+     here), white on a case study (the outro band). A hardcoded seam would be
+     right on one and paint a grey band across the other. */
+  seamClassName = '',
+}) {
   const rootRef = useRef(null)
-  const ctaRef = useRef(null)
+  const nameRef = useRef(null)
+  const lightRef = useRef(null)
   const [visitor, setVisitor] = useState(null)
 
   /* ── visitor number ── */
@@ -152,131 +179,230 @@ export default function SiteFooter({ reduceMotion = false }) {
     }
   }, [reduceMotion])
 
-  /* ── the motion ── */
+
+  /* ── the light ───────────────────────────────────────────────────────────
+     The name is set at --ivory-deep on an --ivory footer, so at flat light it
+     is almost the background. What makes it readable is shading: the filter
+     turns the glyphs into a low relief and this rakes a point light across
+     it, so the letters are picked out by where the light is not.
+
+     IT RESTS SOMEWHERE LEGIBLE. Pensatori can let their hands vanish without
+     a cursor because the hands are decoration; this name is the footer's
+     mark AND its contact control, so it has to read with no pointer at all —
+     on touch, before the mouse has moved, and for anyone who never goes near
+     it. REST sits the light above and slightly left of centre, which is the
+     ordinary direction light comes from and gives every letter a consistent
+     shadow. The pointer only moves the light away from there.
+
+     Coordinates are the element's own box: the CSS filter region puts user
+     space at the element's top-left, so 0..width maps across the name. The
+     pointer is allowed outside that range — a light off to one side rakes at
+     a shallower angle, which is exactly what should happen.
+
+     The loop is on demand. It starts on the first pointer move and stops
+     once the light has settled back on REST, so a footer nobody touches
+     costs no frames at all. */
   useEffect(() => {
-    const root = rootRef.current
-    if (!root || reduceMotion) return
-    const chars = [...root.querySelectorAll('.footer-char')]
-    if (!chars.length) return
+    const el = nameRef.current
+    const light = lightRef.current
+    if (!el || !light) return
 
-    /* Rest positions are measured once and re-measured on resize, never in
-       the loop — reading a rect per character per frame is a forced layout
-       sixty times a second. */
-    let rests = []
-    const measure = () => {
-      rests = chars.map((el) => {
-        const r = el.getBoundingClientRect()
-        return { x: r.left + r.width / 2, y: r.top + r.height / 2 }
-      })
+    const REST = { x: 0.5, y: -0.55 }
+    let box = el.getBoundingClientRect()
+    const measure = () => { box = el.getBoundingClientRect() }
+    const rest = () => ({ x: box.width * REST.x, y: box.height * REST.y })
+
+    const place = (p) => {
+      light.setAttribute('x', p.x.toFixed(1))
+      light.setAttribute('y', p.y.toFixed(1))
+      light.setAttribute('z', (box.height * 0.85).toFixed(1))
     }
-    measure()
 
-    const state = chars.map(() => ({ dx: 0, dy: 0 }))
-    const pointer = { x: -9999, y: -9999, live: false }
+    /* RE-PLACE WHENEVER THE BOX CHANGES, or the resting light is wrong for
+       the whole visit. It is derived from the name's width, and on first
+       mount that width is whatever the fallback face happened to measure —
+       the script loads later and the name grows by hundreds of pixels. The
+       original ran place() once here and left a light sitting where the
+       centre used to be: measured 427 against a true centre of 673, and
+       nothing corrected it until the pointer moved. So the one state that
+       has to be right for a visitor who never hovers was the one state that
+       was never updated.
 
-    const onMove = (e) => {
-      pointer.x = e.clientX
-      pointer.y = e.clientY
-      pointer.live = true
-    }
-    const onLeave = () => {
-      pointer.live = false
-    }
-    /* On window rather than the footer: the characters should already be
-       reacting as the cursor approaches from above, not snap to life at the
-       boundary. */
-    window.addEventListener('pointermove', onMove, { passive: true })
-    window.addEventListener('pointerleave', onLeave)
-    window.addEventListener('resize', measure)
-    /* Rest positions move with the page, so they are stale after any scroll. */
-    window.addEventListener('scroll', measure, { passive: true })
+       `idle` keeps this from yanking the light away from the pointer if a
+       resize lands mid-interaction. */
+    let idle = true
+    const reset = () => { measure(); if (idle) place(rest()) }
+    reset()
+    document.fonts?.ready.then(reset)
+    const ro = new ResizeObserver(reset)
+    ro.observe(el)
 
+    /* No pointer, or the visitor asked for less motion: the resting light is
+       the whole effect and nothing needs to run. */
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
+    if (reduceMotion || !mq.matches) return () => ro.disconnect()
+
+    const cur = rest()
+    let target = rest()
     let raf = 0
     let prev = performance.now()
+
     const tick = (now) => {
       const dt = Math.min(0.05, (now - prev) / 1000)
       prev = now
-
-      for (let i = 0; i < chars.length; i++) {
-        const rest = rests[i]
-        let tx = 0
-        let ty = 0
-
-        if (pointer.live && rest) {
-          const dx = pointer.x - rest.x
-          const dy = pointer.y - rest.y
-          const dist = Math.hypot(dx, dy)
-          const f = smoothstep(REACH, REACH * 0.2, dist)
-          if (f > 0.0001 && dist > 0.0001) {
-            tx = dx * PULL * f
-            ty = dy * PULL * f - LIFT * f
-          }
-        }
-
-        const s = state[i]
-        /* The asymmetry. Compared per axis on magnitude, so a character
-           moving further from rest grabs and one returning releases. */
-        const kx = Math.abs(tx) > Math.abs(s.dx) ? GRAB : RELEASE
-        const ky = Math.abs(ty) > Math.abs(s.dy) ? GRAB : RELEASE
-        s.dx += (tx - s.dx) * chase(dt, kx)
-        s.dy += (ty - s.dy) * chase(dt, ky)
-
-        chars[i].style.transform =
-          Math.abs(s.dx) < 0.01 && Math.abs(s.dy) < 0.01
-            ? ''
-            : `translate3d(${s.dx.toFixed(2)}px, ${s.dy.toFixed(2)}px, 0)`
-      }
+      const k = chase(dt, LIGHT_CHASE)
+      cur.x += (target.x - cur.x) * k
+      cur.y += (target.y - cur.y) * k
+      place(cur)
+      const r = rest()
+      const settled =
+        Math.abs(target.x - r.x) < 0.5 && Math.abs(target.y - r.y) < 0.5 &&
+        Math.abs(cur.x - r.x) < 0.5 && Math.abs(cur.y - r.y) < 0.5
+      if (settled) { raf = 0; return }
       raf = requestAnimationFrame(tick)
     }
-    raf = requestAnimationFrame(tick)
+    const wake = () => { if (!raf) { prev = performance.now(); raf = requestAnimationFrame(tick) } }
 
+    const onMove = (e) => {
+      idle = false
+      target = { x: e.clientX - box.left, y: e.clientY - box.top }
+      wake()
+    }
+    const onLeave = () => { idle = true; target = rest(); wake() }
+
+    window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('pointerleave', onLeave)
+    window.addEventListener('resize', reset)
+    window.addEventListener('scroll', measure, { passive: true })
     return () => {
+      ro.disconnect()
       cancelAnimationFrame(raf)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerleave', onLeave)
-      window.removeEventListener('resize', measure)
+      window.removeEventListener('resize', reset)
       window.removeEventListener('scroll', measure)
-      chars.forEach((el) => {
-        el.style.transform = ''
-      })
+      place(rest())
     }
   }, [reduceMotion])
 
   return (
     <footer
       ref={rootRef}
-      className="relative w-full overflow-hidden bg-[var(--ivory)] pt-12 md:pt-16 pb-8"
+      className={`relative w-full overflow-hidden bg-[var(--ivory)] pt-2 md:pt-3 pb-4 ${seamClassName}`.trim()}
     >
-      <div className="shell">
-        {/* The statement. Script + orchid + sans, the same lockup grammar as
-            the section marquees, so the close reads as part of the system
-            rather than as a detached footer. */}
-        {/* The statement is the hover area, not the whole footer — the footer
-            also holds Email / LinkedIn / GitHub, and a blanket click handler
-            over all of it would hijack those. */}
-        <CursorTag targetRef={ctaRef} label="Contact" />
+      {/* THE VERTICAL BUDGET, top to bottom: pt-6/8, statement, mt-4/5,
+          links, mt-5/6, rule, mt-3, visitor count, mt-4/5, Thai band, pb-4.
+          Six gaps and two paddings, and between them they are now most of
+          what is left to cut here — the statement itself is 123px of the
+          footer's ~300 at 1440, and it is the one thing in here that is
+          supposed to be big. Tightened twice: the gaps alone used to total
+          152px, more than the statement they were separating.
+
+          Anything added to this stack costs the footer twice, once for the
+          element and once for the gap above it. */}
+      {/* DEFINED HERE, not beside ChalkTexture at the app root, and the
+          difference is deliberate: that filter is shared by the hero name,
+          the nav wordmark and the footer CTA, so its id has to be global.
+          This one has a single consumer and carries moving state — the light
+          position — which belongs with the component that drives it.
+
+          The recipe: blur the glyphs' alpha into a height field, rake a point
+          light across it, mask the lighting back inside the letterforms, then
+          MULTIPLY that over the real text. Multiply rather than replace is
+          what keeps the text's own colour: where the light lands the result
+          is the near-background ivory, where it does not the letter darkens.
+          Compositing with `in` alone would throw the colour away and paint
+          pure lighting, which loses the tint the rest of the page is set in. */}
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: 'absolute' }}>
+        <filter id="footer-relief" x="-15%" y="-80%" width="130%" height="260%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="height" />
+          <feDiffuseLighting in="height" surfaceScale="4" diffuseConstant="1" lightingColor="#ffffff" result="lit">
+            <fePointLight ref={lightRef} x="0" y="0" z="80" />
+          </feDiffuseLighting>
+          {/* THE AMBIENT FLOOR, and it is the whole reason this reads as a
+              surface rather than as engraving. feDiffuseLighting has no
+              ambient term: where a normal turns away from the light, N·L
+              reaches 0 and the output is pure black. Multiplying that over
+              the text drives the strokes to black whatever colour the text
+              is — measured, setting the text to pure #ffffff left 4.08% of
+              pixels below level 120 against 4.32% at --ivory-deep, i.e. the
+              colour does essentially nothing. The darkness was never the
+              fill, it was the lighting bottoming out.
+
+              SLOPE 0.48 IS MATCHED TO KAREN LOU'S FOOTER WORDMARK, which is
+              the look this is aiming at. Hers is a pre-rendered transparent
+              PNG, so there was no technique to copy — only a target to hit.
+              Measured off her asset: perfectly neutral (R=G=B), ink spanning
+              181..255 on a white page, median 233. Normalised against the
+              background that is min 0.710, median 0.914, band 0.290.
+
+              Swept against those: slope 0.45 gave min 0.723 / band 0.261 and
+              0.55 gave 0.656 / 0.328, so 0.48 sits on her numbers. Median
+              comes out 0.957 against her 0.914 — ours carries slightly less
+              of its area in shadow, which is the shape of the bevel rather
+              than its range, and not something slope can reach.
+
+              SLOPE IS THE ONLY DIAL THAT MOVES THE RANGE. surfaceScale was
+              swept 6 -> 12 -> 20 -> 30 and stdDeviation 4 -> 2 with the
+              output identical to three decimals every time: the lighting
+              already spans its full 0..1 across glyph edges, so those two
+              redistribute where shading falls, not how far it goes. Change
+              them for the character of the bevel; change slope for depth. */}
+          <feComponentTransfer in="lit" result="ambient">
+            <feFuncR type="linear" slope="0.48" intercept="0.52" />
+            <feFuncG type="linear" slope="0.48" intercept="0.52" />
+            <feFuncB type="linear" slope="0.48" intercept="0.52" />
+          </feComponentTransfer>
+          <feComposite in="ambient" in2="SourceAlpha" operator="in" result="litText" />
+          <feBlend in="SourceGraphic" in2="litText" mode="multiply" />
+        </filter>
+      </svg>
+
+      <div className="page-content-shell">
+        {/* THE NAME AS THE CLOSE, replacing "Let's work together" — the page
+            ends on whose page it is rather than on a request. Two lines, the
+            surname set larger in the script and riding up into the first, so
+            the pair reads as one mark rather than two stacked words.
+
+            IT STILL OPENS MAIL, WITH NOTHING SAYING SO. The "Contact" pill
+            that used to follow the cursor here is gone, so the only hint
+            left is the pointer cursor on a mouse — and none at all on touch
+            or by keyboard, since a div with onClick is not focusable and
+            never was. That is survivable while Email / LinkedIn / GitHub sit
+            directly underneath carrying the same address, and it is the
+            state to remove entirely rather than re-decorate if this stops
+            being a control.
+
+            The click is still scoped to the name rather than the footer: a
+            blanket handler out here would hijack those three links.
+
+            No chalk filter on the name. At this size the displacement reads
+            as a printing fault rather than as texture, and the relief
+            lighting is doing the surface work instead. */}
         <div
-          ref={ctaRef}
-          className="flex flex-wrap items-center justify-center text-center gap-x-[0.24em] text-[clamp(2.4rem,8vw,7rem)] leading-[1.1] text-[var(--walnut)] md:cursor-pointer"
+          className="footer-name md:cursor-pointer"
           onClick={() => {
             window.location.href = 'mailto:kataliyasun@gmail.com'
           }}
         >
-          <span style={{ fontFamily: SCRIPT_FONT, filter: CHALK_TEXTURE }}>
-            <Kinetic text="Let's" />
-          </span>
-          <img
-            src="/images/assets/orchid-logo-placeholder.png"
-            alt=""
-            className="w-auto shrink-0"
-            style={{ height: '0.62em', transform: 'rotate(-0.2deg)' }}
-          />
           <span
-            style={{ fontFamily: FONT, fontWeight: 400, filter: CHALK_TEXTURE }}
-            className="text-[0.62em]"
+            ref={nameRef}
+            className="footer-name-given"
+            style={{ fontFamily: SCRIPT_FONT, fontWeight: 400, filter: 'url(#footer-relief)' }}
           >
-            <Kinetic text="work together" />
+            Kataliya Sungkamee
           </span>
+          {/* The ramp is the colour: a slight drift across the word rather
+              than one flat tint, held at the alpha of a watermark so it reads
+              as a tinted surface and not as coloured type. The hairline
+              stroke in .footer-name-family is what makes it glass. 
+          <span className="footer-name-family" style={{ fontFamily: SCRIPT_FONT }}>
+            <Kinetic
+              text="Sungkamee"
+              ramp={['rgba(45, 136, 169, 0.34)', 'rgba(168, 85, 143, 0.28)']}
+            />
+          </span>
+          */}
         </div>
 
         {/* One centred row under the statement.
@@ -289,7 +415,7 @@ export default function SiteFooter({ reduceMotion = false }) {
             `footer-line` is kept on the row so it still catches the reveal
             that used to bring the message in; without it that timeline would
             target an empty NodeList and the links would simply appear. */}
-        <div className="footer-line mt-8 md:mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
+        <div className="footer-line mt-4 md:mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
           {LINKS.map((l) => (
             <a
               key={l.label}
@@ -304,14 +430,14 @@ export default function SiteFooter({ reduceMotion = false }) {
           ))}
         </div>
 
-        <div aria-hidden="true" className="relative mt-10 md:mt-12 h-px w-full">
+        <div aria-hidden="true" className="relative mt-5 md:mt-6 h-px w-full">
           <div className="footer-rule absolute inset-0 h-px bg-[rgba(43,35,28,0.39)]" />
         </div>
 
         {/* The border-t that used to sit here has gone — it landed a few px
             under the rule above it and the two read as one thick line. */}
         <div
-          className="mt-6 flex justify-end text-[14px] text-[var(--walnut-faint)]"
+          className="mt-3 flex justify-end text-[14px] text-[var(--walnut-faint)]"
           style={{ fontFamily: FONT, fontWeight: 400 }}
         >
           {visitor !== null && (
@@ -323,17 +449,33 @@ export default function SiteFooter({ reduceMotion = false }) {
       {/* Full-bleed, outside .shell: the last thing on the page should run off
           both edges rather than stop at the content column — it is a band, not
           a line of text. Slower than the section titles, because this is the
-          page settling rather than announcing anything. */}
+          page settling rather than announcing anything.
+
+          SIZED DOWN TWICE, from clamp(1.1rem, 1.7vw, 1.5rem) — 24px on a
+          1440 screen, the same tier as the footer's own links, so a blessing
+          meant to murmur read as another line of content — and now to about
+          13px there.
+
+          WEIGHT 300 NEEDS THE FONT REQUEST TO CARRY IT. index.html asked for
+          Noto Sans Thai at 400;500 only, and a weight a family has not
+          loaded does not fail loudly: the browser picks the nearest cut it
+          does have, so this would have rendered at 400 and looked like the
+          change had simply not worked. 300 was added to that URL with this.
+
+          leading-[1.6] stays where it is at every size. Thai stacks tone
+          marks and vowels above and below the base glyph, and a tighter line
+          box is what makes them collide with the row above rather than the
+          point size on its own. */}
       <Marquee
         reduceMotion={reduceMotion}
         speed={12}
-        className="mt-8 md:mt-10"
+        className="mt-4 md:mt-5"
         ariaLabel="A Thai blessing: good luck, strong health, prosperity, a strong community, live well and be happy, friendship"
       >
         <span
           aria-hidden="true"
-          className="whitespace-nowrap text-[clamp(1.1rem,1.7vw,1.5rem)] leading-[1.6] text-[var(--walnut-soft)] pr-[1.2em]"
-          style={{ fontFamily: THAI_FONT, fontWeight: 400 }}
+          className="whitespace-nowrap text-[clamp(0.75rem,0.9vw,0.875rem)] leading-[1.6] text-[var(--walnut-soft)] pr-[1.2em]"
+          style={{ fontFamily: THAI_FONT, fontWeight: 300 }}
         >
           {THAI_BLESSING}
         </span>

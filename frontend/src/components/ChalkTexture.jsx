@@ -8,7 +8,11 @@
 
    Mounted ONCE, at the app root, because an SVG filter id is document-global
    and the things referencing it are scattered: the Home hero name, the nav
-   wordmark that name docks into, and the Disciplines marquee. It previously
+   wordmark that name docks into, and the footer's "Let's work together".
+   Those three are now the whole list — the section marquees used it too
+   until the texture was taken off them deliberately (see MarqueeTitle.jsx),
+   which leaves it marking the opening and the close rather than every
+   heading in between. It previously
    lived inside the hero's JSX, which already meant the nav — an element
    outside the hero entirely — depended on a def buried in a section it has
    no relationship to. Removing or restructuring the hero would have silently
@@ -19,9 +23,9 @@
    is dead weight that looks like it works.
 
    Scale is tuned for large display type (the hero name at ~200px, the
-   marquee at ~172px). It does NOT survive being pointed at small text: a
+   footer CTA at ~112px). It does NOT survive being pointed at small text: a
    10px displacement on a 16px glyph destroys the letterform rather than
-   texturing it, which is why the marquee's "02" is deliberately left plain.
+   texturing it — so anything at label size stays plain.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Import this rather than retyping the url() — the id is an implementation

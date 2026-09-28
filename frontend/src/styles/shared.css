@@ -118,13 +118,41 @@ body {
   /* Redesign tokens — Part 1 */
   --ivory: #ffffff;
   --ivory-deep: #efefef;
-  --walnut: #2B231C;
+  --walnut: #000000;
   --walnut-soft: #55493c;
   --walnut-faint: rgba(43,35,28,0.5);
   --gold: #C9A227;
   --orchid: #A8558F;
   --orchid-clear: rgba(134, 1, 77, 0.436);
-  --jade: #2F6E64;
+  --jade: #2e6d4e;
+  /* The fourth accent, so four disciplines stop sharing three colours.
+     Hue 196 against jade's 150: near enough to the palette to belong,
+     far enough that it does not read as a second green. */
+  --aqua: #2D88A9;
+
+  /* ── ACCENT INKS: the four accents above, safe as TEXT ──────────────────
+     The display accents are for MARKS — a dot, a rule, a fill — where
+     nothing has to be read. As type most of them fail: measured against
+     white, gold 2.42, aqua 4.03, orchid 4.82 (normal text needs 4.5); only
+     jade at 6.15 passes on its own.
+
+     Each ink is ITS OWN accent's hue and saturation walked down in lightness
+     until it clears 4.5:1 on BOTH #ffffff and #efefef, so an accent can be
+     set as text anywhere without checking which band it landed on. They come
+     out on one tier: ~5.2 on white, ~4.5 on --ivory-deep.
+
+     THEY ARE DERIVED, NOT PICKED, and that is the maintenance note that
+     matters. Change a display accent above and its ink no longer matches it
+     — same name, different colour — and that pairing is the whole point:
+     Selected work tints each card's label with the ink, Disciplines marks
+     the matching row with the display value, and colour is what ties a card
+     in (01) to its row in (04). Re-derive rather than eyeball: take the new
+     display colour's hue and saturation, drop lightness until contrast
+     against #efefef reaches 4.5. */
+  --jade-ink: #25eb88;
+  --orchid-ink: #ec2bb2;
+  --gold-ink: #e2c563;
+  --aqua-ink: #22b1e5;
   --border-alpha: rgba(43,35,28,0.1);
   --glass-bg: rgba(255,255,255,0.5);
   --glass-border: rgba(255,255,255,0.7);
@@ -210,6 +238,10 @@ body {
 
   /* Overlay Background */
   --overlay-bg: rgba(0, 0, 0, 0.65);
+
+  /* Page layout — max width and responsive gutters */
+  --page-max-width: 110rem;   /* 1760px */
+  --page-gutter-x: 1.5rem;    /* 24px on mobile */
 }
 
 /* Teal text utility class */
@@ -814,17 +846,204 @@ body {
    band, which is the intent — the only edge is the one at the bottom of the
    lower bar, terminating the whole thing against the page. */
 .site-nav {
+  /* No background or blur here — see ::before. */
+  position: fixed;
+}
+
+/* THE GLASS IS ITS OWN LAYER SO ITS BOTTOM EDGE CAN FADE.
+
+   backdrop-filter cuts off dead straight at the element's box: everything
+   above the line is blurred, everything a pixel below is sharp, and that
+   discontinuity is the hard edge — not a border, which is why removing the
+   hairline earlier did not soften it.
+
+   A mask fixes it, but it cannot go on .site-nav: a mask applies to the
+   element AND its children, so the wordmark and the links would fade out at
+   the bottom along with the glass. The blur moves to a pseudo-element behind
+   the content instead, and only that layer is masked. The content sits above
+   it at full strength.
+
+   The fade stays INSIDE the bar's own 79px rather than spilling past it. On a
+   case study the section nav pins at exactly top: 79, so a blur extending
+   below would sit on top of that bar's own glass and double-blur the strip
+   where they meet. */
+.site-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background: var(--glass-bg);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0) 100%);
 }
 
 /* Without backdrop-filter a half-transparent bar just looks unfinished, so it
-   falls back to the solid ground it used to have. */
+   falls back to the solid ground it used to have. The mask still applies, so
+   the fallback fades out at the bottom too rather than ending on a hard
+   white edge. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav {
+  .site-nav::before {
     background: var(--ivory);
   }
+}
+
+/* ── FOOTER NAME ────────────────────────────────────────────────────────────
+   The page's closing mark: "Kataliya" in the sans, "Sungkamee" in the script
+   riding up into it. Two lines, read as one lockup.
+
+   THE OVERLAP IS ON THE LINE, NEVER ON THE CHARACTERS. Each letter is its
+   own span and the pointer effect writes style.transform on every one of
+   them, sixty times a second — anything positional set on a .footer-char is
+   overwritten on the next frame. So the lift that tucks the surname under
+   the given name is a negative margin on the line wrapper, which the effect
+   never touches.
+
+   The script runs larger than the sans at the same nominal size (it has a
+   small x-height for its em), so .footer-name-family is set up rather than
+   down to arrive at the same optical weight.
+
+   GLASS: a fill at watermark alpha, carrying the per-character colour ramp
+   from SiteFooter.jsx, plus a hairline stroke to give the letterform an edge
+   it would otherwise lose at that alpha. The stroke is what stops it reading
+   as merely faded type. It is a paint property on each span, so unlike a
+   clipped gradient it travels with a character when the pointer moves it. */
+.footer-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 0.92;
+}
+.footer-name-given {
+  /* SOLVED FROM THE COLUMN, NOT GUESSED IN vw. The full name in this script
+     measures 1273px for every 100px of font size (with the -0.035em
+     tracking below included), so the size that fills the content column is
+     just the column width divided by 12.73. Dividing by 13 leaves it at
+     ~98%, a hair inside the gutters.
+
+     A single vw value cannot do this. The gutters are fixed pixels, so they
+     are 12.8% of a 375px viewport and 4.4% of a 1440 one — any vw that fills
+     the column on a laptop overflows it on a phone, and any that fits the
+     phone leaves a laptop looking under-set. The calc tracks both, and
+     min(110rem, 100vw) is what stops it growing once the shell caps and the
+     viewport keeps going.
+
+     white-space: nowrap because each character is its own inline-block and
+     the line can break BETWEEN them — the space is already non-breaking, so
+     without this a wrap lands mid-word. */
+  font-size: calc((min(110rem, 100vw) - 2 * var(--page-gutter-x)) / 13);
+  white-space: nowrap;
+
+  /* ROOM FOR THE ASCENDERS, IN em SO IT SCALES WITH THE TYPE. line-height
+     0.92 on .footer-name makes the line box shorter than the glyphs: this
+     script measures 1.49em of ink against a 0.92em box, and 0.284em of that
+     sits ABOVE the box. The footer clips (it has to — see below), and its
+     top padding is a fixed 32px, so the overhang outgrew it: measured clean
+     at 1440 with 2px to spare, exactly 0 at 1512, and 5px INTO the cut at
+     1920 and beyond, shaving the tops off the K and the S.
+
+     0.32em covers the 0.284em overhang at every size because both scale
+     together, which a pixel padding cannot do.
+
+     Why not just unclip the footer: its overflow:hidden is load-bearing.
+     The Thai marquee's track is `w-max` and runs ~2500px wide; Marquee
+     clips its own painting with clip-path, but clip-path does not reduce
+     scrollable overflow, so removing the footer's hidden adds 1895px of
+     horizontal page scroll (measured). The name has to fit inside the box,
+     not overflow it. */
+  padding-top: 0.32em;
+  /* Explicit, though it is also the default: nothing between here and the
+     footer should ever clip this line. The footer itself must, and the
+     padding above is what keeps the glyphs clear of that cut. */
+  overflow: visible;
+  letter-spacing: -0.035em;
+  /* Near the background on purpose. The name is not painted dark and then
+     lit — it is set almost the colour of the footer, and the relief lighting
+     in SiteFooter.jsx is what makes it legible at all. Darken this and the
+     light stops being the thing you read it by. */
+  color: var(--ivory-deep);
+}
+.footer-name-family {
+  /* 12.5vw, not 15.5. At 15.5 the word measured 1376px inside a 1376px
+     shell — it filled the content column exactly, touched both gutters, and
+     the script's ink (1.4% wider than its advance) spilled past them into
+     the footer's overflow-hidden, so the last letter was shaved. 12.5vw
+     lands it at ~90% of the viewport with a gutter either side.
+
+     The floor is 2.6rem rather than 3.4: on a 375px phone the shell leaves
+     327px, and 3.4rem put the word at 345 — overflowing again, at the one
+     width where there is no room to lose. */
+  font-size: clamp(3rem, 14vw, 15rem);
+  letter-spacing: -0.01em;
+  /* Rides up into the given name. Negative margin, not transform. */
+  margin-top: -0.34em;
+  -webkit-text-stroke: 1px rgba(43, 35, 28, 0.16);
+}
+@media (max-width: 640px) {
+  /* Less overlap on a phone: the same -0.34em collides the two lines rather
+     than nesting them once the given name is only a few characters wide. */
+  .footer-name-family { margin-top: -0.22em; }
+}
+
+/* ── SECTION SEAMS ─────────────────────────────────────────────
+   The page alternates #ffffff and #efefef, and a 16-value step between two
+   flat fills reads as a drawn line even though nothing is drawn. These fade
+   the incoming colour down into the section instead, so the change happens
+   over 160px rather than over one pixel row.
+
+   THE RAMP IS EASED, NOT LINEAR, and that is the whole reason this works. A
+   plain two-stop gradient still showed a line here: the colour is continuous
+   across it, but its SLOPE is not — flat white above, then an immediate
+   constant drop below. The eye resolves that kink as an edge (Mach banding)
+   and draws a line the pixels do not contain. Measured on the hero →
+   Disciplines seam: hard edge with no gradient, still an edge with a linear
+   96px gradient, gone with the stops below. They sample a smoothstep, so the
+   fade starts and finishes gently and is steepest in the middle, leaving no
+   kink at either end for the eye to find.
+
+   It is a background-IMAGE over the section's existing background-COLOR, not
+   a pseudo-element. Both are part of the element's own background, so the
+   gradient is always behind every child with no z-index, no stacking context,
+   and nothing for the sections' overflow-hidden to clip.
+
+   THE FADE ENDS ON THE SAME COLOUR AT ZERO ALPHA, never on `transparent`.
+   `transparent` is rgba(0,0,0,0), so a gradient running to it passes through
+   progressively darker semi-black and lays a grey haze across the seam —
+   exactly the dirty band this is meant to remove.
+
+   Name them for what is ABOVE the section, since that is what fades in. The
+   footer takes its own as a prop rather than hardcoding one: Home puts grey
+   above it, a case study puts the white outro above it. */
+.seam-under-ivory {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0px,
+    rgba(255, 255, 255, 0.957) 20px,
+    rgba(255, 255, 255, 0.844) 40px,
+    rgba(255, 255, 255, 0.684) 60px,
+    rgba(255, 255, 255, 0.5) 80px,
+    rgba(255, 255, 255, 0.316) 100px,
+    rgba(255, 255, 255, 0.156) 120px,
+    rgba(255, 255, 255, 0.043) 140px,
+    rgba(255, 255, 255, 0) 160px
+  );
+}
+.seam-under-deep {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(239, 239, 239, 1) 0px,
+    rgba(239, 239, 239, 0.957) 20px,
+    rgba(239, 239, 239, 0.844) 40px,
+    rgba(239, 239, 239, 0.684) 60px,
+    rgba(239, 239, 239, 0.5) 80px,
+    rgba(239, 239, 239, 0.316) 100px,
+    rgba(239, 239, 239, 0.156) 120px,
+    rgba(239, 239, 239, 0.043) 140px,
+    rgba(239, 239, 239, 0) 160px
+  );
 }
 
 /* Nav wordmark — the same script lockup the Home hero docks into, so every
@@ -1236,4 +1455,20 @@ body {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+
+@media (min-width: 640px) {
+  :root {
+    --page-gutter-x: 2rem;    /* 32px from 640px up */
+  }
+}
+
+/* Page content shell — the main layout container */
+.page-content-shell {
+  max-width: var(--page-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--page-gutter-x);
+  padding-right: var(--page-gutter-x);
 }
