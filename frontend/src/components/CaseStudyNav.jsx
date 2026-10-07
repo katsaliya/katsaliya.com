@@ -25,8 +25,14 @@ import { useEffect, useRef, useState } from 'react'
 /* Cleared height of the bar above (17px pad + 48px wordmark + 14px pad) plus
    this bar's own, so a jump lands the heading below both rather than under
    them. Measured, not guessed — see the note in case-study.css. */
-const SHARED_NAV = 79
+/* The shared bar's height, read from the custom property Nav.jsx measures
+   and publishes. It was a hardcoded 79 here as well as in the stylesheet,
+   and it was wrong in both for the same reason — the bar changed. */
 const OWN_HEIGHT = 46
+const sharedNav = () =>
+  parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--nav-h'),
+  ) || 79
 
 export default function CaseStudyNav({ movements }) {
   const [active, setActive] = useState(movements[0]?.id)
@@ -43,7 +49,7 @@ export default function CaseStudyNav({ movements }) {
        which is what a reader would say is on screen, and is not what a naive
        "most visible" test returns on a section three viewports tall. */
     const pick = () => {
-      const line = SHARED_NAV + OWN_HEIGHT + 8
+      const line = sharedNav() + OWN_HEIGHT + 8
       let current = sections[0]
       for (const s of sections) {
         if (s.getBoundingClientRect().top <= line) current = s
@@ -52,7 +58,7 @@ export default function CaseStudyNav({ movements }) {
     }
 
     const io = new IntersectionObserver(pick, {
-      rootMargin: `-${SHARED_NAV + OWN_HEIGHT}px 0px 0px 0px`,
+      rootMargin: `-${sharedNav() + OWN_HEIGHT}px 0px 0px 0px`,
       threshold: [0, 0.25, 0.5, 0.75, 1],
     })
     sections.forEach((s) => io.observe(s))
@@ -60,16 +66,65 @@ export default function CaseStudyNav({ movements }) {
     return () => io.disconnect()
   }, [movements])
 
+  /* ── PINNED OR NOT, and the glass depends on it ──────────────────────
+     Two backdrop-filters that share an edge do not line up. Each blurs only
+     what is behind its own box and clamps its sampling at the boundary, so
+     where the content behind has any contrast crossing that line the two
+     resolve to different colours — measured at up to 81 levels apart, which
+     is the visible seam between this bar and the one above it.
+
+     The only real fix is one blurred region rather than two. While this bar
+     is pinned it sits exactly under the shared bar, so its own glass can be
+     stretched up to cover both and the shared bar's can be switched off —
+     see .cs-secnav[data-pinned] in case-study.css.
+
+     That is only true WHILE PINNED. Unpinned, this bar is somewhere down the
+     page and a glass panel reaching --nav-h above it would hang over the
+     masthead, so the stretch has to be gated on the state. */
+  const [pinned, setPinned] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let frame = 0
+    const check = () => {
+      frame = 0
+      /* +1 for subpixel: a sticky element settles a fraction below its own
+         top value and a strict compare flickers the state every frame. */
+      setPinned(el.getBoundingClientRect().top <= sharedNav() + 1)
+    }
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(check) }
+    check()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      if (frame) cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  /* The shared bar has to know too, so it can drop its own glass. It is a
+     different component entirely, so this goes through the body. */
+  useEffect(() => {
+    document.body.classList.toggle('secnav-pinned', pinned)
+    return () => document.body.classList.remove('secnav-pinned')
+  }, [pinned])
+
   const jump = (e, id) => {
     e.preventDefault()
     const el = document.getElementById(id)
     if (!el) return
-    const top = el.getBoundingClientRect().top + window.scrollY - (SHARED_NAV + OWN_HEIGHT)
+    const top = el.getBoundingClientRect().top + window.scrollY - (sharedNav() + OWN_HEIGHT)
     window.scrollTo({ top, behavior: 'smooth' })
   }
 
   return (
-    <nav ref={ref} className="cs-secnav" aria-label="Sections of this case study">
+    <nav
+      ref={ref}
+      className="cs-secnav"
+      data-pinned={pinned ? 'true' : 'false'}
+      aria-label="Sections of this case study"
+    >
       <div className="page-content-shell cs-secnav-inner">
         {movements.map((m) => {
           const current = active === m.id

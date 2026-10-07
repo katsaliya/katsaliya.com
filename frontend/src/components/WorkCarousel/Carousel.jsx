@@ -183,9 +183,42 @@ export default function Carousel() {
     const readyWaiters = [];
     const whenReady = (fn) => (launchReady ? fn() : readyWaiters.push(fn));
 
-    const atlas = buildAtlas(IMAGE_FILES, (p) => {
-      if (!disposed) loadProg = p;
-    });
+    /* The atlas cell is cut to the size a card actually occupies on THIS
+       screen — see the note at the top of atlas.js for why a fixed number
+       cannot be right. Mirrors the sizing the ring itself does in refit()
+       below: the same fit clamp, the same narrow-band plane multiplier.
+
+       It is solved for the FOCUSED card, not the resting ring — endScale is
+       in here for that reason. The ring settles on one card centred at
+       roughly 4.5x the resting size, and that is the state the page sits in;
+       sizing the atlas for the small cards left the one anybody actually
+       looks at magnified more than twice over.
+
+       Ceiling of 1536 because that is the widest source art in the set, so a
+       larger cell would allocate texture for detail that does not exist.
+
+       Resize does not rebuild this. The 5% headroom absorbs ordinary window
+       dragging, and rebuilding the atlas mid-session would blink every card
+       on the ring — a worse trade than slight softness after a big resize. */
+    const atlasDpr = Math.min(window.devicePixelRatio || 1, 2);
+    const atlasFit = Math.min(
+      params.maxScale,
+      Math.max(params.minScale, window.innerWidth / Math.max(1, params.refWidth)),
+    );
+    const atlasNarrow = window.innerWidth <= params.narrowAt;
+    const atlasPlaneK = atlasNarrow ? params.narrowPlane : 1;
+    const atlasEnd = atlasNarrow ? params.narrowEndScale : params.endScale;
+    const cardPx =
+      params.planeSize * atlasPlaneK * atlasEnd * atlasFit * atlasDpr;
+    const cellW = Math.max(512, Math.min(1536, Math.round((cardPx * 1.05) / 64) * 64));
+
+    const atlas = buildAtlas(
+      IMAGE_FILES,
+      (p) => {
+        if (!disposed) loadProg = p;
+      },
+      cellW,
+    );
 
     uniforms.uAtlas.value.dispose();
     atlas.texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -299,6 +332,48 @@ export default function Carousel() {
     let snapTo = 0;
     let snapCap = 0;
 
+    // ── Stepped input ───────────────────────────────────────────────────
+    // One gesture, one card. Every input used to add VELOCITY and let the
+    // ring coast wherever that carried it, which made landing on a chosen
+    // card a matter of feathering the wheel: at maxSpeed a single flick runs
+    // past three of them. A step instead names the slot next door and hands
+    // it to the same run-in the snap already uses, so the motion is the
+    // settle curve rather than a separate animation.
+    //
+    // stepIndex is the slot being stepped to, or null when the ring is
+    // coasting freely. Steps chain off it rather than off the ring's current
+    // angle, so two quick notches advance two cards instead of both
+    // resolving to the same neighbour.
+    let wheelAccum = 0;
+    let lastStepAt = 0;
+    let lastWheelAt = 0;
+    let gestureStepped = false;
+    let stepIndex = null;
+
+    const slotSize = () => TAU / Math.round(params.count);
+    // Slots are measured off the seed and off wherever front ended up, the
+    // same basis the snap commits on — otherwise a step would land a plane
+    // facing somewhere other than the viewer.
+    const slotPhase = () => params.seed * DEG - frontAngle;
+    // The rate damping alone bleeds velocity off at, in 1/s.
+    const decayRate = () => Math.max(0.01, -Math.log(params.damping) * 60);
+    const settleRate = () => 4.8 / Math.max(0.05, params.snapTime);
+
+    const stepBy = (dir) => {
+      const slot = slotSize();
+      const from =
+        stepIndex !== null
+          ? stepIndex
+          : Math.round((state.spin + slotPhase()) / slot);
+      stepIndex = from + dir;
+      snapTo = stepIndex * slot - slotPhase();
+      // Headroom to cross a whole slot inside snapTime. The snap's own cap is
+      // half a slot, which is right for a throw running itself out but would
+      // make a deliberate step crawl.
+      snapCap = slot * settleRate();
+      settling = true;
+    };
+
     // A click is turning the ring to a card. While this is up the momentum
     // above is suspended entirely, so the two cannot both drive spin.
     let picking = false;
@@ -341,6 +416,10 @@ export default function Carousel() {
 
       spinVel = 0;
       settling = false;
+      // A pick drives spin itself, so any step in flight is abandoned and the
+      // next one measures from wherever the tween lands.
+      stepIndex = null;
+      wheelAccum = 0;
       picking = true;
       gsap.killTweensOf(state);
       gsap.to(state, {
@@ -364,6 +443,10 @@ export default function Carousel() {
     const spinAround = () => {
       spinVel = 0;
       settling = false;
+      // A pick drives spin itself, so any step in flight is abandoned and the
+      // next one measures from wherever the tween lands.
+      stepIndex = null;
+      wheelAccum = 0;
       picking = true;
       gsap.killTweensOf(state);
       const count = Math.round(params.count);
@@ -456,11 +539,67 @@ export default function Carousel() {
       e.preventDefault();
       // Trackpads send horizontal deltas too; take whichever dominates.
       const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      // Fresh input hands the ring back to its own momentum.
       stopPick();
-      settling = false;
-      spinVel += d * params.scrollSpeed;
-      spinVel = Math.max(-params.maxSpeed, Math.min(params.maxSpeed, spinVel));
+
+      if (!params.stepped) {
+        // Fresh input hands the ring back to its own momentum.
+        settling = false;
+        stepIndex = null;
+        spinVel += d * params.scrollSpeed;
+        spinVel = Math.max(-params.maxSpeed, Math.min(params.maxSpeed, spinVel));
+        return;
+      }
+
+      const now = performance.now();
+
+      // ONE GESTURE, ONE CARD — and a gesture is not an event. A trackpad
+      // sends a stream while the fingers move and then a decaying tail for
+      // most of a second after they lift, so counting events, or gating on
+      // elapsed time, both read that tail as someone scrolling on. Measured
+      // against a 12-event flick: no gate walked the ring a full six cards
+      // back to its start; gating on the step's own progress still let three
+      // through, because the tail is long enough for steps to complete inside
+      // it.
+      //
+      // A gap in the stream is what actually separates one swipe from the
+      // next, so that is what is measured. Everything after the first step
+      // until the stream goes quiet belongs to the same gesture and is
+      // ignored. A mouse wheel is unaffected: its notches are already further
+      // apart than gestureGap, so each one is its own gesture.
+      const quiet = now - lastWheelAt > params.gestureGap * 1000;
+      lastWheelAt = now;
+      if (quiet) {
+        gestureStepped = false;
+        wheelAccum = 0;
+      }
+      if (gestureStepped) {
+        wheelAccum = 0;
+        return;
+      }
+
+      // Belt and braces for deliberate fast scrolling: distinct gestures can
+      // still arrive faster than the ring can travel, and this keeps them
+      // from queueing a journey. The ring must be most of the way to the slot
+      // it is already heading for before another step is taken.
+      if (stepIndex !== null) {
+        const remaining = Math.abs(snapTo - state.spin);
+        if (remaining > slotSize() * params.stepChainAt) {
+          wheelAccum = 0;
+          return;
+        }
+      }
+      if (now - lastStepAt < params.stepCooldown * 1000) {
+        wheelAccum = 0;
+        return;
+      }
+
+      wheelAccum += d;
+      if (Math.abs(wheelAccum) < params.stepThreshold) return;
+
+      stepBy(Math.sign(wheelAccum));
+      wheelAccum = 0;
+      lastStepAt = now;
+      gestureStepped = true;
     };
 
     const onPointerDown = (e) => {
@@ -473,6 +612,8 @@ export default function Carousel() {
       if (coarse) beginHold();
       dragging = true;
       settling = false;
+      stepIndex = null;
+      wheelAccum = 0;
       spinVel = 0;
       dragPrevAngle = pointerAngle(e);
       dragPrevTime = performance.now();
@@ -517,6 +658,20 @@ export default function Carousel() {
       endHold();
       if (!dragging) return;
       dragging = false;
+
+      // A RELEASE CAN ONLY CARRY TO THE NEXT CARD. The drag itself stays
+      // one-to-one with the cursor — that part was never the problem — but
+      // the velocity it hands over used to be whatever the last few
+      // milliseconds of travel implied, and a quick flick threw the ring
+      // most of the way round. Capping it at the speed whose coast is
+      // dragCoastSlots of a slot means the snap always has a neighbour to
+      // run in to, not a card three along.
+      if (params.stepped) {
+        const cap = decayRate() * slotSize() * params.dragCoastSlots;
+        spinVel = Math.max(-cap, Math.min(cap, spinVel));
+        stepIndex = null;
+      }
+
       renderer.domElement.releasePointerCapture?.(e.pointerId);
     };
 
@@ -1321,6 +1476,9 @@ export default function Carousel() {
         if (Math.abs(spinVel) < 0.0015 && Math.abs(off) < 0.0008) {
           spinVel = 0;
           state.spin += off;
+          // Parked: the next step measures from the ring again, not from a
+          // slot index left over from the last one.
+          stepIndex = null;
         }
       }
 
@@ -1507,12 +1665,20 @@ export default function Carousel() {
         focusable="false"
       >
         <defs>
+          {/* THE REGION IS THE COST. Everything inside it is rasterised on
+              every frame of a melt, and on Safari that happens on the CPU —
+              an SVG filter on a DOM element is not GPU-accelerated there,
+              which is why the melt stutters in Safari and not in Chrome.
+              It was -100%/300%: three times the lockup's own height, sized
+              for a smear that could reach 100px. With nameBlurMax holding
+              that to 32 the extra room is no longer earning anything, and
+              every percent of it is pixels touched per frame. */}
           <filter
             id="name-goo"
-            x="-20%"
-            y="-100%"
-            width="140%"
-            height="300%"
+            x="-15%"
+            y="-55%"
+            width="130%"
+            height="210%"
             colorInterpolationFilters="sRGB"
           >
             <feColorMatrix

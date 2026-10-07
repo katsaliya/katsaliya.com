@@ -202,9 +202,17 @@ function Block({ d, reduceMotion }) {
           setOpen(true)
         }}
       >
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-6 md:gap-12">
           <div
-            className="disc-numeral leading-[0.8] text-[clamp(7rem,13vw,15rem)] text-[var(--walnut)] will-change-[opacity,transform,filter]"
+            /* THE FLOOR WAS 7rem, WHICH IS THE PHONE CASE. 13vw is a
+               sensible ratio on a wide screen and collapses to nothing on a
+               narrow one, so the clamp's minimum is what actually renders
+               below ~860px — 112px of numeral above every discipline,
+               measured at ~400px of column once its own leading and the
+               gap below it are counted. Four of those were most of why this
+               section ran to 1919px on a 390px screen. 3.25rem keeps the
+               numeral as a numeral and gives the section back its height. */
+            className="disc-numeral leading-[0.8] text-[clamp(3.25rem,13vw,15rem)] text-[var(--walnut)] will-change-[opacity,transform,filter]"
             style={{ fontFamily: SCRIPT_FONT }}
             aria-hidden="true"
           >
@@ -343,7 +351,11 @@ export default function Disciplines({ reduceMotion = false }) {
           className="grid grid-cols-1 md:grid-cols-2 gap-x-10 pb-4 border-b border-[var(--border-alpha)] text-[16px] leading-[1.54] text-[var(--walnut-soft)]"
           style={{ fontFamily: FONT, fontWeight: 400 }}
         >
-          <span>Number</span>
+          {/* BOTH OR NEITHER. "Service" is hidden below md because there is
+              no second column to label there — which left "Number" sitting
+              alone over a single stack, labelling a column that is not a
+              column. The row is a two-column key or it is nothing. */}
+          <span className="hidden md:block">Number</span>
           <span className="hidden md:block">Service</span>
         </div>
 

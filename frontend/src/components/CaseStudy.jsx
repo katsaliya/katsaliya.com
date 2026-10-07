@@ -34,6 +34,7 @@ import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 
 import Nav from './Nav'
+import GoldStar from './GoldStar'
 import SiteFooter from './SiteFooter'
 import MarqueeTitle from './MarqueeTitle'
 import DragStrip from './DragStrip'
@@ -103,12 +104,12 @@ function Stat({ figure, claim, secondary, row }) {
   return (
     <div className={`cs-stat ${row && secondary ? 'cs-stat--row' : ''}`}>
       <p className="cs-stat-line">
-        <span className="cs-stat-figure" style={{ fontFamily: SCRIPT_FONT }}>{figure}</span>
+        <span className="cs-stat-figure">{figure}</span>
         {claim}
       </p>
       {secondary && (
         <p className="cs-stat-line">
-          <span className="cs-stat-figure" style={{ fontFamily: SCRIPT_FONT }}>{secondary.figure}</span>
+          <span className="cs-stat-figure">{secondary.figure}</span>
           {secondary.claim}
         </p>
       )}
@@ -152,14 +153,6 @@ function Device({ video, src, alt, placeholder = 'Demo coming soon', poster }) {
    the better structure and the CSS stays simpler. */
 /* A star, not a bullet. A filled gold dot reads as a list marker; the shape
    is what says "this is a prize" before the sentence is read. */
-function GoldStar({ className = '' }) {
-  return (
-    <svg className={`cs-star ${className}`} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 1.8 14.9 8.7 22.4 9.3 16.7 14.2 18.4 21.5 12 17.6 5.6 21.5 7.3 14.2 1.6 9.3 9.1 8.7Z" />
-    </svg>
-  )
-}
-
 function Ledger({ eyebrow, rows, headers, wide, note }) {
   return (
     <div className={`cs-ledger ${wide ? 'cs-ledger--wide' : ''}`}>

@@ -38,7 +38,10 @@ export default function MicroLabel({ children, className = '', color = 'var(--wa
   return (
     <div
       className={`flex items-baseline gap-2 text-[16px] leading-[1.54] ${className}`}
-      style={{ fontFamily: FONT, fontWeight: 400, color }}
+      /* 300, lighter than the body it sits over. The mark is an
+         annotation; at the body's own 400 the only thing distinguishing it
+         was the brackets. Matches .cs-label on the case studies. */
+      style={{ fontFamily: FONT, fontWeight: 300, color }}
     >
       <span aria-hidden="true">+</span>
       <span>({children})</span>

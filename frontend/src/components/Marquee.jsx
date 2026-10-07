@@ -44,7 +44,7 @@ export default function Marquee({
   maxBoost = 5,
   /* How far content may spill above and below the strip before it is cut.
      A percentage of the strip's own height, so it scales with the type. */
-  bleed = '25%',
+  bleed = '9999px',
   reduceMotion = false,
   className = '',
   ariaLabel,
@@ -141,17 +141,27 @@ export default function Marquee({
     <div
       ref={containerRef}
       className={`w-full ${className}`}
-      /* Clipped on the horizontal axis ONLY. overflow:hidden would do the
-         job sideways but also cuts the strip's top and bottom, and display
-         type routinely paints outside its own line box — a swashed script's
+      /* Clipped on the horizontal axis ONLY, and the vertical inset is now
+         large enough to be no clip at all. overflow:hidden would do the job
+         sideways but also cuts the strip's top and bottom, and display type
+         routinely paints outside its own line box — a swashed script's
          ascenders, any descender, and the chalk filter's paint region all
-         live out there. Roughly 16px of the "D" swash was being sliced off.
+         live out there.
+
+         The bleed used to be 25% of the strip's height, which was a guess
+         and was still cutting: these titles are set in a face whose swashes
+         reach well past the line box, and the chalk filter widens the paint
+         region further. 9999px is simply "do not clip vertically" — there is
+         nothing to tune and nothing to get wrong when a title changes.
+
+         Sections above and below still clip at their own edges, so this
+         cannot bleed into a neighbour; it only stops the marquee cutting its
+         own type.
 
          overflow-x:hidden with overflow-y:visible is not an option: CSS
          computes the visible axis to auto as soon as the other is hidden,
          which turns this into a scroll container. clip-path is the way to
-         constrain one axis and genuinely leave the other alone — the
-         negative vertical inset pushes the cut well outside the box. */
+         constrain one axis and genuinely leave the other alone. */
       style={{ clipPath: `inset(-${bleed} 0px)` }}
       role={ariaLabel ? 'img' : undefined}
       aria-label={ariaLabel}

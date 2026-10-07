@@ -52,7 +52,7 @@ const PARAGRAPHS = [
     text: 'As my technical skills grew, I naturally transitioned into product and design—the perfect bridge to apply my eye for visuals directly to code.',
   },
   {
-    text: 'After graduating, I returned to Los Angeles to launch the second location Emporium Thai Market. On any given day, I’m fixing our websites, designing new branding materials, or managing our socials. I recently built a tv box and programmed an photobooth app particularly for the box\'s functionality.',
+    text: 'After graduating, I returned to Los Angeles to help the brand and marketing of Emporium Thai\'s recently launched second location. On any given day, I’m fixing our websites, designing new branding materials — I recently built our very own photobooth and programmed a personalized app — or managing our socials.',
   },
   {
     text: 'Falling deep into the hospitality scene inspired my next move:',

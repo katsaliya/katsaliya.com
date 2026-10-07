@@ -157,17 +157,11 @@ export default function MarqueeTitle({
             </span>
           )}
 
-          <img
-            src="/images/assets/orchid-logo-placeholder.png"
-            alt=""
-            className="w-auto shrink-0"
-            style={{
-              height: 'calc(var(--m) * 0.74)',
-              marginTop: 'calc(var(--m) * 0.1855)',
-              marginLeft: 'calc(var(--m) * 0.348)',
-              transform: 'rotate(-0.2deg)',
-            }}
-          />
+          {/* The orchid that used to ride between the title and the next
+              repeat has been taken out, to be replaced. Nothing stands in
+              for it: the gap it leaves is the run's own spacing, so the
+              marquee reads as words with air between them rather than as a
+              row with a hole in it. */}
 
           <span
             style={{

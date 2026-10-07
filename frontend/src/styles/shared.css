@@ -880,6 +880,23 @@ body {
   mask-image: linear-gradient(to bottom, #000 0%, #000 58%, rgba(0, 0, 0, 0) 100%);
 }
 
+/* THE FADE STAYS WHILE THE SECTION NAV IS UNPINNED. An earlier pass took
+   it off for the whole of a case study, on the reasoning that the bar below
+   continues the glass — but that bar only sits underneath while it is
+   pinned. Everywhere else this is the bottom of the glass again, and
+   without the fade it ended on a hard edge: a uniform 58-level step right
+   across the window, measured, which read as exactly the line it was
+   supposed to remove.
+
+   WHILE THE SECTION NAV IS PINNED, THIS BAR HAS NO GLASS OF ITS OWN.
+   The bar below stretches its glass up to cover both, so painting one here
+   as well would be a second blurred layer over the same strip — which is
+   the seam this is all here to remove, plus a doubled blur. The content of
+   this bar still sits above it at z-50, so only the ground goes. */
+body.page-case-study.secnav-pinned .site-nav::before {
+  opacity: 0;
+}
+
 /* Without backdrop-filter a half-transparent bar just looks unfinished, so it
    falls back to the solid ground it used to have. The mask still applies, so
    the fallback fades out at the bottom too rather than ending on a hard
@@ -890,103 +907,271 @@ body {
   }
 }
 
-/* ── FOOTER NAME ────────────────────────────────────────────────────────────
-   The page's closing mark: "Kataliya" in the sans, "Sungkamee" in the script
-   riding up into it. Two lines, read as one lockup.
+/* ── "COMING SOON" NOTE ─────────────────────────────────────────────────────
+   The reply a Selected work card gives when it has no case study behind it
+   yet. Temporary — see SelectedWork.jsx.
 
-   THE OVERLAP IS ON THE LINE, NEVER ON THE CHARACTERS. Each letter is its
-   own span and the pointer effect writes style.transform on every one of
-   them, sixty times a second — anything positional set on a .footer-char is
-   overwritten on the next frame. So the lift that tucks the surname under
-   the given name is a negative margin on the line wrapper, which the effect
-   never touches.
+   Styled as the site's glass pill rather than as a system tooltip, so it
+   belongs to the same family as CursorTag even though it is not that
+   component: same radius logic, same 13-14px label, same frosted ground.
+   pointer-events are off in the JSX, so it can never swallow the next click.
 
-   The script runs larger than the sans at the same nominal size (it has a
-   small x-height for its em), so .footer-name-family is set up rather than
-   down to arrive at the same optical weight.
+   A TRANSITION, NOT AN ANIMATION, and both directions are real. The first
+   version used a one-shot keyframe for the entrance and nothing at all for
+   the exit, so it faded in and then disappeared between two frames. Driving
+   opacity and transform off [data-open] means the same curve runs forwards
+   and backwards, and SelectedWork.jsx holds the node mounted long enough
+   for the backwards half to play.
 
-   GLASS: a fill at watermark alpha, carrying the per-character colour ramp
-   from SiteFooter.jsx, plus a hairline stroke to give the letterform an edge
-   it would otherwise lose at that alpha. The stroke is what stops it reading
-   as merely faded type. It is a paint property on each span, so unlike a
-   clipped gradient it travels with a character when the pointer moves it. */
-.footer-name {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  line-height: 0.92;
+   The entrance is slower than the exit on purpose: arriving wants to be
+   noticed, leaving should not pull the eye back. Both ease out, and the
+   slight lift and scale are small enough to read as settling rather than as
+   a pop. */
+.sw-note {
+  color: var(--walnut);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 6px 20px rgba(43, 35, 28, 0.1);
+
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+  transform-origin: 20% 0;
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
-.footer-name-given {
-  /* SOLVED FROM THE COLUMN, NOT GUESSED IN vw. The full name in this script
-     measures 1273px for every 100px of font size (with the -0.035em
-     tracking below included), so the size that fills the content column is
-     just the column width divided by 12.73. Dividing by 13 leaves it at
-     ~98%, a hair inside the gutters.
+.sw-note[data-open='true'] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 260ms ease-out,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw-note,
+  .sw-note[data-open='true'] {
+    transition-duration: 1ms;
+    transform: none;
+  }
+}
 
-     A single vw value cannot do this. The gutters are fixed pixels, so they
-     are 12.8% of a 375px viewport and 4.4% of a 1440 one — any vw that fills
-     the column on a laptop overflows it on a phone, and any that fits the
-     phone leaves a laptop looking under-set. The calc tracks both, and
-     min(110rem, 100vw) is what stops it growing once the shell caps and the
-     viewport keeps going.
+/* ── MOBILE NAV PANEL ───────────────────────────────────────────────────────
+   The stacked links below md. Its own glass ground, because .site-nav::before
+   is sized to the bar and stops at its lower edge — a panel hanging below
+   that would otherwise be type floating over whatever is scrolling past.
 
-     white-space: nowrap because each character is its own inline-block and
-     the line can break BETWEEN them — the space is already non-breaking, so
-     without this a wrap lands mid-word. */
-  font-size: calc((min(110rem, 100vw) - 2 * var(--page-gutter-x)) / 13);
-  white-space: nowrap;
+   Cleared entirely at md, where the links go back to being a row inside the
+   bar and the bar's own ground already covers them. */
+/* ── THE NAV MENU ──────────────────────────────────────────────────────
+   The panel GROWS OUT OF THE TRIGGER rather than appearing beside it, and
+   it is translucent rather than a card laid over the page.
 
-  /* ROOM FOR THE ASCENDERS, IN em SO IT SCALES WITH THE TYPE. line-height
-     0.92 on .footer-name makes the line box shorter than the glyphs: this
-     script measures 1.49em of ink against a 0.92em box, and 0.284em of that
-     sits ABOVE the box. The footer clips (it has to — see below), and its
-     top padding is a fixed 32px, so the overhang outgrew it: measured clean
-     at 1440 with 2px to spare, exactly 0 at 1512, and 5px INTO the cut at
-     1920 and beyond, shaving the tops off the K and the S.
+   Both of those are the thing to get right. A solid white panel on an ivory
+   page is a white rectangle on white — no contrast, and it blanks whatever
+   it covers. This is a dark ink wash at 86% over a 12px backdrop blur, so
+   the page stays legible through it and the links sit at full contrast
+   against ink instead of competing with the page behind them.
 
-     0.32em covers the 0.284em overhang at every size because both scale
-     together, which a pixel padding cannot do.
+   THE GROWTH IS A CLIP, NOT A SCALE OR A SIZE. clip-path inset from the
+   top-right corner opens the panel from exactly the point the flower sits
+   at, and because it is a clip the type inside never stretches — a scaled
+   box would squash the words on the way out and is the usual tell that a
+   menu was animated the cheap way. It also needs no measurement: the panel
+   is at its natural size the whole time and the clip simply uncovers it, so
+   adding a fourth link cannot break the animation.
 
-     Why not just unclip the footer: its overflow:hidden is load-bearing.
-     The Thai marquee's track is `w-max` and runs ~2500px wide; Marquee
-     clips its own painting with clip-path, but clip-path does not reduce
-     scrollable overflow, so removing the footer's hidden adds 1895px of
-     horizontal page scroll (measured). The name has to fit inside the box,
-     not overflow it. */
-  padding-top: 0.32em;
-  /* Explicit, though it is also the default: nothing between here and the
-     footer should ever clip this line. The footer itself must, and the
-     padding above is what keeps the glyphs clear of that cut. */
+   Closed is inset(0 0 100% 100%) — the whole box clipped away at that
+   corner. Open is inset(0). The round is carried on both so the corner
+   radius does not pop at the ends. */
+.nav-menu-panel {
+  /* 78%, not solid and not 86%. The page has to stay readable through it —
+     that is the whole point of not using a card — and at 86% the blur
+     behind it was doing nothing visible. 78% over the ivory composites to
+     about #383838, which still carries the muted links at 5.2:1 and the
+     white ones far above that, so the contrast is bought honestly rather
+     than by blanking what is underneath. */
+  background: color-mix(in srgb, var(--walnut) 78%, transparent);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  clip-path: inset(0 0 100% 100% round 14px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    clip-path 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 220ms ease;
+}
+.nav-menu-panel[data-open='true'] {
+  clip-path: inset(0 0 0 0 round 14px);
+  opacity: 1;
+  pointer-events: auto;
+  transition:
+    clip-path 720ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 160ms ease;
+}
+
+/* The links ride up into place behind the clip rather than simply being
+   revealed by it, staggered top to bottom so the list reads as arriving in
+   order. Hidden until the box has started opening — the delays below are
+   what keep the first word from being visible in the 44px corner before
+   there is a panel around it. */
+.nav-menu-panel > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 300ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-menu-panel[data-open='true'] > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.nav-menu-panel[data-open='true'] > :nth-child(1) { transition-delay: 120ms; }
+.nav-menu-panel[data-open='true'] > :nth-child(2) { transition-delay: 185ms; }
+.nav-menu-panel[data-open='true'] > :nth-child(3) { transition-delay: 250ms; }
+.nav-menu-panel[data-open='true'] > :nth-child(4) { transition-delay: 315ms; }
+
+/* ── THE FAN TRIGGER ──────────────────────────────────────────────────
+   A brisé fan that folds shut when the menu opens. Geometry and the
+   reasoning behind the two states are in FanMark.jsx.
+
+   THE ROTATIONS ARE PER-SLAT CUSTOM PROPERTIES. Each slat carries its own
+   --o (open angle), --s (shut angle) and --i (index), set in the markup,
+   so this file holds one rule for thirteen different rotations rather than
+   thirteen nth-child selectors that would have to be rewritten if the slat
+   count ever changed.
+
+   transform-box: fill-box is deliberately NOT used here: the slats must all
+   turn about the rivet, which is a point in the shared viewBox, not the
+   centre of each slat's own bounding box. The rotation origin is given in
+   user units instead. */
+.fan-mark {
+  --fan-edge: rgba(255, 255, 255, 0.34);
+  --fan-cord: #5E1726;
   overflow: visible;
-  letter-spacing: -0.035em;
-  /* Near the background on purpose. The name is not painted dark and then
-     lit — it is set almost the colour of the footer, and the relief lighting
-     in SiteFooter.jsx is what makes it legible at all. Darken this and the
-     light stops being the thing you read it by. */
-  color: var(--ivory-deep);
 }
-.footer-name-family {
-  /* 12.5vw, not 15.5. At 15.5 the word measured 1376px inside a 1376px
-     shell — it filled the content column exactly, touched both gutters, and
-     the script's ink (1.4% wider than its advance) spilled past them into
-     the footer's overflow-hidden, so the last letter was shaved. 12.5vw
-     lands it at ~90% of the viewport with a gutter either side.
 
-     The floor is 2.6rem rather than 3.4: on a 375px phone the shell leaves
-     327px, and 3.4rem put the word at 345 — overflowing again, at the one
-     width where there is no room to lose. */
-  font-size: clamp(3rem, 14vw, 15rem);
-  letter-spacing: -0.01em;
-  /* Rides up into the given name. Negative margin, not transform. */
-  margin-top: -0.34em;
-  -webkit-text-stroke: 1px rgba(43, 35, 28, 0.16);
+.fan-blade {
+  transform: rotate(var(--o));
+  transform-origin: 100px 112px;
+  /* THE CASCADE. calc on the index turns one declaration into a stagger
+     that runs outward from the middle slat. The close is faster and runs
+     in the same direction, so the fan gathers itself rather than
+     unravelling backwards. */
+  transition: transform 460ms cubic-bezier(0.33, 1, 0.68, 1);
+  transition-delay: calc(var(--i) * 7ms);
 }
-@media (max-width: 640px) {
-  /* Less overlap on a phone: the same -0.34em collides the two lines rather
-     than nesting them once the given name is only a few characters wide. */
-  .footer-name-family { margin-top: -0.22em; }
+
+.fan-mark[data-open='true'] .fan-blade {
+  transform: rotate(var(--s));
+  /* Opening the menu folds the fan. Slightly slower and with a touch of
+     overshoot at the end, which is what a fan does when it is snapped
+     shut — the slats arrive and settle rather than stopping dead. */
+  transition-duration: 620ms;
+  transition-timing-function: cubic-bezier(0.34, 1.26, 0.52, 1);
+  transition-delay: calc(var(--i) * 9ms);
 }
+
+.fan-rivet { fill: #6E4B2A; }
+.fan-rivet-pin { fill: #C9A227; }
+
+/* ── the tassel ────────────────────────────────────────────────────────
+   Nested segments, each with the same sway and a later start, so the
+   rotations compound down the cord and the tip travels furthest. 5.2s
+   against the cat's roughly 3 — asked for, and right: this sits in the
+   corner of every page and has to be ignorable. */
+.fan-tassel path {
+  fill: none;
+  stroke: var(--fan-cord);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.fan-knot { fill: var(--fan-cord); }
+.fan-pom { fill: #3A0E1C; }
+.fan-pom--back { fill: #240811; }
+
+.fan-seg {
+  transform-origin: 100px 110px;
+  animation: fan-sway 5.2s ease-in-out infinite;
+  animation-delay: calc(var(--d, 0) * -0.26s);
+}
+
+@keyframes fan-sway {
+  0%,
+  100% { transform: rotate(-7deg); }
+  50%  { transform: rotate(7deg); }
+}
+
+/* A hint of the fold on hover, so the mark shows what it does. */
+.chrys-trigger:hover .fan-mark[data-open='false'] .fan-blade {
+  transform: rotate(calc(var(--o) * 0.9));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fan-blade { transition-duration: 1ms; transition-delay: 0s; }
+  .fan-seg { animation: none; }
+}
+
+/* ── SELECTED WORK: the turning orchid ─────────────────────────────────
+   katsaliya.com's card has no video and should not have one — a screen
+   recording of the site you are already standing on tells you nothing. The
+   motif turns instead.
+
+   48s for a full revolution. Slow enough to read as drift rather than as a
+   spinner, which is the whole difference between a motif and a loading
+   state. The breathe runs on 11s against that 48s: the two periods do not
+   divide into each other, so the pair never settles into a visible cycle.
+
+   Paused rather than removed under reduced motion, so the card keeps the
+   orchid and only loses the movement. */
+@keyframes sw-motif-turn {
+  to { transform: rotate(360deg); }
+}
+@keyframes sw-motif-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.055); }
+}
+.sw-motif {
+  animation: sw-motif-breathe 11s ease-in-out infinite;
+  will-change: transform;
+}
+/* The turn is on a wrapper rather than the same element, because one
+   element cannot carry two transform animations — the second would simply
+   replace the first. */
+.sw-motif-spin {
+  animation: sw-motif-turn 48s linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw-motif,
+  .sw-motif-spin { animation: none; }
+}
+
+/* ── THE AWARD ROSETTE ────────────────────────────────────────────────
+   A shadow under a cut-out object, so it sits ON the card rather than
+   being pasted flat against it. Tuned soft and low-contrast: the site has
+   no other drop shadows of consequence, and anything heavier would read as
+   a sticker. */
+.sw-ribbon {
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.16));
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESTORED LAYOUT FOUNDATIONS
+
+   These were lost to a bad edit, not a decision: a replacement that spliced
+   on two text markers took everything between them, and the closing marker
+   was at the end of the file. The page gutter went with it, which is why the
+   whole site was suddenly running edge to edge.
+
+   Recovered from git. Only the blocks genuinely retired earlier in the
+   session were left out — the footer name, the floating social widgets and
+   the old nav wordmark rules, none of which anything references now.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── SECTION SEAMS ─────────────────────────────────────────────
    The page alternates #ffffff and #efefef, and a 16-value step between two
@@ -1046,29 +1231,6 @@ body {
   );
 }
 
-/* Nav wordmark — the same script lockup the Home hero docks into, so every
-   page carries one mark. Sized and spaced to match Home's nav slot. */
-.nav-wordmark {
-  font-family: 'Coneria Script Slanted', cursive;
-  font-size: 21.38px;
-  line-height: 1.14;
-  letter-spacing: -0.01em;
-  color: var(--walnut);
-  text-decoration: none;
-}
-
-/* The page you are on: the orchid in place of that link. */
-.nav-current {
-  display: inline-flex;
-  align-items: center;
-}
-
-.nav-current img {
-  height: 32px;
-  width: auto;
-  display: block;
-}
-
 /* DragStrip: a real overflow scroller, just without the chrome. The bar is
    hidden rather than the element being made non-scrollable, so trackpad and
    keyboard scrolling still work — see components/DragStrip.jsx. */
@@ -1096,248 +1258,6 @@ body {
 }
 
 /* ─────────────────────────────────────────
-   FLOATING SOCIAL WIDGET
-   Fixed bottom-right corner social links with collapse/expand
-   ───────────────────────────────────────── */
-
-/* Main widget container */
-.floating-social-widget {
-  /* Fixed position: bottom-right corner */
-  position: fixed;
-  bottom: 2rem;
-  right: 0;
-  z-index: 50;
-
-  /* Smooth slide animation */
-  transition: right 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Expanded state */
-.floating-social-widget.expanded {
-  right: 0;
-}
-
-/* Collapsed state: slides off to the right, tab sticks out */
-.floating-social-widget.collapsed {
-  right: calc(-100% + 48px);
-}
-
-/* Widget content container */
-.floating-social-widget__content {
-  /* Flexbox for vertical stacking */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-
-  /* Padding */
-  padding: 1.5rem 1rem;
-
-  /* Background: white with subtle shadow */
-  background: var(--white);
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
-
-  /* Minimum width */
-  min-width: 48px;
-}
-
-/* Icons container */
-.floating-social-widget__icons {
-  /* Flexbox: vertical stack */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* Individual icon link */
-.floating-social-widget__icon-link {
-  /* Display as block */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* No underline */
-  text-decoration: none;
-
-  /* Smooth color transition on hover */
-  transition: transform 0.2s ease;
-}
-
-.floating-social-widget__icon-link:hover {
-  /* Slight scale up on hover */
-  transform: scale(1.1);
-}
-
-/* Icon itself */
-.floating-social-widget__icon {
-  /* Display as block */
-  display: block;
-
-  /* Icon size: 22px */
-  width: 22px;
-  height: 22px;
-
-  /* Background image sizing */
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  /* Smooth transition on hover */
-  transition: filter 0.15s ease;
-}
-
-.floating-social-widget__icon-link:hover .floating-social-widget__icon {
-  /* Brighten on hover */
-  filter: brightness(1.3);
-}
-
-/* Collapse button (in expanded state) */
-.floating-social-widget__toggle {
-  /* Minimal button styling */
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Smooth transition */
-  transition: transform 0.2s ease;
-}
-
-.floating-social-widget__toggle:hover {
-  /* Slight rotation on hover */
-  transform: rotate(-180deg);
-}
-
-/* Arrow icon */
-.floating-social-widget__arrow {
-  /* Display as block */
-  display: block;
-
-  /* Arrow dimensions */
-  width: 24px;
-  height: 2px;
-
-  /* Arrow color */
-  background: var(--black);
-
-  /* Rounded ends */
-  border-radius: 1px;
-
-  /* Position relative for rotation animation */
-  position: relative;
-
-  /* Smooth rotation transition */
-  transition: transform 0.3s ease;
-}
-
-/* Collapse button arrow points right */
-.floating-social-widget__toggle .floating-social-widget__arrow::before {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(-45deg);
-  width: 8px;
-  height: 2px;
-  background: var(--black);
-  border-radius: 1px;
-}
-
-.floating-social-widget__toggle .floating-social-widget__arrow::after {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 8px;
-  height: 2px;
-  background: var(--black);
-  border-radius: 1px;
-}
-
-/* Collapsed tab */
-.floating-social-widget__tab {
-  /* Minimal button styling */
-  background: var(--white);
-  border: none;
-  cursor: pointer;
-  padding: 1rem 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Rounded on left side only */
-  border-radius: 12px 0 0 12px;
-
-  /* Subtle shadow */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  /* Smooth transition */
-  transition: transform 0.2s ease;
-}
-
-.floating-social-widget__tab:hover {
-  /* Slight scale on hover */
-  transform: scale(1.05);
-}
-
-/* Tab arrow points left (expand direction) */
-.floating-social-widget__tab .floating-social-widget__arrow {
-  transform: scaleX(-1);
-}
-
-.floating-social-widget__tab .floating-social-widget__arrow::before {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(-45deg);
-  width: 8px;
-  height: 2px;
-  background: var(--black);
-  border-radius: 1px;
-}
-
-.floating-social-widget__tab .floating-social-widget__arrow::after {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 8px;
-  height: 2px;
-  background: var(--black);
-  border-radius: 1px;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .floating-social-widget {
-    bottom: 1rem;
-    right: 0;
-  }
-
-  .floating-social-widget__content {
-    padding: 1rem 0.75rem;
-    gap: 0.75rem;
-  }
-
-  .floating-social-widget__icons {
-    gap: 0.75rem;
-  }
-
-  .floating-social-widget__icon {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-/* ─────────────────────────────────────────
    KEYFRAME ANIMATIONS
    ───────────────────────────────────────── */
 
@@ -1356,107 +1276,6 @@ body {
   }
 }
 
-/* ─────────────────────────────────────────
-   FLOATING SOCIAL BUBBLE
-   Draggable speech bubble with expandable social links
-   ───────────────────────────────────────── */
-
-/* Main bubble container */
-.floating-social-bubble {
-  /* Fixed positioning handled by component */
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Bubble trigger button */
-.floating-social-bubble__trigger {
-  /* No background — transparent to show image as-is */
-  width: 80px;
-  height: 80px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Smooth transitions */
-  transition: transform 0.2s ease;
-
-  /* Image sizing */
-  overflow: visible;
-}
-
-.floating-social-bubble__trigger img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.floating-social-bubble__trigger:hover {
-  transform: scale(1.1);
-}
-
-/* Scale pulse animation when collapsed (not expanded) */
-.floating-social-bubble.collapsed .floating-social-bubble__trigger {
-  animation: icon-scale-pulse 3s infinite;
-}
-
-.floating-social-bubble__trigger:active {
-  transform: scale(0.95);
-}
-
-/* Icons container */
-.floating-social-bubble__icons {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  /* Position is relative to bubble, icons use absolute positioning */
-}
-
-/* Individual icon link */
-.floating-social-bubble__icon-link {
-  /* Absolute positioning set by component based on edge */
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-
-  /* Smooth expansion animation */
-  transition: opacity 0.3s ease, transform 0.2s ease;
-}
-
-.floating-social-bubble.collapsed .floating-social-bubble__icon-link {
-  /* When collapsed, icons are hidden and scaled down */
-  opacity: 0;
-  pointer-events: none;
-}
-
-.floating-social-bubble.expanded .floating-social-bubble__icon-link {
-  /* When expanded, icons are visible and interactive */
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.floating-social-bubble__icon-link:hover {
-  transform: scale(1.1);
-}
-
-/* Icon itself */
-.floating-social-bubble__icon {
-  display: block;
-  width: 80px;
-  height: 80px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
 
 @media (min-width: 640px) {
   :root {
@@ -1466,6 +1285,12 @@ body {
 
 /* Page content shell — the main layout container */
 .page-content-shell {
+  /* WIDTH IS LOAD-BEARING, and it is not obvious. This rule came back from
+     git during the restore above, and git predates the fix: without it a
+     flex or grid child shrink-to-fits instead of filling, which is what put
+     the loader's name in a box narrower than the column and had it reading
+     as cut off in Safari while Chrome looked fine. Do not drop it. */
+  width: 100%;
   max-width: var(--page-max-width);
   margin-left: auto;
   margin-right: auto;

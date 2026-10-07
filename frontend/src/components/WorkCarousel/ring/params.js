@@ -37,6 +37,27 @@ export const WEIGHTS = { Light: 300, Regular: 400, Medium: 500, Semibold: 600 }
  * enough to render cleanly in the meantime — do not treat it as the real
  * font pass.
  */
+/* WebKit does not GPU-accelerate an SVG filter applied to a DOM element — it
+   rasterises that subtree on the CPU, every frame. The name melt stacks an
+   animated CSS blur inside exactly such a filter, and the cost scales with
+   device pixels, so it is invisible at DPR 1 and severe on a Retina display.
+
+   Measured in WebKit at 1512x900, across one card change:
+
+                     p90     p99    worst   frames >32ms
+       DPR 1  goo on  18ms    21ms    29ms      0
+       DPR 2  goo on  38ms    66ms    79ms     24
+       DPR 2  goo off 22ms    34ms    40ms      9
+
+   So on WebKit the threshold is dropped and the two words plainly crossfade.
+   The melt loses its fusing character there and keeps its timing; Chrome and
+   Firefox are untouched. This is a UA test because no feature query reports
+   "SVG filters are CPU-bound here" — set nameGoo explicitly to override. */
+const SVG_FILTER_IS_CPU_BOUND =
+  typeof navigator !== "undefined" &&
+  /AppleWebKit/.test(navigator.userAgent) &&
+  !/Chrome|Chromium|Edg|OPR/.test(navigator.userAgent);
+
 export function defaultParams() {
   return {
     // -- fit ------------------------------------------------------------
@@ -121,6 +142,25 @@ export function defaultParams() {
     snap: true, // settle with a plane facing front
     snapTime: 0.8, // run-in, once the flick itself is spent
     snapFrom: 1, // rad/s under which the ring commits to a slot
+
+    // -- stepped input ----------------------------------------------------
+    // A wheel notch, a trackpad swipe or a drag release moves the ring ONE
+    // card. Before this, every input added VELOCITY and the ring coasted
+    // wherever that carried it: at maxSpeed a single flick ran 3+ cards, and
+    // landing on a particular one meant feathering the wheel.
+    stepped: true, // false restores the old add-velocity-and-coast wheel
+    stepThreshold: 18, // px of accumulated wheel delta that counts as a card
+    stepCooldown: 0.12, // s floor between steps, so one frame cannot double-fire
+    // Silence that separates one swipe from the next. A trackpad streams
+    // events continuously within a gesture and keeps sending a decaying tail
+    // after the fingers lift; a gap longer than this is what marks a genuinely
+    // new gesture. Mouse-wheel notches are further apart than this already.
+    gestureGap: 0.14,
+    // How far through a step the next one may start, as a fraction of a slot
+    // still to travel. 0.5 means the ring must be halfway there. Lower is
+    // stricter (one card per completed move), higher chains more freely.
+    stepChainAt: 0.5,
+    dragCoastSlots: 0.9, // cards a drag RELEASE may coast, before the snap
     pickTime: 0.55, // click-to-centre: seconds for one slot, root-scaled
     pickEase: 'power3.inOut',
 
@@ -180,6 +220,20 @@ export function defaultParams() {
     nameMorphTime: 1.2,
     nameEase: 'circ.out',
     nameBlur: 8.5, // px the outgoing word smears to before it lets go
+    // Ceiling on that smear. The curve is blur/f - blur, which runs away as a
+    // word fades out: it used to be capped at 100px, reached while the word
+    // was still at ~35% opacity. A blur that wide costs real raster area, and
+    // this subtree is already inside an SVG filter — the combination is what
+    // makes the melt stutter on Safari, which rasterises SVG-filtered
+    // subtrees on the CPU. 32px is past the point where the threshold has
+    // already welded the two words, so the melt reads the same and the
+    // browser has a fraction of the pixels to touch.
+    nameBlurMax: 32,
+    // Whether the alpha threshold that fuses the two words runs at all.
+    nameGoo: !SVG_FILTER_IS_CPU_BOUND,
+    // The cap to use when it does not. Without a threshold to weld them, a
+    // wide blur is just smear, so the plain crossfade wants a tighter one.
+    nameBlurPlainMax: 14,
     nameEdge: 400, // alpha gain — how abruptly the threshold sets
     nameCut: 0.33, // and the alpha it sets at
     nameSoften: 0.35, // px of blur after it, standing in for antialiasing
