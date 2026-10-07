@@ -30,9 +30,11 @@
      Before, each block invented its own clamp — 2.5/5/4, 3/6/5, 2/4/3 —
      which is how a page ends up looking unevenly spaced even when no single
      value is wrong. Three steps, used consistently, is the whole trick. */
-  --cs-gap-sm: clamp(1rem, 1.8vw, 1.5rem);
-  --cs-gap-md: clamp(2rem, 3.5vw, 3rem);
-  --cs-gap-lg: clamp(3rem, 5vw, 4.5rem);
+  /* Gaps UP while the type came down — the two halves of the same change.
+     See the note on the type scale. */
+  --cs-gap-sm: clamp(1rem, 1.7vw, 1.4rem);
+  --cs-gap-md: clamp(2rem, 3.4vw, 2.9rem);
+  --cs-gap-lg: clamp(3.75rem, 6.4vw, 6.25rem);
 
   /* THE DISPLAY TIER, which is also the page title's size. 112px at 1512. */
   --cs-display: clamp(2.4rem, 8vw, 7rem);
@@ -58,13 +60,23 @@
      ═══════════════════════════════════════════════════════════════════════ */
   --cs-t-marquee: clamp(2.3rem, 5.833vw, 5.42rem);
 
-  --cs-t-numeral: clamp(1.75rem, 3.2vw, 3rem);
-  --cs-t-h1:      clamp(1.75rem, 2.6vw, 2.4rem);
-  --cs-t-h2:      clamp(1.3rem, 1.9vw, 1.75rem);
-  --cs-t-h3:      clamp(1.1rem, 1.6vw, 1.35rem);
-  --cs-t-body:    clamp(1rem, 1.48vw, 1.25rem);
-  --cs-t-meta:    16px;
-  --cs-t-micro:   12px;
+  /* THE WHOLE SCALE CAME DOWN ABOUT A TENTH, and the leading with it. The
+     page was not short of information, it was short of air: at the old
+     sizes a movement was a wall of 20px copy at 1.7 leading, and the gaps
+     between sections could not read as gaps because the type beside them
+     was nearly as loose. Smaller type at tighter leading makes the same
+     words occupy less, and the section gaps below — which went UP — then
+     have something to separate.
+
+     Caps are what actually changed; the vw middles came down with them so
+     the shrink is felt across the range rather than only on a wide screen. */
+  --cs-t-numeral: clamp(1.6rem, 2.9vw, 2.7rem);
+  --cs-t-h1:      clamp(1.55rem, 2.25vw, 2.05rem);
+  --cs-t-h2:      clamp(1.18rem, 1.62vw, 1.5rem);
+  --cs-t-h3:      clamp(1rem, 1.34vw, 1.16rem);
+  --cs-t-body:    clamp(0.94rem, 1.22vw, 1.08rem);
+  --cs-t-meta:    15px;
+  --cs-t-micro:   11.5px;
 
   --cs-numeral: clamp(1.75rem, 5vw, 5rem);
   --cs-rail: calc(var(--cs-numeral) * 1.45);
@@ -105,6 +117,8 @@
 
   --cs-sans: 'DM Sans', sans-serif;
   --cs-script: 'Coneria Script Slanted', cursive;
+  /* The figures' face — see .cs-stat-figure for why it is not --cs-script. */
+  --cs-figure: 'Cormorant Garamond', Georgia, serif;
 
   background: var(--ivory);
   color: var(--walnut);
@@ -220,6 +234,35 @@
   gap: 1.5rem;
   padding: 12px 0;
   border-bottom: 1px solid var(--border-alpha);
+}
+
+/* ── THE MASTHEAD'S OWN ROWS ARE TIGHTER THAN A LEDGER'S ────────────────
+   Same object, different job. A ledger in the body is a table a reader
+   studies; this is the four facts under the project's name, read once on
+   the way past. At the shared 12px padding and body leading it stood 52px
+   a row — 208px of masthead for four short pairs.
+
+   Each row is also held to ONE LINE. The longest value, the client's full
+   name with its city, was the only one that wrapped, and a single wrapped
+   row in a set of four breaks the alignment of every rule below it.
+   nowrap plus a slightly smaller tier keeps all four on one line to well
+   under 900px; below that it is allowed to wrap rather than overflow. */
+.cs-masthead .cs-meta .cs-ledger-row {
+  padding: 7px 0;
+  gap: 1.25rem;
+}
+
+.cs-masthead .cs-meta .cs-ledger-row dt,
+.cs-masthead .cs-meta .cs-ledger-row dd {
+  font-size: var(--cs-t-meta);
+  line-height: 1.45;
+}
+
+@media (min-width: 620px) {
+  .cs-masthead .cs-meta .cs-ledger-row dt,
+  .cs-masthead .cs-meta .cs-ledger-row dd {
+    white-space: nowrap;
+  }
 }
 
 /* NOT diagram type. The outcomes table is the substance of the impact
@@ -409,7 +452,12 @@
 .cs-label {
   display: block;
   font-family: var(--cs-sans);
-  font-weight: 400;
+  /* LIGHTER THAN WHAT IT LABELS. At 400 it matched the body weight exactly,
+     so the only thing separating a label from the paragraph under it was
+     the brackets. 300 makes it read as an annotation at a glance, before
+     any of it is read. Requires DM Sans 300 in the font request — without
+     it the browser synthesises, which on this face looks blurred. */
+  font-weight: 300;
   font-size: var(--cs-t-meta);
   line-height: 1.54;
   color: var(--walnut-soft);
@@ -425,10 +473,14 @@
 
 .cs-body {
   max-width: var(--prose-max);
-  margin: 0 0 1.1em;
+  margin: 0 0 1.05em;
   font-size: var(--cs-t-h3);
   font-weight: 400;
-  line-height: 1.7;
+  /* 1.7 was generous for a measure this wide and it is what made the page
+     read as wordy — long lines AND loose leading give the eye nothing to
+     hold. 1.55 is still comfortable at this measure and takes roughly a
+     line off every paragraph of four. */
+  line-height: 1.55;
   color: var(--walnut-soft);
 }
 
@@ -505,13 +557,36 @@
   padding-top: 1.35em;
 }
 
+/* NOT THE SCRIPT FACE, and this is not a styling preference.
+
+   Coneria Script Slanted is the DEMO cut. Its own name table reads "Coneria
+   Script Slanted Demo … Personal use only", and it substitutes a filled
+   "PERSONAL USE ONLY / get full font at www.mawns.com" seal for thirteen
+   characters: # $ % ( ) * + [ ] { } EUR GBP. Every figure on these pages is
+   a number with a symbol attached — 80%, 5K+, 3M+ — so all three were
+   rendering that seal where the symbol should be.
+
+   Cormorant Garamond instead, italic. It keeps what the script was doing
+   here, which is to set the figure in a different voice from the sentence
+   it opens: high stroke contrast against DM Sans's even one, a slant that
+   echoes the script elsewhere, and old-style figures that read as
+   typography rather than as data. It is also OFL licensed and already
+   loaded for the rest of the site.
+
+   The size rises from 2.6em to 2.9em because Cormorant's cap height is
+   markedly smaller than Coneria's at the same nominal size; matched by eye
+   against the sentence beside it, not by the number. */
 .cs-stat-figure {
   /* Inline, so text flows after it and wraps beneath. Its own line-height is
      collapsed to 0 so a 3x-size glyph does not blow the paragraph's leading
      apart on the line it sits in — see the padding above for the cost. */
   display: inline;
-  margin-right: 0.12em;
-  font-size: 2.6em;
+  margin-right: 0.14em;
+  font-family: var(--cs-figure);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 2.9em;
+  letter-spacing: -0.01em;
   line-height: 0;
   color: var(--walnut);
 }
@@ -765,12 +840,26 @@
   .cs-steps-panel { background: #f3eaf0; }
 }
 
+/* A TIER BELOW THE PHASES IT INTRODUCES. This and .cs-phase-title were
+   both --cs-t-h1, which put the diagram's own heading at the same size as
+   each of the four phases inside it — so the panel read as five headings of
+   equal rank rather than as one heading over four. It is also the longest
+   string of the five and was wrapping to two lines at that size while the
+   phases held one.
+
+   h2 and a wider measure: 32ch keeps it to a line at desktop where 26ch did
+   not, and the balance below still evens it when a narrow screen breaks it. */
 .cs-steps-title {
-  max-width: 26ch;
-  margin: 0 auto 0.5em;
-  font-size: var(--cs-t-h1);
+  max-width: 32ch;
+  margin: 0 auto 0.55em;
+  /* THE SAME TIER AS .cs-themes-title, which is the heading on the Gap
+     Mapping panel directly below. These are the same object — a centred
+     heading over a diagram — and they were two steps apart (h2 against
+     body), so the first panel shouted and the second muttered. Both sit at
+     h3 now and the run of panels reads as one series. */
+  font-size: var(--cs-t-h3);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.22;
   text-align: center;
   color: var(--walnut);
   text-wrap: balance;
@@ -1008,10 +1097,10 @@
 }
 
 .cs-phase-title {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.45rem;
   font-size: var(--cs-t-h1);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.18;
   color: var(--walnut);
   text-wrap: balance;
 }
@@ -1371,12 +1460,30 @@
    ratio of type size — it reads as chalk around 200px and eats the letterform
    by 21px. At the marquee step it would shred a face that is already fragile,
    so this one stays clean. */
+/* ONE LINE, ALWAYS. It was set at --cs-t-marquee, which is the size the
+   full-bleed movement titles run at — those are allowed to fill the screen
+   because that is their whole job. This is a heading over a list, and at
+   marquee size "Written along the way" filled the column at 1440 and broke
+   to two and three lines below that, which turned a quiet closing heading
+   into the loudest thing on the page.
+
+   Its own tier now, about 60% of the marquee, with nowrap from the width
+   where it comfortably fits so it can never break mid-phrase. Below that it
+   is allowed to wrap, because forcing one line on a phone would just push
+   it off the side. */
 .cs-outro-title {
   margin: 0 0 var(--cs-gap-md);
-  font-size: var(--cs-t-marquee);
+  font-size: clamp(1.45rem, 2.9vw, 2.6rem);
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.05;
   color: var(--cs-plum);
+}
+
+/* nowrap from 560px rather than 700px, because at the size above the line
+   now fits well below that — the earlier pair of numbers left a band of
+   widths where it was allowed to break and still wanted two lines. */
+@media (min-width: 560px) {
+  .cs-outro-title { white-space: nowrap; }
 }
 
 .cs-outro-list {
@@ -1608,7 +1715,8 @@
    question carry the hierarchy that size used to. */
 .cs-themes-title {
   margin: 0 0 var(--cs-gap-sm);
-  font-size: var(--cs-t-body);
+  /* Matched to .cs-steps-title — see the note there. */
+  font-size: var(--cs-t-h3);
   font-weight: 500;
   line-height: 1.25;
   text-align: center;
@@ -1711,23 +1819,54 @@
 
 .cs-secnav {
   position: sticky;
-  /* Clears the shared bar: 17px pad + 48px wordmark + 14px pad = 79. */
-  top: 79px;
+  /* MEASURED, NOT DERIVED. This was `top: 79px` with the arithmetic written
+     out beside it, and the arithmetic stopped being true the moment the bar
+     above changed — leaving this pinned 8px under it on every case study.
+     Nav.jsx publishes its own height as --nav-h; the fallback is the old
+     figure, for the frame before that lands. */
+  top: var(--nav-h, 79px);
   z-index: 40;
-  /* Glass, matching the shared bar above it — see .site-nav. Nothing divides
-     the two, so they read as one continuous band; the border-bottom here is
-     the only edge, closing that band against the page rather than splitting
-     it. Same glass as the cursor tag and the ring's View pill. */
+  /* The glass is on ::before, not here — see below. */
+  border-bottom: 1px solid var(--border-alpha);
+}
+
+/* ONE BLURRED REGION, NOT TWO. The glass used to be on this element, next
+   to the shared bar's own. Two backdrop-filters that share an edge do not
+   agree: each blurs only what is behind its own box and clamps its sampling
+   at the boundary, so wherever the content behind has contrast crossing
+   that line the two resolve to different colours. Measured at up to 81
+   levels apart — that was the visible seam between the bars.
+
+   So the glass moved to a layer that can cover BOTH. While pinned it
+   stretches up by --nav-h to sit behind the shared bar as well, and the
+   shared bar switches its own off (see shared.css). One blur, one sampling,
+   no edge to disagree across.
+
+   Unpinned it covers only this bar, because then there is no bar above it
+   to join — just the masthead, which a glass panel reaching upward would
+   smear. CaseStudyNav.jsx sets data-pinned. */
+.cs-secnav::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   background: var(--glass-bg);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  border-bottom: 1px solid var(--border-alpha);
+  transition: top 0s;
+}
+
+.cs-secnav[data-pinned='true']::before {
+  top: calc(-1 * var(--nav-h, 79px));
 }
 
 /* Without backdrop-filter the half-transparent ground just looks unfinished,
    so it falls back to solid. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .cs-secnav { background: var(--ivory); }
+  .cs-secnav::before { background: var(--ivory); }
 }
 
 .cs-secnav-inner {

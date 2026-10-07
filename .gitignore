@@ -10,3 +10,8 @@ frontend/dist/images/cards/orbcard.mov
 
 # macOS finder droppings
 .DS_Store
+
+# The 150MB orb master. Kept on disk as the source for
+# frontend/public/video/bluecore-orb-loop.mp4, but out of public/ so vite
+# stops copying it into every build. Too large for GitHub either way.
+_media-source/

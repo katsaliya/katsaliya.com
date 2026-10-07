@@ -20,7 +20,7 @@
 // requirement as any other entry: name, type, year, and your own thumbnail.
 export const PROJECTS = [
   {
-    file: 'images/cards/demo-bluecore.png',
+    file: 'images/cards/demo-bluecore.webp',
     name: 'BlueCore',
     type: 'Product Design',
     year: '2025',

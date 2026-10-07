@@ -1,12 +1,18 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    SELECTEDWORK.JSX — the proof, first thing after the tldr;
 
-   ONE WORK PER DISCIPLINE, and the numerals are the join. Each card carries
-   the same numeral as its discipline in Disciplines.jsx — 1 Product, 2
-   Front-End, 3 Social & Content, 4 Brand — so the two sections are the same
-   list read twice: here as evidence, there as capability. Reordering
-   DISCIPLINES without reordering WORKS breaks that silently, since nothing
-   enforces the pairing but these numerals.
+   ONE WORK PER DISCIPLINE, and the numeral on each card is the join: it
+   names that card's discipline in Disciplines.jsx — 1 Product, 2 Front-End,
+   3 Social & Content, 4 Brand — so the two sections are the same list read
+   twice, here as evidence and there as capability.
+
+   THE TWO ARRAYS ARE NOT PARALLEL BY INDEX, and must not be assumed to be.
+   This one is ordered for reading — Known first, because a number anyone
+   recognises is the strongest opening — while Disciplines is ordered by
+   discipline. So the numerals here run 3, 1, 4, 2 and that is correct. The
+   pairing lives in the numeral and nowhere else, which means either array
+   can be reordered freely, but a card's numeral may only change if its
+   discipline does.
 
    WHY IT SITS FIRST. The page used to open tldr; -> Disciplines, which is
    one sentence followed immediately by a four-area capability matrix: a
@@ -29,12 +35,14 @@
    than leaving it quiet. Adding the case study later is one field.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import MarqueeTitle from './MarqueeTitle'
 import MicroLabel from './MicroLabel'
+import useReducedMotion from '../hooks/useReducedMotion'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -45,34 +53,17 @@ const FONT = "'DM Sans', sans-serif"
    paragraphs. Nothing is inferred and nothing is new copy about the work
    itself, so a number that changes gets changed in both places or neither.
 
+   ONE EXCEPTION, and it is marked because the rule above is worth keeping:
+   katsaliya.com has no case study to be the other place, since the site is
+   its own evidence. Its note is therefore the only statement of how this
+   one was built, rather than a second copy of one.
+
    All four images are 1200x900 or smaller at exactly 4:3, generated into
    /images/selected-work/ from art that was every ratio from 2.26 to 1.05.
    The frame below is aspect-[4/3], so object-cover crops nothing — the same
    arrangement Where I've been settled on, for the same reason: normalise the
    files once rather than let the frame fight them on every render. */
 const WORKS = [
-  {
-    numeral: '1',
-    discipline: 'Product Strategy & Design',
-    ink: 'var(--jade-ink)',
-    title: 'BlueCore',
-    note: 'AI automation built for the realities of maritime work - decreasing documentation time by 80%.',
-    meta: 'Product Design & Engineering Lead ',
-    image: '/images/selected-work/bluecore.jpg',
-    href: '/bluecore',
-  },
-  {
-    numeral: '2',
-    discipline: 'Front-End Development',
-    ink: 'var(--orchid-ink)',
-    title: 'katsaliya.com',
-    /* No href, and not for want of a page: this IS the page. A link to the
-       site you are standing on is a link to nowhere. */
-    note: 'This site — React and Vite, GSAP and ScrollTrigger riding a Lenis ticker.',
-    meta: 'Design & Build ',
-    image: '/images/selected-work/katsaliya.jpg',
-    href: null,
-  },
   {
     numeral: '3',
     discipline: 'Social & Content',
@@ -81,7 +72,34 @@ const WORKS = [
     note: 'Content and growth campaigns for a new dating app — 3M+ impressions, 10K+ followers.',
     meta: 'Growth Associate',
     image: '/images/selected-work/known.jpg',
+    /* Already a seamless loop and already in the repo for the case study
+       hero — 179KB, so there is nothing to cut down. */
+    video: '/video/known-hero-loop.mp4',
+    poster: '/video/known-hero-loop-poster.jpg',
     href: '/known',
+  },
+  {
+    numeral: '1',
+    discipline: 'Product Strategy & Design',
+    ink: 'var(--jade-ink)',
+    title: 'BlueCore',
+    note: 'AI automation built for the realities of maritime work - decreasing documentation time by 80%.',
+    meta: 'Product Design & Engineering Lead ',
+    image: '/images/selected-work/bluecore.jpg',
+    /* The orb, cut from the 157MB source that cannot be committed. Five
+       seconds forward and the same five reversed, so the loop point has
+       nothing to see — the orb morphs continuously and a straight cut back
+       to frame one would read as a jolt. 697KB at 720x540. */
+    video: '/video/bluecore-orb-loop.mp4',
+    poster: '/video/bluecore-orb-loop-poster.jpg',
+    /* Verbatim from BLUECORE.awards in data/caseStudies.js, per the rule at
+       the top of this file — the masthead there is the other place these
+       live, so a correction has to land in both. */
+    awards: [
+      '1st Place at SF Hacks 2026 for VectorAI DB',
+      '1st Place SFSU Student AI Awards for Problem Solving',
+    ],
+    href: '/bluecore',
   },
   {
     numeral: '4',
@@ -93,9 +111,87 @@ const WORKS = [
     image: '/images/selected-work/emporium-thai-market.jpg',
     href: null,
   },
+  {
+    numeral: '2',
+    discipline: 'Front-End Development',
+    ink: 'var(--orchid-ink)',
+    title: 'katsaliya.com',
+    /* No href, and not for want of a page: this IS the page. A link to the
+       site you are standing on is a link to nowhere. */
+    note: 'This site — React and Vite, GSAP riding a Lenis ticker, built end to end in Claude Code and Cursor.',
+    meta: 'Design & Build ',
+    image: '/images/selected-work/katsaliya.jpg',
+    /* No video for this one and it does not want one — a screen recording
+       of the site you are already standing on says nothing. The orchid
+       turns instead; see CardMedia. */
+    motif: true,
+    href: null,
+  },
 ]
 
-function Card({ work }) {
+/* ═══════════════════════════════════════════════════════════════════════
+   CARDMEDIA — the 4:3 frame at the top of a card
+
+   Three kinds of thing go in the same box, so they all take the same
+   classes: the aspect ratio, the cover fit and the hover swell live in one
+   string and are handed to whichever element the entry calls for.
+
+   `video` wins, then `motif`, then the still. The still stays on every
+   entry regardless — it is the poster for the video path and the fallback
+   if a file is missing, so no card can ever come up empty.
+
+   AUTOPLAY NEEDS ALL FOUR of muted, playsInline, loop and autoPlay. Drop
+   muted and every browser blocks it outright; drop playsInline and iOS
+   Safari takes the video fullscreen the moment it starts, which on a
+   portfolio card is the worst possible behaviour.
+
+   preload="none" on purpose. Four cards would otherwise pull their video
+   on page load, and these sit below the fold on every screen — the poster
+   carries the card until the browser gets round to it.
+
+   REDUCED MOTION GETS THE POSTER, not a paused video. A paused <video> on
+   iOS still shows a play affordance over it; an <img> is just the frame. */
+function CardMedia({ work, linked }) {
+  const reduceMotion = useReducedMotion()
+  const frame = `block w-full aspect-[4/3] object-cover ${
+    linked ? 'transition-transform duration-700 ease-out group-hover:scale-[1.03]' : ''
+  }`
+
+  if (work.video && !reduceMotion) {
+    return (
+      <video
+        className={frame}
+        src={work.video}
+        poster={work.poster}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="none"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+    )
+  }
+
+  /* The orchid, turning. A full rotation is 48s — slow enough that it reads
+     as drift rather than as a spinner, which is the difference between a
+     motif and a loading state. The breathe runs on a different period from
+     the turn on purpose, so the two never sync into an obvious cycle. */
+  if (work.motif && !reduceMotion) {
+    return (
+      <div className={`${frame} grid place-items-center bg-[var(--ivory-deep)]`}>
+        <div className="sw-motif-spin w-[46%] max-w-[190px]">
+          <img src="/images/assets/orchid-logo-placeholder.png" alt="" className="sw-motif block w-full" />
+        </div>
+      </div>
+    )
+  }
+
+  return <img src={work.image} alt="" loading="lazy" className={frame} />
+}
+
+function Card({ work, onUnavailable }) {
   const linked = Boolean(work.href)
 
   /* The image and the words are ONE target, not two. Splitting them means a
@@ -110,15 +206,47 @@ function Card({ work }) {
      a clickable card stops announcing itself at all. */
   const inner = (
     <>
-      <div className="overflow-hidden rounded-[4px] bg-[var(--ivory-deep)]">
-        <img
-          src={work.image}
-          alt=""
-          loading="lazy"
-          className={`block w-full aspect-[4/3] object-cover ${
-            linked ? 'transition-transform duration-700 ease-out group-hover:scale-[1.03]' : ''
-          }`}
-        />
+      {/* RELATIVE, so the ribbon can hang off the frame. The frame itself
+          keeps overflow-hidden for the hover swell, which means the ribbon
+          cannot live inside it — anything crossing that edge would be cut
+          off at exactly the corner it is meant to straddle. So it is a
+          sibling, positioned against this wrapper instead. */}
+      <div className="relative">
+        <div className="overflow-hidden rounded-[4px] bg-[var(--ivory-deep)]">
+          <CardMedia work={work} linked={linked} />
+        </div>
+
+        {work.awards?.length ? (
+          /* A PHOTOGRAPH OF A REAL ROSETTE, supplied rather than drawn. It
+             came with its own alpha, so it needed only trimming to its
+             content and sizing — no background to key out.
+
+             ANCHORED BY THE ROSETTE, NOT BY THE IMAGE. The tails are more
+             than half the file's height, so the corner offsets here place
+             the medal on the corner and let the tails hang down across the
+             artwork, which is how the object actually pins to something.
+
+             It is the one place on the site with a photographic object
+             rather than a drawn mark, and that is the point of it: a prize
+             is a thing that exists, and a thing that exists is allowed to
+             look like itself.
+
+             Outside the clipped frame, so it does not scale with the hover
+             swell — a badge that grows with the artwork reads as part of
+             the picture. Offsets stay inside the grid's 24px gutter so it
+             never reaches the neighbouring card.
+
+             alt rather than aria-label and role=img: it IS an image, and
+             the awards it names are information the page does not otherwise
+             carry. A single rosette cannot say "two wins" — the alt text
+             and the tooltip are what carry the second one. */
+          <img
+            src="/images/assets/award-ribbon-1st.webp"
+            alt={work.awards.join('. ')}
+            title={work.awards.join('. ')}
+            className="sw-ribbon absolute -top-3 -right-3 z-10 h-[84px] w-auto md:h-[100px]"
+          />
+        ) : null}
       </div>
 
       <div className="mt-4">
@@ -187,7 +315,19 @@ function Card({ work }) {
           {inner}
         </Link>
       ) : (
-        <div>{inner}</div>
+        /* TEMPORARY. These two cards have no case study yet, and the whole
+           point of the hover state being inert is that nothing claims they
+           go anywhere — but people click them regardless, because the other
+           two are links and a grid of four reads as four of the same thing.
+           So a click gets an answer instead of silence.
+
+           It is a div with onClick, which is not focusable and cannot be
+           reached by keyboard. That is acceptable only because it announces
+           something rather than doing something; when the real pages land,
+           this becomes a Link and the problem goes away. */
+        <div onClick={(e) => onUnavailable(e, work.title)} className="md:cursor-pointer">
+          {inner}
+        </div>
       )}
     </article>
   )
@@ -195,6 +335,74 @@ function Card({ work }) {
 
 export default function SelectedWork({ reduceMotion = false }) {
   const listRef = useRef(null)
+
+  /* ── "Coming soon", at the cursor ────────────────────────────────────
+     TEMPORARY, until the two missing case studies exist.
+
+     IT IS PORTALLED TO document.body, which is the only part of this that
+     is not obvious. This section is overflow-hidden — it has to be, the
+     marquee title's track is far wider than the viewport — so a popup
+     rendered inside it is clipped the moment it sits near an edge, and the
+     rightmost card is exactly where that bites. Out at the body it is
+     clipped by nothing.
+
+     Position is clamped so it cannot open off-screen, and it is offset down
+     and right of the pointer so it does not cover what was just clicked.
+
+     TWO PIECES OF STATE, NOT ONE, and that is what makes it not choppy. The
+     first version unmounted the node the moment it was dismissed, so it had
+     an entrance and no exit — it faded in over 180ms and then vanished
+     between frames, which is the part that read as a snap. `note` holds the
+     position and keeps the element mounted; `open` drives the transition.
+     Dismissing flips `open` to false, and the node is not removed until the
+     fade has actually run. */
+  const [note, setNote] = useState(null)
+  const [open, setOpen] = useState(false)
+  const hideTimer = useRef(0)
+  const dropTimer = useRef(0)
+
+  const dismissNote = () => {
+    clearTimeout(hideTimer.current)
+    setOpen(false)
+    /* Matches the transition in .sw-note. Longer and the node lingers
+       invisibly swallowing nothing; shorter and the fade is cut off. */
+    dropTimer.current = setTimeout(() => setNote(null), 220)
+  }
+
+  const showNote = (e) => {
+    clearTimeout(hideTimer.current)
+    clearTimeout(dropTimer.current)
+    const PAD = 14
+    setNote({
+      x: Math.min(e.clientX + 18, window.innerWidth - 170 - PAD),
+      y: Math.min(e.clientY + 20, window.innerHeight - 52 - PAD),
+    })
+    /* Mount closed, open on the next frame. Setting both in one pass gives
+       the browser no state to transition FROM — it would paint the open
+       state directly and the entrance would never play. */
+    setOpen(false)
+    requestAnimationFrame(() => requestAnimationFrame(() => setOpen(true)))
+    hideTimer.current = setTimeout(dismissNote, 2000)
+  }
+
+  /* Any scroll or any other press dismisses it — a toast that outlives its
+     context reads as a bug. These go through dismissNote rather than
+     clearing the node outright, so an interrupted note still fades. */
+  useEffect(() => {
+    if (!note) return
+    const drop = () => dismissNote()
+    window.addEventListener('scroll', drop, { passive: true, once: true })
+    window.addEventListener('pointerdown', drop, { once: true })
+    return () => {
+      window.removeEventListener('scroll', drop)
+      window.removeEventListener('pointerdown', drop)
+    }
+  }, [note])
+
+  useEffect(() => () => {
+    clearTimeout(hideTimer.current)
+    clearTimeout(dropTimer.current)
+  }, [])
 
   useEffect(() => {
     const el = listRef.current
@@ -261,10 +469,24 @@ export default function SelectedWork({ reduceMotion = false }) {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 xl:gap-x-8 gap-y-10 w-full"
         >
           {WORKS.map((work) => (
-            <Card key={work.title} work={work} />
+            <Card key={work.title} work={work} onUnavailable={showNote} />
           ))}
         </div>
       </div>
+
+      {note &&
+        createPortal(
+          <div
+            role="status"
+            aria-live="polite"
+            data-open={open ? 'true' : 'false'}
+            className="sw-note fixed z-[90] pointer-events-none select-none rounded-full px-4 py-2 text-[13px] leading-none whitespace-nowrap"
+            style={{ left: note.x, top: note.y, fontFamily: FONT, fontWeight: 500 }}
+          >
+            Coming soon
+          </div>,
+          document.body,
+        )}
     </section>
   )
 }

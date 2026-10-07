@@ -32,7 +32,7 @@ const slotsOf = (row) => row?.firstElementChild?.children;
 // slower than the blur climbs, so the word still carries alpha well into its
 // smear — without that there is nothing for the threshold to weld the other
 // one to. Applied per word, not per row, so a held word can be left alone.
-function fade(el, f, blur) {
+function fade(el, f, blur, blurMax) {
   if (!el) return;
   if (f >= 1) {
     el.style.filter = "none";
@@ -43,7 +43,7 @@ function fade(el, f, blur) {
     el.style.filter = "none";
     el.style.opacity = "0";
   } else {
-    el.style.filter = `blur(${Math.min(blur / f - blur, 100)}px)`;
+    el.style.filter = `blur(${Math.min(blur / f - blur, blurMax)}px)`;
     el.style.opacity = `${Math.pow(f, 0.4)}`;
   }
 }
@@ -67,8 +67,9 @@ function createGroup(side, groups, params) {
 
     for (let j = 0; j < SLOTS; j++) {
       if (moving[j]) {
-        fade(out?.[j], 1 - t, params.nameBlur);
-        fade(into?.[j], t, params.nameBlur);
+        const cap = params.nameGoo ? params.nameBlurMax : params.nameBlurPlainMax;
+        fade(out?.[j], 1 - t, params.nameBlur, cap);
+        fade(into?.[j], t, params.nameBlur, cap);
         if (held?.[j]) held[j].style.opacity = "0";
       } else {
         if (out?.[j]) out[j].style.opacity = "0";
@@ -81,8 +82,13 @@ function createGroup(side, groups, params) {
     // hardens glyph edges, and at this size that is the difference between
     // type that is set and type that is stamped.
     if (g.goo) {
+      // nameGoo is off where an SVG filter on a DOM element is rasterised on
+      // the CPU — see params.js for the measurements. The words then simply
+      // blur past each other instead of fusing.
       g.goo.style.filter =
-        t >= 1 ? "none" : `url(#name-goo) blur(${params.nameSoften}px)`;
+        t >= 1 || !params.nameGoo
+          ? "none"
+          : `url(#name-goo) blur(${params.nameSoften}px)`;
     }
   };
 
