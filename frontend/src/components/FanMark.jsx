@@ -34,7 +34,7 @@
 export default function FanMark({ open = false, className = '' }) {
   return (
     <svg
-      viewBox="0 0 200 186"
+      viewBox="0 0 200 232"
       className={`fan-mark ${className}`}
       data-open={open ? 'true' : 'false'}
       aria-hidden="true"
@@ -84,10 +84,41 @@ export default function FanMark({ open = false, className = '' }) {
                   <g transform="translate(0 11)">
                     <g className="fan-seg" style={{ "--d": 4 }}>
                       <path d="M100 110 L100 122" />
-                  {/* The knot, then the two pom-poms the reference has. */}
-                  <circle cx="100" cy="112" r="3.2" className="fan-knot" />
-                  <circle cx="96.2" cy="121" r="7.6" className="fan-pom fan-pom--back" />
-                  <circle cx="104.4" cy="123.4" r="6.6" className="fan-pom" />
+                  {/* ── THE PENDANT ──────────────────────────────────
+                      bead, knot, bead, fringe — the order the reference
+                      hangs them in. The knot is four loops on the
+                      diagonals around a small barred square, which is the
+                      pan chang the real cord is tied into; drawn as four
+                      rotated rounded rects so it stays one stroke weight
+                      with the cord above it. */}
+                  <circle cx="100" cy="113" r="3.4" className="fan-bead" />
+
+                  <g className="fan-knot-grp" transform="translate(0 6)">
+                    <g transform="rotate(45 100 126)">
+                      <rect x="86" y="112" width="28" height="28" rx="13" className="fan-knot-loop" />
+                      <rect x="92.5" y="118.5" width="15" height="15" rx="7" className="fan-knot-loop" />
+                    </g>
+                    <rect x="94.6" y="120.6" width="10.8" height="10.8" className="fan-knot-sq" />
+                    <path d="M97.4 120.6v10.8M102.6 120.6v10.8M94.6 123.4h10.8M94.6 128.6h10.8"
+                          className="fan-knot-bar" />
+                  </g>
+
+                  <path d="M100 148v7" className="fan-cord-l" />
+                  <circle cx="100" cy="158" r="3.2" className="fan-bead" />
+
+                  {/* The fringe: a bound head, then strands that splay a
+                      little and end at slightly different lengths, because
+                      a cut tassel never ends level. */}
+                  <path d="M93.4 163h13.2l-1.6 7H95z" className="fan-fringe-head" />
+                  <path d="M94.2 165.4h11.6M94.6 167.8h10.8" className="fan-fringe-bind" />
+                  <g className="fan-fringe">
+                    <path d="M95.6 170c-1.6 7-2.6 13.4-2.4 20.4" />
+                    <path d="M97.6 170c-1 7.4-1.6 14-1.5 21.6" />
+                    <path d="M99.4 170c-.4 7.6-.5 14.4-.4 22.4" />
+                    <path d="M101.2 170c.3 7.6.4 14.4.5 22.1" />
+                    <path d="M103 170c.9 7.4 1.4 14 1.6 21.3" />
+                    <path d="M104.8 170c1.5 7 2.5 13.4 2.5 20.1" />
+                  </g>
                     </g>
                   </g>
                   </g>

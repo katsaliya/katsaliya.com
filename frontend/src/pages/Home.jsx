@@ -31,8 +31,7 @@ import Disciplines from '../components/Disciplines'
 import HowIGotHere from '../components/HowIGotHere'
 import WhereIveBeen from '../components/WhereIveBeen'
 import SiteFooter from '../components/SiteFooter'
-import { CHALK_TEXTURE } from '../components/ChalkTexture'
-import LineReveal from '../components/LineReveal'
+import FanLoader from '../components/FanLoader'
 
 /* ─── Font — matches the Work page (Nav, carousel labels, project list all
    run on DM Sans alone; nothing else is actually loaded there). Weights
@@ -41,7 +40,6 @@ const FONT = "'DM Sans', sans-serif"
 
 /* ─── Script headline — Coneria Script Slanted, under a purchased
    commercial license (see the @font-face note in shared.css). ─── */
-const SCRIPT_FONT = "'Coneria Script Slanted', cursive"
 
 /* The name's landing font-size once docked into the nav slot. Imported from
    the nav rather than restated, so the FLIP cannot be measuring against a
@@ -49,7 +47,6 @@ const SCRIPT_FONT = "'Coneria Script Slanted', cursive"
 
 /* ─── Loader: how small the name starts, centered in the viewport, before
    growing/moving into its natural hero position. ─── */
-const NAME_LOADER_SCALE = 0.42
 
 /* ─── Intro copy — held here rather than inline in the JSX because it is
    rendered split into per-word spans (the paragraph's entrance staggers
@@ -67,8 +64,6 @@ const TLDR_COPY =
 
 export default function Home() {
   const { pathname } = useLocation()
-  const nameGroupRef = useRef(null)
-  const navNameSlotRef = useRef(null)
   const navLinksGroupRef = useRef(null)
   const flowerImgRef = useRef(null)
   const tldrRef = useRef(null)
@@ -150,65 +145,18 @@ export default function Home() {
      flash of the unfit baseline size. Re-fits on resize (font-size only —
      see the loader effect below for the one-time starting transform), and
      once webfonts settle — see the fonts.ready note below. ─── */
-  useLayoutEffect(() => {
-    const container = nameGroupRef.current
-    if (!container) return
-    const lines = container.querySelectorAll('.line-reveal-row')
-    if (!lines.length) return
+  /* THE FIT EFFECT IS GONE WITH THE NAME IT SIZED. It measured the
+     script's own width-per-font-pixel and solved for the size that filled
+     the shell, which only a display line of unknown metrics needs.
 
-    const fit = () => {
-      const containerWidth = container.clientWidth
-      const baseFontSize = parseFloat(getComputedStyle(container).fontSize)
-      if (!containerWidth || !baseFontSize) return
-      let maxRatio = 0
-      lines.forEach((line) => {
-        const ratio = line.scrollWidth / baseFontSize
-        if (ratio > maxRatio) maxRatio = ratio
-      })
-      if (!maxRatio) return
-      container.style.fontSize = `${containerWidth / maxRatio}px`
-    }
-
-    /* AND TELL SCROLLTRIGGER. fit() changes the name's font-size, which
-       changes the hero's height, which moves every section on the page —
-       and ScrollTrigger caches each trigger's start as a scroll position
-       computed from the layout as it stood when the trigger was created.
-       Nothing here invalidated that, so from the first re-fit onward every
-       reveal below the hero was keyed to a hero that no longer existed.
-
-       It survived this long because the error is small (tens of pixels) and
-       everything affected used to sit a full viewport below the fold, where
-       being a few pixels early or late is invisible. Shortening the mobile
-       hero brought Selected work's first card to 671px in an 844px window,
-       four pixels inside its own `top 80%` start — so the stale value was
-       suddenly the difference between the card being there at rest and
-       being an empty screen that only filled in once you scrolled. */
-    const fitAndRepark = () => {
-      fit()
-      parkAtLoaderStateRef.current?.()
-      ScrollTrigger.refresh()
-    }
-
-    fit()
-    const ro = new ResizeObserver(fitAndRepark)
-    ro.observe(container)
-
-    /* The observer above catches viewport resizes and nothing else — and it
-       specifically CANNOT catch the event that most changes this
-       measurement, a webfont swapping in. Its width is the shell's (fixed)
-       and its height is line-count x font-size (also unchanged by a swap);
-       only the rows inside get wider or narrower, and those aren't observed.
-       So on a cold cache the name is fitted against the fallback face's much
-       narrower glyphs, and when Coneria arrives it overflows --hero-max
-       badly — measured at 2560px: 2812px of name in an 1800px column. A warm
-       cache hides this completely, which is what makes it so easy to miss. */
+     Its ScrollTrigger.refresh stays, though, as its own effect: the reason
+     for it was never the name specifically, it was that a webfont swap
+     changes heights above the fold and every trigger below is keyed to
+     stale positions. That is still true of the marquees and the intro. */
+  useEffect(() => {
     let alive = true
-    document.fonts?.ready.then(() => { if (alive) fitAndRepark() })
-
-    return () => {
-      alive = false
-      ro.disconnect()
-    }
+    document.fonts?.ready.then(() => { if (alive) ScrollTrigger.refresh() })
+    return () => { alive = false }
   }, [])
 
   /* ─── The loader, and the landing it hands off to ──────────────────
@@ -225,113 +173,7 @@ export default function Home() {
      the same x/y mean different things under each. Left-centre throughout:
      scaling holds the left edge and the vertical centre, so both states are
      just an offset and a scale from the same reference. ─── */
-  const naturalRef = useRef(null)
   const landingRef = useRef(null)
-  const landingStartedRef = useRef(false)
-  const curtainRef = useRef(null)
-
-  /* Where the name sits at rest, and how big it is there. Read before any
-     transform is applied, since a transformed rect would describe the
-     loader rather than the layout. */
-  const measureNatural = () => {
-    const el = nameGroupRef.current
-    if (!el) return null
-    const prev = el.style.transform
-    el.style.transform = 'none'
-    const rect = el.getBoundingClientRect()
-    const fontSize = parseFloat(getComputedStyle(el).fontSize) || 1
-    el.style.transform = prev
-    return { left: rect.left, centerY: rect.top + rect.height / 2, width: rect.width, fontSize }
-  }
-
-  /* Small and centred in the VIEWPORT, expressed from the natural box.
-
-     Viewport, not hero, on every width. From md up the two coincide anyway
-     because the hero is a full screen. Below that the hero is a short band
-     and the centring is what makes the load read as a page-wide moment
-     rather than a small animation in a corner — the curtain below is what
-     makes that safe, by covering the content the name would otherwise be
-     floating over. */
-  const loaderState = (nat) => ({
-    x: window.innerWidth / 2 - (nat.width * NAME_LOADER_SCALE) / 2 - nat.left,
-    y: window.innerHeight / 2 - nat.centerY,
-    scale: NAME_LOADER_SCALE,
-  })
-
-  /* Docked in the nav slot, expressed from the same box. */
-  const navState = (nat) => {
-    const el = navNameSlotRef.current
-    const slot = el?.getBoundingClientRect()
-    if (!slot) return null
-    /* READ THE SLOT'S LIVE FONT-SIZE, do not assume it. This used to divide
-       by the NAV_NAME_FONT_SIZE constant, which silently required the nav
-       wordmark to be that exact size on every screen — so making it smaller
-       on mobile would have landed the flying name at the wrong scale and
-       left it overlapping the bar. The constant stays as the fallback for a
-       slot that has not been styled yet. */
-    const target = parseFloat(getComputedStyle(el).fontSize) || NAV_NAME_FONT_SIZE
-    return {
-      x: slot.left - nat.left,
-      y: slot.top + slot.height / 2 - nat.centerY,
-      scale: target / nat.fontSize,
-    }
-  }
-
-  /* RE-PARK AFTER A RE-FIT, not just re-fit. fit() changes the font-size,
-     which changes the natural box that every measurement here is expressed
-     from — so any fit running after the starting transform was set leaves
-     the name parked against a box that no longer exists. Measured on a cold
-     cache at 1024px: the name held 49px left of centre, because it had been
-     centred against a 1324px natural width that became 1088px the moment
-     Coneria replaced the fallback face. A warm cache hides it, which is what
-     made it survive this long.
-
-     Guarded on the flight: once that starts, its tween owns the transform
-     and re-parking would snatch the name back to the middle mid-travel. */
-  const parkAtLoaderState = () => {
-    if (landingStartedRef.current || reduceMotion) return
-    const container = nameGroupRef.current
-    if (!container) return
-    const nat = measureNatural()
-    if (!nat) return
-    naturalRef.current = nat
-    gsap.set(container, { ...loaderState(nat), transformOrigin: 'left center' })
-  }
-
-  /* The fit effect runs with [] deps, so a direct reference would freeze
-     render zero's closure — and with it a stale reduceMotion. The ref is
-     re-pointed every render, so the effect always calls the current one. */
-  const parkAtLoaderStateRef = useRef(null)
-  parkAtLoaderStateRef.current = parkAtLoaderState
-
-  useLayoutEffect(() => {
-    const container = nameGroupRef.current
-    if (!container) return
-    if (reduceMotion) {
-      setHeroLanded(true)
-      return
-    }
-    parkAtLoaderState()
-  }, [reduceMotion])
-
-  /* FAIL OPEN. The curtain is opaque in the markup, and every route that
-     takes it down runs off the reveal's onComplete. That is a single point
-     of failure with the worst possible blast radius: if the reveal throws,
-     or never fires because a webfont request hangs past LineReveal's own
-     waiting, the phone gets a blank ivory screen and no way out of it. The
-     desktop would be fine, so it is also the kind of thing that ships.
-
-     Four seconds is roughly three times the longest honest path to the
-     landing (a ~0.95s reveal, then a 1.15s flight) and well short of a
-     visitor deciding the site is broken. If the timeline is already running
-     this finds the curtain hidden and does nothing. */
-  useEffect(() => {
-    const t = setTimeout(() => {
-      const curtain = curtainRef.current
-      if (curtain) gsap.set(curtain, { autoAlpha: 0 })
-    }, 4000)
-    return () => clearTimeout(t)
-  }, [])
 
   /* ─── The landing. One timeline, fired when the per-character reveal
      finishes:
@@ -360,11 +202,11 @@ export default function Home() {
      one-way behaviour asked of it fought that at every turn; on a timeline it
      is one-way for free, because a timeline that is never reversed never
      reverses. ─── */
-  const onNameRevealComplete = () => {
-    /* From here the timeline owns the transform — see parkAtLoaderState. */
-    landingStartedRef.current = true
-    const nameGroup = nameGroupRef.current
-    const navSlot = navNameSlotRef.current
+  /* Fired by the fan loader, not by the name. The name used to gate this
+     because the name WAS the loader; now it is just hero content that
+     reveals on its own, and the arrival the rest of the page waits for is
+     the fan reaching the bar. */
+  const onLoaderDone = () => {
     const navLinksGroup = navLinksGroupRef.current
     const flowerImg = flowerImgRef.current
     const tldr = tldrRef.current
@@ -372,12 +214,10 @@ export default function Home() {
     const tldrWords = tldr ? [...tldr.querySelectorAll('.tldr-word')] : []
 
     const showAll = () => {
-      gsap.set([navSlot, navLinksGroup, flowerImg, tldr, tldrLabel, ...tldrWords].filter(Boolean), {
+      gsap.set([navLinksGroup, flowerImg, tldr, tldrLabel, ...tldrWords].filter(Boolean), {
         opacity: 1, y: 0, scale: 1, filter: 'blur(0px)',
       })
       if (flowerImg) gsap.set(flowerImg, { rotation: 29.309 })
-      if (nameGroup) gsap.set(nameGroup, { opacity: 0 })
-      if (curtainRef.current) gsap.set(curtainRef.current, { autoAlpha: 0 })
       setHeroLanded(true)
     }
 
@@ -386,16 +226,8 @@ export default function Home() {
       return
     }
 
-    const nat = naturalRef.current || measureNatural()
-    const to = nat && navState(nat)
-    if (!nat || !to) {
-      showAll()
-      return
-    }
-
     /* Starting states. The tldr; container is visible and its PARTS are what
        hide — they are the things that animate. */
-    if (navSlot) gsap.set(navSlot, { opacity: 0 })
     if (navLinksGroup) gsap.set(navLinksGroup, { opacity: 0, y: -6 })
     if (flowerImg) gsap.set(flowerImg, { opacity: 0, scale: 0.94, y: 18, rotation: 29.309 })
     if (tldr) gsap.set(tldr, { opacity: 1, y: 0 })
@@ -409,29 +241,8 @@ export default function Home() {
 
     const tl = gsap.timeline()
 
-    /* Disable scroll during the name morph animation */
-    const lenis = window.__lenis
-    if (lenis) lenis.stop()
-
-    tl.to(nameGroup, { ...to, duration: 1.15, ease: 'power3.inOut' }, 0)
-
-    /* The curtain lifts WHILE the name is still travelling, not after it has
-       landed. Same rule the flower and the tldr; follow — each one starts
-       under the one before it rather than queueing — and here it also means
-       the page is already there to receive the wordmark when the crossfade
-       happens at 0.92, instead of the bar appearing against ivory and the
-       content arriving a beat later. autoAlpha so it ends up
-       visibility:hidden and stops intercepting taps. */
-    if (curtainRef.current) {
-      tl.to(curtainRef.current, { autoAlpha: 0, duration: 0.4, ease: 'none' }, 0.7)
-    }
-    /* Handoff at the end of the travel: the name is already sitting exactly
-       on the slot by now, so this is a pure crossfade and nothing moves. */
-    tl.to(nameGroup, { opacity: 0, duration: 0.28, ease: 'none' }, 0.92)
-    tl.to(navSlot, { opacity: 1, duration: 0.28, ease: 'none' }, 0.92)
-
-    /* The flower starts while the name is still travelling — it takes over
-       the screen the name is leaving rather than waiting for it to go. */
+    /* The flower comes up as the fan is settling into the bar, rather than
+       queueing behind it. */
     if (flowerImg) {
       tl.to(flowerImg, { opacity: 1, scale: 1, y: 0, duration: 1.3, ease: 'power3.out' }, 0.3)
     }
@@ -449,11 +260,6 @@ export default function Home() {
       )
     }
 
-    /* Re-enable scroll after the morph animation completes (1.15s) */
-    tl.call(() => {
-      if (lenis) lenis.start()
-    }, null, 1.15)
-
     landingRef.current = tl
   }
 
@@ -464,38 +270,15 @@ export default function Home() {
           fade in on the same scrub, so it hands over the two refs and the
           opacity-0 starting states. Everything else about the nav lives in
           one place now rather than being duplicated here. */}
-      <Nav
-        wordmarkRef={navNameSlotRef}
-        wordmarkClassName="opacity-0"
-        wordmarkAriaHidden
-      />
+      {/* No refs and no opacity-0 any more. The wordmark was the landing
+          point of the name's FLIP and had to start hidden; nothing flies
+          into it now, so it is simply part of the bar. */}
+      <Nav />
 
-      {/* ─── Loader curtain — PHONE ONLY (md:hidden).
-
-          On a wide screen the hero is a full viewport of ivory, so the name
-          revealing in the middle of it IS a full-screen loader; there is
-          nothing to cover because everything else is below the fold.
-
-          On a phone the hero is a 214px band, so the intro and the first
-          work card sit inside the first screen — which is what we wanted
-          for the resting page, and exactly wrong during the load: the
-          viewport-centred name came down on top of the intro paragraph.
-          This covers the lot, including the nav's own bar, so the first two
-          seconds are the name on ivory and nothing else.
-
-          z-[55] sits between the nav (z-50) and the name group (z-[60]), so
-          the name paints over the curtain and everything else paints under
-          it. It renders opaque — no entrance — because it has to be there
-          on the very first frame, before any effect has run.
-
-          Starts as a plain div rather than a GSAP-set one for the same
-          reason: a transparent-until-JS curtain is no curtain at all on a
-          slow first paint. ─── */}
-      <div
-        ref={curtainRef}
-        aria-hidden="true"
-        className="md:hidden fixed inset-0 z-[55] bg-[var(--ivory)]"
-      />
+      {/* The arrival. Owns its own ivory ground, so the phone-only curtain
+          that used to cover the page during the name's flight is gone with
+          the flight itself. */}
+      <FanLoader onDone={onLoaderDone} reduceMotion={reduceMotion} />
 
       <SideSocial />
       <div className="relative min-h-screen w-full bg-[var(--ivory)]">
@@ -541,7 +324,21 @@ export default function Home() {
                it is a short band rather than nothing — the name appears
                under the nav, lifts into it, and the intro follows directly
                underneath instead of a screen later. */
-            className="relative w-full min-h-0 md:min-h-screen bg-[var(--ivory)] flex flex-col justify-start md:justify-center pt-20 pb-6 md:py-0"
+            /* A FULL VIEWPORT ONLY WHERE THERE IS SOMETHING TO FILL IT.
+               This was md:min-h-screen, from when the hero's job was to
+               centre the script name. The name is gone and the two things
+               left in here — the flower and the tldr; block — are both
+               `hidden xl:block`, so from md to xl the hero was a whole
+               screen of nothing before the first word of the page.
+
+               xl is where the content appears, so xl is where the stage
+               appears. Below it the hero is the same short band under the
+               bar that the phone gets.
+
+               The top padding reads --nav-h rather than a fixed 80px,
+               because the bar is 94px on a phone and 115px from md — a
+               constant clears one and not the other. */
+            className="relative w-full min-h-0 xl:min-h-screen bg-[var(--ivory)] flex flex-col justify-start xl:justify-center pt-[calc(var(--nav-h,94px)+14px)] pb-6 xl:py-0"
           >
             {/* .shell-hero, not .shell — the readability cap exists to
                 protect measure, and there is no prose here, just a two-line
@@ -549,57 +346,6 @@ export default function Home() {
                 effect below solves font-size from this element's own
                 clientWidth, so capping the shell at --hero-max is what stops
                 a script face growing unbounded on an ultrawide display. */}
-            <div className="page-content-shell">
-              {/* COLLAPSED ON A PHONE, and this wrapper exists only to do
-                  that. The name below is in normal flow, so its two lines
-                  reserve ~146px of hero whether or not anything is painted
-                  there — and on a phone nothing ever is. The loader stages
-                  the name at the centre of the VIEWPORT and the landing then
-                  parks it in the nav at opacity 0, so from the first frame to
-                  the last that box is empty space the page scrolls past. It
-                  is the band the "{ scroll down }" cue used to sit in, left
-                  behind when the cue went.
-
-                  h-0 drops the reservation without touching the name itself:
-                  it keeps its own width (so the fit still solves against the
-                  shell) and its own height and position (so measureNatural
-                  still has a real box to express the loader and nav states
-                  from). It simply overflows a parent with no height, which
-                  costs nothing because it is never visible in flow.
-
-                  The overflow cannot grow the page either — the name's only
-                  two transformed positions are the centre of the first
-                  screen and the nav, both above the fold.
-
-                  md:h-auto because above that the hero IS a full viewport
-                  centred on this name, and there the box is the whole
-                  point. ─── */}
-              <div className="h-0 md:h-auto">
-              {/* ─── Name — sized to fill the full container width (see the
-                  fit useLayoutEffect above; clamp() alone can't solve this
-                  for an arbitrary script font's glyph metrics) ─── */}
-              <div
-                ref={nameGroupRef}
-                className="relative z-[60] pointer-events-none leading-[1.14] tracking-[-0.01em] text-[var(--walnut)] text-[clamp(3rem,15vw,14rem)] will-change-[transform,opacity]"
-                style={{ fontFamily: SCRIPT_FONT, filter: CHALK_TEXTURE }}
-              >
-                <LineReveal
-                  lines={['Kataliya', 'Sungkamee']}
-                  splitBy="char"
-                  trigger="load"
-                  delay={0.1}
-                  stagger={0.015}
-                  duration={0.95}
-                  ease="power4.out"
-                  blur
-                  wipe={false}
-                  reduceMotion={reduceMotion}
-                  onComplete={onNameRevealComplete}
-                />
-              </div>
-              </div>
-            </div>
-
             {/* ─── Flower motif — lives in the hero itself, not a section
                 further down: it resolves in on the same timeline as the
                 name's morph into the nav, arriving while that is still

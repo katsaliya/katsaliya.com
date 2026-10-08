@@ -36,7 +36,16 @@ const blankTexture = () => {
   return t;
 };
 
-export default function Carousel() {
+/* `onOpen` is called with the project when a card that is ALREADY at the
+   front is clicked. The first click on any other card brings it forward —
+   that is what the ring is for — and only the second, on the card the
+   "View" tag is offering, opens it. */
+export default function Carousel({ onOpen }) {
+  /* The click handler lives inside an effect that runs once, so a direct
+     reference would freeze render zero's prop. Re-pointed every render. */
+  const onOpenRef = useRef(null);
+  onOpenRef.current = onOpen;
+
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const itemsRef = useRef([]);
@@ -467,6 +476,16 @@ export default function Carousel() {
     // ring slot, not plane index" warning. Searched rather than solved in
     // closed form, since count === imageCount here (one plane per project)
     // makes a direct search cheap and avoids hand-deriving cellOf's inverse.
+    /* Forward of planeForProject: which project a given plane is wearing.
+       Same cellOf() arithmetic the layout uses, so the two cannot drift. */
+    const cellOfPlane = (planeIndex) => {
+      const imgOff = Math.round(params.imageOffset);
+      const slot = signedOffset(planeIndex);
+      return imageCount > 0
+        ? (((imgOff - slot) % imageCount) + imageCount) % imageCount
+        : 0;
+    };
+
     const planeForProject = (projectIndex) => {
       const count = Math.round(params.count);
       const imgOff = Math.round(params.imageOffset);
@@ -678,9 +697,16 @@ export default function Carousel() {
     // A drag ends in a click too, so only a near-stationary press counts.
     // `over` comes from the same hit test that decides the tag, so a click
     // only ever lands on the card the tag was offering.
-    const onClick = () => {
+    const onClick = (e) => {
       if (!interactive || pointerTravel >= 5 || over < 0) return;
-      pick(over);
+      /* pick() returns false when the card is already facing front, which
+         is exactly the case where a click means "open this" rather than
+         "bring this here". */
+      if (!pick(over)) {
+        const cell = cellOfPlane(over);
+        const project = PROJECTS[cell];
+        if (project) onOpenRef.current?.(project, e);
+      }
     };
 
     container.addEventListener("wheel", onWheel, { passive: false });
