@@ -987,30 +987,98 @@ body.page-case-study.secnav-pinned .site-nav::before {
    corner. Open is inset(0). The round is carried on both so the corner
    radius does not pop at the ends. */
 .nav-menu-panel {
-  /* 78%, not solid and not 86%. The page has to stay readable through it —
-     that is the whole point of not using a card — and at 86% the blur
-     behind it was doing nothing visible. 78% over the ivory composites to
-     about #383838, which still carries the muted links at 5.2:1 and the
-     white ones far above that, so the contrast is bought honestly rather
-     than by blanking what is underneath. */
-  background: color-mix(in srgb, var(--walnut) 78%, transparent);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
-  clip-path: inset(0 0 100% 100% round 14px);
+  /* THE FAN'S OWN CRIMSON, not a neutral grey. The panel is the thing the
+     fan folds into, so it reads as one object when it carries the same
+     colour — and a near-black box was the one element on the site that
+     belonged to no part of its palette.
+
+     82% over a 20px blur: dark enough to hold ivory text at full contrast,
+     open enough that the page keeps moving behind it, which is the whole
+     reason for not using a solid card. Deepened past the slat colour
+     because #85283A at 82% over ivory composites too light to sit white
+     type on; this lands near #5C1B2A. */
+  background: color-mix(in srgb, #5C1B2A 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow: 0 24px 70px rgba(50, 10, 20, 0.3);
+
+  /* SQUARE CORNERS. The ornament below runs along all four edges and meets
+     at the corners; a radius would cut the scroll off mid-curl on every
+     one of them. */
+  border-radius: 0;
+  clip-path: inset(0 0 100% 100%);
   opacity: 0;
   pointer-events: none;
   transition:
     clip-path 560ms cubic-bezier(0.16, 1, 0.3, 1),
     opacity 220ms ease;
 }
+/* FROM md UP THE PANEL BELONGS TO THE CONTAINER, not the viewport. Its
+   right edge sits on --nav-right, the trigger's own measured inset from
+   the right edge of the window (published by Nav.jsx). Past
+   --page-max-width the shell stops growing and centres, so a panel pinned
+   to the viewport walks away from it — measured at 300px adrift at 2400px
+   wide. Measuring from the trigger cannot disagree with the container,
+   because it is measured from inside it, and it keeps the panel landing on
+   the fan it grows out of at any width.
+
+   The width is a clamp rather than one fixed number, for the same reason
+   every other size on this site is. */
+@media (min-width: 768px) {
+  .nav-menu-panel {
+    left: auto;
+    right: var(--nav-right, 20px);
+    width: clamp(22rem, 27vw, 28.5rem);
+  }
+}
+
 .nav-menu-panel[data-open='true'] {
-  clip-path: inset(0 0 0 0 round 14px);
+  clip-path: inset(0 0 0 0);
   opacity: 1;
   pointer-events: auto;
   transition:
     clip-path 720ms cubic-bezier(0.16, 1, 0.3, 1),
     opacity 160ms ease;
+}
+
+/* ── THE SCROLL BORDER ────────────────────────────────────────────────
+   The embroidered scrollwork, running all four edges.
+
+   ONE ELEMENT, FOUR MASK LAYERS. `mask` takes a comma-separated list and
+   composites the layers together, so a single pseudo-element carries the
+   top and bottom strips (the horizontal cut, repeat-x) and the left and
+   right (the vertical cut, repeat-y) at once. Four separate divs would
+   have been four more things in the markup for the same picture.
+
+   It is a MASK rather than an image, so the ornament is painted in ivory
+   at the opacity set here and can be recoloured in one place. The art is
+   the supplied strip, cut to exactly one repeat — the period measured at
+   190px with 0.984 autocorrelation — so each edge tiles without a seam.
+
+   The corner overlaps are deliberate and invisible: both layers paint the
+   same flat colour, so where the top strip crosses the left one there is
+   nothing to see. */
+.nav-menu-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.78);
+  --sh: url('/images/assets/scroll-h.png');
+  --sv: url('/images/assets/scroll-v.png');
+  -webkit-mask:
+    var(--sh) repeat-x left top / auto 20px,
+    var(--sh) repeat-x left bottom / auto 20px,
+    var(--sv) repeat-y left top / 20px auto,
+    var(--sv) repeat-y right top / 20px auto;
+  mask:
+    var(--sh) repeat-x left top / auto 20px,
+    var(--sh) repeat-x left bottom / auto 20px,
+    var(--sv) repeat-y left top / 20px auto,
+    var(--sv) repeat-y right top / 20px auto;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
 }
 
 /* The links ride up into place behind the clip rather than simply being
@@ -1089,9 +1157,23 @@ body.page-case-study.secnav-pinned .site-nav::before {
   stroke-width: 2.4;
   stroke-linecap: round;
 }
-.fan-knot { fill: var(--fan-cord); }
-.fan-pom { fill: #3A0E1C; }
-.fan-pom--back { fill: #240811; }
+/* The pendant: one cord colour throughout, as a real knotted cord is. The
+   knot is stroked rather than filled so the loops read as cord crossing
+   over itself; the fringe head is the only solid part, because the binding
+   is where the strands are gathered and hidden. */
+.fan-bead { fill: #7E1F2E; }
+.fan-cord-l { stroke: var(--fan-cord); stroke-width: 2.4; fill: none; stroke-linecap: round; }
+.fan-knot-loop { fill: none; stroke: var(--fan-cord); stroke-width: 2.2; }
+.fan-knot-sq { fill: none; stroke: var(--fan-cord); stroke-width: 1.9; }
+.fan-knot-bar { stroke: var(--fan-cord); stroke-width: 1.1; fill: none; }
+.fan-fringe-head { fill: #7E1F2E; }
+.fan-fringe-bind { stroke: rgba(255, 255, 255, 0.28); stroke-width: 0.9; fill: none; }
+.fan-fringe path {
+  fill: none;
+  stroke: var(--fan-cord);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
 
 .fan-seg {
   transform-origin: 100px 110px;

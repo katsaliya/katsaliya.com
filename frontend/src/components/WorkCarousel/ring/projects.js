@@ -10,6 +10,11 @@
 // `type` is a best-guess short discipline label for each, not pulled from a
 // canonical source — check these before treating them as final copy.
 //
+// `href` is the case study a card opens. Only the two that have one carry
+// it; everything else answers a click with the same "Coming soon" note the
+// Selected work cards use, rather than with silence. Add the route here
+// when a case study lands and the card starts working with no other change.
+//
 // The two "Coming Soon" entries are flat colour placeholders, not real
 // projects — interleaved with the photographic thumbnails on purpose. The
 // ring's goo/crossfade reads far more clearly between two high-contrast flat
@@ -22,6 +27,7 @@ export const PROJECTS = [
   {
     file: 'images/cards/demo-bluecore.webp',
     name: 'BlueCore',
+    href: '/bluecore',
     type: 'Product Design',
     year: '2025',
   },
@@ -34,6 +40,7 @@ export const PROJECTS = [
   {
     file: 'images/cards/demo-known.png',
     name: 'Known',
+    href: '/known',
     type: 'Content & Design',
     year: '2025',
   },
