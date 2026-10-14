@@ -54,6 +54,15 @@ import Known from './pages/Known'
 /* Work carousel page — the ring, ported from the Viscose-carousel reference */
 import WorkCarousel from './pages/WorkCarousel'
 
+/* The four studies that are not written yet. They render straight from
+   their data through CaseStudy, with no page file of their own — Bluecore
+   and Known each have an eight-line wrapper that does exactly this, and
+   four more of those would be four more files saying nothing. When one of
+   these gets real content it can grow a wrapper like theirs if it needs
+   page-level behaviour; until then the route IS the page. */
+import CaseStudy from './components/CaseStudy'
+import { EMPORIUM, ALLIED, AIDENTITY, KATSALIYA } from './data/caseStudies'
+
 /* The chalky-edge SVG filter, mounted once here rather than inside any one
    page: an SVG filter id is document-global, and the elements referencing it
    (Home's hero name, the nav wordmark, the Disciplines marquee) sit in
@@ -208,6 +217,14 @@ export default function App() {
       {/* Deep dive into the Known project */}
       {/* TO CHANGE: Replace <Known /> with different component */}
       <Route path="/known" element={<Known />} />
+
+      {/* The template studies. Every card on the ring has a destination;
+          these four land on the real page shape with the prose still to
+          write, rather than on a "coming soon". */}
+      <Route path="/emporium-thai-market" element={<CaseStudy study={EMPORIUM} />} />
+      <Route path="/allied-global-marketing" element={<CaseStudy study={ALLIED} />} />
+      <Route path="/aidentity" element={<CaseStudy study={AIDENTITY} />} />
+      <Route path="/katsaliya" element={<CaseStudy study={KATSALIYA} />} />
 
         {/* Note: Any URL not listed above (e.g., /invalid-page) will show nothing */}
         {/* TO ADD A PAGE: */}

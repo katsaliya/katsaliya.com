@@ -172,8 +172,40 @@ export function createMeta(refs, params) {
     const bigWeight = `${params.nameWeight}`;
     const smallWeight = `${params.idxWeight}`;
     // Roomy, because this box is what the filter region is measured off and
-    // the blur needs somewhere to go.
-    const h = bigVw * 3;
+    // the blur needs somewhere to go. Four rather than three now that a long
+    // name is allowed to take a second line — at three the descenders of a
+    // wrapped line sat on the edge of the filter region and were clipped.
+    const h = bigVw * 4;
+
+    /* ── HOW WIDE THE LOCKUP MAY BE ──────────────────────────────────────
+       The box used to be a flat 34vw a side, which at 1440 is 490px
+       starting 79px in — so it ran to 569px while the focused card starts
+       at 421. The box overlapped the card by 148px, and with nowrap on the
+       row the text simply drew over the artwork: "Entertainment Marketing"
+       lost its E behind the card.
+
+       So the width is solved from the card instead of declared. The card is
+       the same figure the ring draws with — planeSize x planeK x endScale x
+       fit — and what is left beside it, less its own inset and a margin, is
+       all the type may have. Long names then wrap inside that, which is the
+       behaviour asked for: break to a second line rather than cross the
+       picture.
+
+       Derived here rather than passed in because the alternative is a
+       second copy of the ring's geometry somewhere else that has to be kept
+       in step with this one. */
+    const narrow = viewW <= params.narrowAt;
+    const fit = Math.min(
+      params.maxScale,
+      Math.max(params.minScale, viewW / Math.max(1, params.refWidth)),
+    );
+    const planeK = narrow ? params.narrowPlane : 1;
+    const endScale = narrow ? params.narrowEndScale : params.endScale;
+    const cardHalfPx = (params.planeSize * planeK * endScale * fit) / 2;
+    const insetPx = (params.metaLeft / 100) * viewW;
+    const GAP = 28; // breathing room between the words and the card's edge
+    const availPx = viewW / 2 - cardHalfPx - insetPx - GAP;
+    const availVw = Math.max(12, (availPx / viewW) * 100);
 
     for (const side of SIDES) {
       const g = groups[side];
@@ -190,7 +222,9 @@ export function createMeta(refs, params) {
       }
       g.box.style.display = "";
 
-      g.box.style.width = `${corner ? params.tightMetaWidth : params.metaWidth}vw`; // prettier-ignore
+      // In the corner layout the card is not beside the words, so the
+      // measured width does not apply — that one keeps its own figure.
+      g.box.style.width = `${corner ? params.tightMetaWidth : Math.min(params.metaWidth, availVw)}vw`; // prettier-ignore
       g.box.style.height = `${h}vw`;
 
       if (corner) {
@@ -223,12 +257,24 @@ export function createMeta(refs, params) {
         if (!layer) continue;
         layer.style.justifyContent =
           corner || isRight ? "flex-end" : "flex-start";
+        /* A wrapped line has to align the same way the lockup does, or the
+           second line of a right-hand label starts under the middle of the
+           first. */
+        layer.style.textAlign = corner || isRight ? "right" : "left";
         const row = layer.firstElementChild;
         row.style.gap = `${isRight ? params.metaGapR : params.metaGapL}vw`;
         const [lead, trail] = row.children;
         // The number is what goes in the corner layout. Its morph carries on
         // underneath, so nothing needs resyncing on the way back out.
         lead.style.display = corner ? "none" : "";
+        /* A flex item will not shrink below its content unless told it may,
+           so without this the name keeps its single-line width and overflows
+           the box instead of wrapping inside it. The index and the year are
+           short and fixed, so only the long half is allowed to give. */
+        lead.style.minWidth = isRight ? "0" : "";
+        lead.style.flexShrink = isRight ? "1" : "0";
+        trail.style.minWidth = isRight ? "" : "0";
+        trail.style.flexShrink = isRight ? "0" : "1";
         lead.style.fontFamily = isRight ? bigFace : smallFace;
         lead.style.fontSize = isRight ? big : small;
         lead.style.fontWeight = isRight ? bigWeight : smallWeight;

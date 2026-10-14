@@ -1623,7 +1623,11 @@ export default function Carousel({ onOpen }) {
         // Baseline, not centre: the halves are set at different sizes, and a
         // shared baseline is what makes them read as one lockup.
         const row = (
-          <span className="flex items-baseline whitespace-nowrap">
+          /* NOT whitespace-nowrap any more. It was what let a long name
+             draw straight over the card: the row kept one line however
+             little room it had. Wrapping is bounded by the box, which
+             meta.js now sizes to the space actually beside the card. */
+          <span className="flex items-baseline">
             <span />
             <span />
           </span>
