@@ -8,6 +8,14 @@ frontend/public/images/cards/orbcard.mov
 # outright rather than warning.
 frontend/dist/images/cards/orbcard.mov
 
+# THE WHOLE BUILD DIRECTORY. dist/ was tracked, which put a fresh ~800KB of
+# minified output into every commit and ~300MB into the repo's history. It
+# was never serving any purpose: vercel.json sets only rewrites, with no
+# outputDirectory, so Vercel runs `vite build` from source and ignores
+# whatever dist/ happens to contain — confirmed by the live bundle hash
+# (index-CVjBrIhc.js) differing from the committed one (index-Dgp0R1x_.js).
+frontend/dist/
+
 # macOS finder droppings
 .DS_Store
 
