@@ -787,4 +787,492 @@ export const KNOWN = {
   ],
 }
 
-export const CASE_STUDIES = { bluecore: BLUECORE, known: KNOWN }
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEMPLATES — the four studies that are not written yet
+
+   Every card on the ring has to go somewhere. These four exist so that
+   clicking them lands on a real page in the site's own shape rather than on
+   a "coming soon" note: the masthead, the meta table, and the three
+   movements the written studies use, with the prose still to come.
+
+   WHY A FACTORY AND NOT FOUR OBJECTS. BLUECORE and KNOWN are ~300 lines
+   each because they have real content; four more skeletons of that length,
+   identical but for a handful of facts, would be four places to fix the
+   same typo. The facts that differ are arguments; the shape is shared.
+
+   WHEN ONE GETS WRITTEN, stop calling this and give it a literal object
+   like BLUECORE's. The factory is scaffolding for the empty state, not a
+   format to grow a real case study inside — the written ones diverge
+   heavily in their blocks and should be free to.
+
+   Every placeholder line is marked PLACEHOLDER, so a page that has not been
+   filled in is obvious in the source and greppable.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const templateStudy = ({ slug, title, tagline, meta, brand, intro }) => ({
+  slug,
+  title,
+  brand,
+  tagline,
+  description: tagline,
+  meta,
+  movements: [
+    { id: 'overview', number: '01', script: 'The', sans: 'overview', sections: ['overview'] },
+    { id: 'approach', number: '02', script: 'My',  sans: 'approach', sections: ['approach'] },
+    { id: 'impact',   number: '03', script: 'The', sans: 'impact',   sections: ['impact'], tone: 'plum' },
+  ],
+  sections: [
+    {
+      id: 'overview',
+      label: 'Overview',
+      bare: true,
+      blocks: [
+        { type: 'prose', items: [intro, '/* PLACEHOLDER */ What the brief actually was, and what made it hard.'] },
+      ],
+    },
+    {
+      id: 'approach',
+      label: 'My approach',
+      blocks: [
+        { type: 'prose', items: [
+          '/* PLACEHOLDER */ How the work was done — the research, the decisions, and the one that mattered most.',
+        ] },
+      ],
+    },
+    {
+      id: 'impact',
+      label: 'The impact',
+      blocks: [
+        { type: 'prose', items: [
+          '/* PLACEHOLDER */ What changed because of it, and what it is worth saying about the result.',
+        ] },
+      ],
+    },
+  ],
+})
+
+/* ── EMPORIUM THAI MARKET ─────────────────────────────────────────────────
+   Written, so it is a literal object rather than a templateStudy() call —
+   see the factory's note above. It diverges from the three-movement shape
+   the templates use, which is the whole reason the factory says to stop
+   calling it once a study has real content. */
+export const EMPORIUM = {
+  slug: 'emporium-thai-market',
+  title: 'Emporium Thai Market',
+  /* SET, NOT PLACED. The supplied logotype is a 17:1 strip, and
+     .cs-brand--logo gives an image a fixed height with max-width: 100% —
+     so the moment the strip is wider than the 58% column the width is
+     clamped while the height is not, and the wordmark is literally
+     squashed. Reproducing it as text removes the failure mode entirely
+     and keeps the name selectable and scalable.
+
+     DM Sans 500 is the match: of the families the site already loads it
+     scored highest against the artwork on a glyph-overlap test, and its
+     caps run 6.4% narrow against the original, which the tracking below
+     puts back. #272160 is sampled from the artwork's ink. */
+  brand: {
+    font: "'DM Sans', sans-serif",
+    weight: 500,
+    color: '#272160',
+    letterSpacing: '0.038em',
+    uppercase: true,
+  },
+  /* The second location, as rendered. Cropped to the building — the
+     export carried ~50px of empty canvas, and trimming it means the
+     hero's height cap applies to the building rather than to blank space.
+     The supplied cutout is already clean: no white fringe against a dark
+     ground, and the gaps between the gable slats are genuinely
+     transparent, so the page shows through them.
+
+     No size or position override: the hero spacing is BlueCore's and
+     every study shares it, and the motif holds the page margin by
+     default — see the note in CaseStudy.jsx. */
+  motif: { src: '/images/case-studies/emporium-storefront.webp' },
+  tagline:
+    'Design, social and growth for a second restaurant on Sawtelle — built while the doors are open.',
+  description:
+    'Design, social and growth for a second restaurant on Sawtelle — built while the doors are open.',
+  meta: [
+    ['Client', 'Emporium Thai LLC'],
+    ['My role', 'Creative & Growth Lead'],
+    ['Timeline', 'June 2026 — present'],
+    ['Tools', 'Figma, CapCut, Adobe CC, Meta Business Suite, SwiftUI, Canva'],
+  ],
+  /* NOT THE THREE-ACT RETROSPECTIVE. overview -> approach -> impact is a
+     shape for finished work: it promises a problem, a method and a result,
+     in that order and all in the past tense. This engagement started in
+     June 2026 and is still running, so two of those three acts would have
+     to be invented.
+
+     The movements are the workstreams instead, because that is how the
+     work is actually organised — five things running at once, each at a
+     different stage, plus the team being built to take them over. Being
+     visibly in progress is a position; imitating a finished case study
+     and coming up short is not.
+
+     The two "Where it stands" ledgers carry PLACEHOLDER values. They are
+     the metrics only Kataliya can supply, and they are marked with the
+     same token the unwritten template studies use so they stay
+     greppable. */
+  movements: [
+    { id: 'overview',   number: '01', script: 'The', sans: 'overview' ,  sections: ['overview'] },
+    { id: 'brand',      number: '02', script: 'The', sans: 'brand',      sections: ['brand'] },
+    { id: 'socials',    number: '03', script: 'The', sans: 'socials',    sections: ['socials'] },
+    { id: 'photobooth', number: '04', script: 'The', sans: 'photobooth', sections: ['photobooth'] },
+    { id: 'growth',     number: '05', script: 'The', sans: 'growth',     sections: ['growth'] },
+    { id: 'plan',       number: '06', script: 'The', sans: 'plan',       sections: ['plan'], tone: 'plum' },
+  ],
+  sections: [
+    {
+      id: 'overview',
+      label: 'Overview',
+      bare: true,
+      blocks: [
+        {
+          type: 'prose',
+          items: [
+            'Emporium Thai opened its second restaurant, Emporium Thai Market on Sawtelle, in January 2026. I joined a few months later to build a brand around it. The restaurant was already trading — my job was not to fix it, but to give it the structure to grow on its own.',
+            'My work sits where design, social and growth meet: how the brand looks, how it shows up online, and how that turns into orders and people through the door. All of it is being built while the doors are open, so what follows is where each piece stands now, not a finished account.',
+          ],
+        },
+        {
+          type: 'slot',
+          wide: true,
+          label: 'The room on Sawtelle',
+          note: 'One wide establishing shot of the dining room, lit as it actually is in service. This is the thing every other decision on the page is matched to.',
+          ratio: '16 / 9',
+        },
+      ],
+    },
+    {
+      id: 'brand',
+      label: 'Brand and graphic design',
+      blocks: [
+        {
+          type: 'prose',
+          items: [
+            'The brand runs on two identities. The dine-in side is deep red and deliberately understated, to match the room — I turned down a louder pop-art menu direction because it looked cheap next to the interior. The online ordering side uses a brighter pop-art elephant herd, built to stand out on a phone screen.',
+            'From there I designed the pieces customers actually handle.',
+          ],
+        },
+        {
+          type: 'slot',
+          items: [
+            {
+              label: 'Dine-in identity',
+              note: 'The deep red system as it appears in the room — menu cover, type, the restrained palette.',
+            },
+            {
+              label: 'Online-ordering identity',
+              note: 'The pop-art elephant herd as it appears on a phone. Shown at phone scale, since that is the argument.',
+            },
+          ],
+          ratio: '4 / 5',
+          caption: 'Side by side, because the two-identity decision is the one that needs showing rather than telling',
+        },
+        {
+          type: 'ledger',
+          headers: ['Piece', 'What it carries'],
+          rows: [
+            ['Dine-in menu', 'With a separate lunch menu'],
+            ['To-go bag inserts', 'A direct-ordering discount code'],
+            ['Review cards', 'Dropped into delivery bags'],
+            ['Colouring page', 'For families with kids'],
+          ],
+        },
+        {
+          type: 'slot',
+          items: [
+            { label: 'Dine-in menu', note: 'Flat scan or a shot on the table.' },
+            { label: 'To-go bag insert', note: 'The discount code legible.' },
+            { label: 'Review card', note: 'As it sits in a delivery bag.' },
+            { label: 'Colouring page', note: 'Ideally in use, crayons and all.' },
+          ],
+          ratio: '4 / 5',
+        },
+        {
+          type: 'stat',
+          figure: '55',
+          claim: ' delivery menu photos art-directed to one house look',
+        },
+        {
+          type: 'prose',
+          items: [
+            'Black background, vintage china, orchids — so the menu reads as one brand instead of a mix of old shoots.',
+          ],
+        },
+        {
+          type: 'slot',
+          wide: true,
+          label: 'Dish photography',
+          count: 4,
+          note: 'Four of the 55, square-cropped as the delivery apps show them. If any old shots survive, one before/after pair would make the point faster than four new ones.',
+          ratio: '1 / 1',
+        },
+        {
+          type: 'ledger',
+          eyebrow: 'Where it stands',
+          rows: [
+            ['Menu photos reshot', '55 of 55'],
+            ['Pieces in circulation', '/* PLACEHOLDER */'],
+            ['Discount-code redemptions from bag inserts', '/* PLACEHOLDER */'],
+            ['Reviews attributable to the review card', '/* PLACEHOLDER */'],
+          ],
+        },
+      ],
+    },
+    {
+      id: 'socials',
+      label: 'Social media',
+      blocks: [
+        {
+          type: 'prose',
+          items: [
+            'Social was the first piece I took on, and the challenge was making it last. I studied how Kei Concepts and Nude Project run content across a team, and built a playbook from it: a library of repeatable formats — how to eat a dish, process to result, the family kitchen — plus brand voice rules and a weekly rhythm, so anyone on the team can pick up a post.',
+            'Events are treated as content shoots. Our catering appearance at LA Magazine’s The Food Event became a recap reel and a run of posts out of one night.',
+          ],
+        },
+        {
+          type: 'slot',
+          items: [
+            { label: 'How to eat a dish', note: 'One frame, or the cover of the reel.' },
+            { label: 'Process to result', note: 'Same format, different dish.' },
+            { label: 'The family kitchen', note: 'The one that carries the story.' },
+          ],
+          ratio: '9 / 16',
+          caption: 'One frame from each repeatable format — the library is the deliverable, so it has to be visible',
+        },
+        {
+          type: 'slot',
+          items: [
+            { label: 'The playbook itself', note: 'A spread or two from the document: the calendar grid and the voice rules. This is what makes it a system rather than a feed.', ratio: '4 / 3' },
+            { label: 'The Food Event', note: 'Catering stand, or the recap reel cover.', ratio: '4 / 3' },
+          ],
+        },
+        {
+          type: 'ledger',
+          eyebrow: 'Where it stands',
+          rows: [
+            ['Followers, start to now', '/* PLACEHOLDER */'],
+            ['Posting cadence, before and after the playbook', '/* PLACEHOLDER */'],
+            ['Best-performing post', '/* PLACEHOLDER */'],
+            ['Saves and shares', '/* PLACEHOLDER */'],
+            ['Reach on the event recap', '/* PLACEHOLDER */'],
+            ['Profile visits to website taps', '/* PLACEHOLDER */'],
+          ],
+        },
+      ],
+    },
+    {
+      id: 'photobooth',
+      label: 'The photobooth',
+      blocks: [
+        {
+          type: 'prose',
+          items: [
+            'I wanted guests to leave with something they could keep and share — something that ties back to us every time it is posted. So I designed and built a photobooth for Emporium Thai Market from scratch.',
+          ],
+        },
+        {
+          type: 'slot',
+          wide: true,
+          label: 'The booth in the dining room',
+          note: 'In place, in service, with people using it. The hero shot of this section — it is the one thing on the page that physically exists and that nobody else has.',
+          ratio: '16 / 9',
+        },
+        {
+          /* noIndex: three parts of one object, not three steps. */
+          type: 'cards',
+          noIndex: true,
+          items: [
+            {
+              title: 'The booth',
+              body: 'I built the box by hand to sit in the dining room.',
+            },
+            {
+              title: 'The app',
+              body: 'It runs the camera and lets us swap filters and effects, so the booth can change with the seasons.',
+            },
+            {
+              title: 'The strip',
+              body: 'A thermal receipt printer prints each strip on the spot, in a layout I designed and can update whenever I like.',
+            },
+          ],
+        },
+        {
+          type: 'prose',
+          items: [
+            'Receipt paper keeps each print cheap enough to give away, and it gives the strip a look of its own. The result is something people take home, put on Instagram, and come back for when the next season’s design drops.',
+          ],
+        },
+        {
+          type: 'slot',
+          items: [
+            { label: 'The box', note: 'The build — ideally one in-progress shot as well as the finished cabinet.' },
+            { label: 'The app', note: 'A screen capture mid-session, filters visible.' },
+            { label: 'The strips', note: 'Several real prints, overlapped. Show the seasonal variants together if more than one exists.' },
+          ],
+          ratio: '4 / 5',
+        },
+        {
+          type: 'ledger',
+          eyebrow: 'Where it stands',
+          rows: [
+            ['Strips printed since launch', '/* PLACEHOLDER */'],
+            ['Posts and stories tagging the booth', '/* PLACEHOLDER */'],
+            ['Seasonal strip designs shipped', '/* PLACEHOLDER */'],
+            ['Cost per strip', '/* PLACEHOLDER */'],
+          ],
+        },
+      ],
+    },
+    {
+      id: 'growth',
+      label: 'Marketing growth',
+      blocks: [
+        {
+          type: 'prose',
+          items: [
+            'Delivery apps take a cut of every order, so growth meant two things at once.',
+          ],
+        },
+        {
+          type: 'cards',
+          noIndex: true,
+          items: [
+            {
+              title: 'Make the apps work harder',
+              body: 'A reviews-first plan, bundles and add-ons in place of deep discounts, clearer dish names for search, and a win-back offer for lapsed customers.',
+            },
+            {
+              title: 'Move regulars to direct',
+              body: 'A Square Online site, and a 10%-off pickup code that goes home in every bag.',
+            },
+          ],
+        },
+        {
+          type: 'slot',
+          items: [
+            { label: 'A delivery-app listing', note: 'The refreshed photography and dish names in situ, as a customer meets them.', ratio: '9 / 16' },
+            { label: 'The Square Online storefront', note: 'The direct-ordering site.', ratio: '16 / 10' },
+          ],
+        },
+        {
+          type: 'ledger',
+          eyebrow: 'Where it stands',
+          rows: [
+            ['Sales change, period over period', '/* PLACEHOLDER */'],
+            ['Delivery-app rating, before and now', '/* PLACEHOLDER */'],
+            ['Review volume', '/* PLACEHOLDER */'],
+            ['Share of orders now direct', '/* PLACEHOLDER */'],
+            ['Redemptions of the 10% pickup code', '/* PLACEHOLDER */'],
+            ['Repeat-order rate', '/* PLACEHOLDER */'],
+          ],
+        },
+      ],
+    },
+    {
+      id: 'plan',
+      label: '310table: the plan',
+      blocks: [
+        {
+          type: 'prose',
+          items: [
+            '310table is the marketing team I am building to run across both restaurants, so the brand does not depend on me.',
+            'The brand works in layers. Emporium Thai is the umbrella that lives online, carrying the family story, our Southern Thai roots and the elephant. Market and Cuisine each keep their own look in person.',
+            'The team is organised into four pods, borrowed from a growth internship I did at a startup.',
+          ],
+        },
+        {
+          type: 'cards',
+          noIndex: true,
+          items: [
+            { title: 'Content & Social', body: 'Video, posts, and keeping the playbook current.' },
+            { title: 'Community', body: 'Comments, DMs, reviews, and customer reposts.' },
+            { title: 'Events & Partnerships', body: 'Catering, collabs, and local organisations.' },
+            { title: 'Guerrilla & Outreach', body: 'Flyers, street-level ideas, and email.' },
+          ],
+        },
+        {
+          type: 'prose',
+          items: [
+            'Each pod owns one metric and reports it weekly. I am starting with one or two people on two-week trials, working alongside them rather than managing from above. We are also turning a space above the Westwood restaurant into the team’s workroom.',
+          ],
+        },
+        {
+          type: 'ledger',
+          eyebrow: 'The number each pod reports',
+          headers: ['Pod', 'Its one metric'],
+          rows: [
+            ['Content & Social', '/* PLACEHOLDER */'],
+            ['Community', '/* PLACEHOLDER */'],
+            ['Events & Partnerships', '/* PLACEHOLDER */'],
+            ['Guerrilla & Outreach', '/* PLACEHOLDER */'],
+          ],
+        },
+        {
+          type: 'slot',
+          items: [
+            { label: 'The brand layers', note: 'Emporium Thai as the online umbrella, Market and Cuisine under it. A drawn diagram, not a photo — this is the part of the plan that is hardest to say in a sentence.', ratio: '4 / 3' },
+            { label: 'The workroom above Westwood', note: 'As it is now, before the fit-out.', ratio: '4 / 3' },
+          ],
+        },
+        {
+          type: 'statement',
+          text: 'Year one: lines out the door driven by Instagram, a presence at LA food and entertainment events, and one coherent look from the feed to the dining room.',
+        },
+      ],
+    },
+  ],
+}
+
+export const ALLIED = templateStudy({
+  slug: 'allied-global-marketing',
+  title: 'Allied Global Marketing',
+  tagline: 'Entertainment campaign work for a global agency.',
+  brand: { font: "'DM Sans', sans-serif", weight: 700, color: '#55493c', letterSpacing: '-0.035em' },
+  meta: [
+    ['Client', 'Allied Global Marketing'],
+    ['My role', '/* PLACEHOLDER */ Role'],
+    ['Timeline', '/* PLACEHOLDER */ Dates'],
+    ['Tools', '/* PLACEHOLDER */ Tools'],
+  ],
+  intro: '/* PLACEHOLDER */ One sentence on what the work was.',
+})
+
+export const AIDENTITY = templateStudy({
+  slug: 'aidentity',
+  title: 'AIdentity',
+  tagline: 'Product design for an AI identity tool.',
+  brand: { font: "'Unbounded', sans-serif", weight: 600, color: '#693E5E', letterSpacing: '-0.04em' },
+  meta: [
+    ['Client', '/* PLACEHOLDER */ Team or client'],
+    ['My role', 'Product Design'],
+    ['Timeline', '2026'],
+    ['Tools', 'Figma, React'],
+  ],
+  intro: '/* PLACEHOLDER */ One sentence on what AIdentity is and what you made.',
+})
+
+export const KATSALIYA = templateStudy({
+  slug: 'katsaliya',
+  title: 'katsaliya.com',
+  tagline: 'This site — React and Vite, GSAP riding a Lenis ticker, built end to end in Claude Code and Cursor.',
+  brand: { font: "'Coneria Script Slanted', cursive", weight: 400, color: '#000000', letterSpacing: '-0.01em' },
+  meta: [
+    ['Client', 'Self-initiated'],
+    ['My role', 'Design & Build'],
+    ['Timeline', '2026'],
+    ['Tools', 'React, Vite, GSAP, Lenis, three.js, Claude Code, Cursor'],
+  ],
+  intro: 'The portfolio you are reading. Designed and built end to end, with the whole process run through Claude Code and Cursor.',
+})
+
+export const CASE_STUDIES = {
+  bluecore: BLUECORE,
+  known: KNOWN,
+  'emporium-thai-market': EMPORIUM,
+  'allied-global-marketing': ALLIED,
+  aidentity: AIDENTITY,
+  katsaliya: KATSALIYA,
+}

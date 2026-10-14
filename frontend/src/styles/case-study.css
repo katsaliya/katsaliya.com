@@ -2188,6 +2188,85 @@
   color: var(--walnut-faint);
 }
 
+/* ── SLOT — reserved artwork ──────────────────────────────────────────
+   Built from .cs-placeholder's vocabulary (dashed hairline on ivory-deep)
+   so an empty page still reads as this page and not as a wireframe. The
+   boxes carry their own aspect ratio inline, which is the point: the
+   layout below them is already final. */
+.cs-slots-wrap {
+  margin-block: var(--cs-gap-lg);
+}
+
+.cs-slots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--cs-gap-sm);
+}
+
+/* Two up from 700, then the full count from 1100 — a four-up of phone
+   crops at 700px wide is four 150px thumbnails, which shows nothing. */
+@media (min-width: 700px) {
+  .cs-slots { grid-template-columns: repeat(min(var(--slot-count), 2), minmax(0, 1fr)); }
+}
+
+@media (min-width: 1100px) {
+  .cs-slots { grid-template-columns: repeat(var(--slot-count), minmax(0, 1fr)); }
+}
+
+.cs-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: var(--cs-gap-sm);
+  border: 1px dashed var(--border-alpha);
+  border-radius: 6px;
+  background: var(--ivory-deep);
+  text-align: center;
+}
+
+.cs-slot-tag {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-family: var(--cs-sans);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--walnut-faint);
+}
+
+.cs-slot-ratio {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-family: var(--cs-sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--walnut-faint);
+}
+
+.cs-slot-label {
+  max-width: 34ch;
+  font-family: var(--cs-sans);
+  font-size: var(--cs-t-meta);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--walnut);
+}
+
+.cs-slot-note {
+  max-width: 40ch;
+  font-family: var(--cs-sans);
+  font-size: var(--cs-t-micro);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--walnut-faint);
+}
+
 /* The masthead's live orb. LogoOrb is a whole hero composition — a canvas,
    decorative rings offset well outside their box, and an <h1> — so in the
    masthead it is cropped to the canvas and the heading is removed. Without

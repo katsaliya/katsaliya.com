@@ -15,53 +15,61 @@
 // Selected work cards use, rather than with silence. Add the route here
 // when a case study lands and the card starts working with no other change.
 //
-// The two "Coming Soon" entries are flat colour placeholders, not real
-// projects — interleaved with the photographic thumbnails on purpose. The
-// ring's goo/crossfade reads far more clearly between two high-contrast flat
-// colours than between two similar light-UI screenshots, so spacing them out
-// does double duty: pads the ring toward its fuller 18-card feel now, and
-// gives the melt effect something more legible to work with at each seam.
-// Replace them with real projects as you build more case studies — same
-// requirement as any other entry: name, type, year, and your own thumbnail.
+// THE "COMING SOON" PLACEHOLDERS ARE GONE, and with them the one argument
+// for keeping them: they were flat colour interleaved between photographs
+// because the ring's goo/crossfade reads more clearly between two
+// high-contrast fills than between two similar images. All six cards are
+// photographic now, so each seam melts between two mid-tone images and the
+// effect is quieter than it was. That is the cost of a ring with no filler
+// in it, and it is the right trade — every card goes somewhere.
 export const PROJECTS = [
+  {
+    /* The real market shot, not the flagged stand-in. The placeholder
+       carried a "replace with real art" TODO and there was real art two
+       folders away, already serving this project on the home page. */
+    file: 'images/about/emporium-thai-market.jpg',
+    name: 'Emporium Thai Market',
+    type: 'Brand & Web',
+    year: '2026',
+    href: '/emporium-thai-market',
+  },
+  {
+    /* The Where I've been photograph, replacing the monitor mock-up. */
+    file: 'images/about/known.jpg',
+    name: 'Known',
+    type: 'Content & Design',
+    year: '2025',
+    href: '/known',
+  },
+  {
+    file: 'images/about/allied-global-marketing.jpg',
+    name: 'Allied Global Marketing',
+    type: 'Entertainment Marketing',
+    year: '2025',
+    href: '/allied-global-marketing',
+  },
   {
     file: 'images/cards/demo-bluecore.webp',
     name: 'BlueCore',
-    href: '/bluecore',
     type: 'Product Design',
     year: '2025',
-  },
-  {
-    file: 'work-carousel/coming-soon-1.webp',
-    name: 'Coming Soon',
-    type: 'TBD',
-    year: '2026',
-  },
-  {
-    file: 'images/cards/demo-known.png',
-    name: 'Known',
-    href: '/known',
-    type: 'Content & Design',
-    year: '2025',
-  },
-  {
-    file: 'work-carousel/coming-soon-2.webp',
-    name: 'Coming Soon',
-    type: 'TBD',
-    year: '2026',
+    href: '/bluecore',
   },
   {
     file: 'images/cards/demo-aidentity.png',
     name: 'AIdentity',
     type: 'Product Design',
     year: '2026',
+    href: '/aidentity',
   },
   {
-    file: 'work-carousel/emporium-placeholder.webp', // TODO: replace with real art
-    name: 'Emporium Thai Market',
-    type: 'Brand & Web',
+    file: 'images/selected-work/katsaliya.jpg',
+    name: 'katsaliya.com',
+    type: 'Front-End Development',
     year: '2026',
+    href: '/katsaliya',
   },
 ]
+
 
 export const IMAGE_FILES = PROJECTS.map((p) => p.file)

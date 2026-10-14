@@ -311,6 +311,46 @@ function Strip({ items, caption, reduceMotion }) {
   )
 }
 
+/* ── SLOT — a reserved place for artwork that does not exist yet ──────────
+   A case study with no pictures in it is a memo. These mark where each
+   piece of media goes, at the aspect ratio it will be cropped to, so the
+   page already has its real rhythm before a single file lands — drop a
+   JPEG in and nothing below it moves.
+
+   NOT A <Figure> WITH A MISSING src. Figure renders an <img> unconditionally,
+   so an empty one is a broken-image icon and a collapsed box. This states
+   what belongs there instead, which also makes the list of what still has
+   to be shot readable straight off the page.
+
+   `label` is the shot; `note` is the direction for taking it. Every one is
+   greppable as `type: 'slot'`, and swapping it for a figure/strip is a
+   one-line change in the data. */
+function Slot({ label, note, items, ratio = '16 / 9', count = 1, caption, wide }) {
+  /* Two ways to ask for the same thing: `items` when each box is a
+     different shot, `label` + `count` when they are N of one kind. */
+  const cells = items ?? Array.from({ length: count }, (_, i) => ({
+    label: count > 1 ? `${label} (${i + 1} of ${count})` : label,
+    note,
+  }))
+  return (
+    <div className={`cs-slots-wrap ${wide ? 'cs-bleed' : ''}`}>
+      <div className="cs-slots" style={{ '--slot-count': cells.length }}>
+        {cells.map((c, i) => (
+          <div key={i} className="cs-slot" style={{ aspectRatio: c.ratio || ratio }}>
+            <span className="cs-slot-tag">Artwork</span>
+            <span className="cs-slot-label">{c.label}</span>
+            {(c.note ?? note) && <span className="cs-slot-note">{c.note ?? note}</span>}
+            <span className="cs-slot-ratio" aria-hidden="true">
+              {(c.ratio || ratio).replace(/\s/g, '')}
+            </span>
+          </div>
+        ))}
+      </div>
+      {caption && <p className="cs-caption">{caption}</p>}
+    </div>
+  )
+}
+
 function LinkGrid({ kind, items }) {
   return (
     <div className={`cs-links cs-links--${kind}`}>
@@ -1213,6 +1253,7 @@ function Block({ block, reduceMotion }) {
     case 'figure':    return <Figure {...block} />
     case 'strip':     return <Strip {...block} reduceMotion={reduceMotion} />
     case 'links':     return <LinkGrid {...block} />
+    case 'slot':      return <Slot {...block} />
     case 'disclosure': return <Disclosure {...block} reduceMotion={reduceMotion} />
     case 'orb':       return <Orb {...block} />
     default:          return null
@@ -1338,6 +1379,13 @@ export default function CaseStudy({ study, reduceMotion = false }) {
                     hero's bottom edge. Nothing here uses transform for
                     layout, so the timeline can own it. */}
                 <div className="relative h-full flex items-center justify-end">
+                  {/* THE MOTIF HOLDS THE PAGE MARGIN. This used to carry
+                      mr-[-2vw] by default, which put every hero graphic
+                      20-51px (2vw) past the shell's own 32px padding — so
+                      the masthead and the section nav stopped on the margin
+                      and the graphic did not. `bleed` keeps that available
+                      for a shape that wants to run off the edge, but it is
+                      now something a study asks for rather than the rule. */}
                   {/* LIVE, not a still. The PNG was a frame of this same orb;
                       the real one breathes and responds to the cursor, which
                       is the thing the copy below claims about it. LogoOrb is
@@ -1350,7 +1398,7 @@ export default function CaseStudy({ study, reduceMotion = false }) {
                       324px inside a 520px request. */}
                   <div
                     ref={motifRef}
-                    className={`cs-hero-motif ${motif.live ? 'cs-hero-motif--live' : ''} ${motif.video ? 'cs-hero-motif--clip' : ''} hidden lg:block mr-[-2vw] opacity-0`}
+                    className={`cs-hero-motif ${motif.live ? 'cs-hero-motif--live' : ''} ${motif.video ? 'cs-hero-motif--clip' : ''} hidden lg:block ${motif.bleed ? 'mr-[-2vw]' : ''} opacity-0`}
                     style={motif.live ? { width: orbSize, height: orbSize } : undefined}
                   >
                     {/* Three kinds of motif: the live orb sizes itself to an
@@ -1371,7 +1419,27 @@ export default function CaseStudy({ study, reduceMotion = false }) {
                         className="block h-[46vh] w-auto max-w-none"
                       />
                     ) : (
-                      <img src={motif.src} alt="" className="block h-[52vh] w-auto max-w-none" />
+                      /* BOUNDED ON BOTH AXES, not just height. h-[52vh] with
+                         w-auto is fine for the orb and the Known clip, which
+                         are roughly square — on a wide one it is not: the
+                         Emporium mural is 2.3:1, so 52vh of height came out
+                         1096px wide and laid the elephants straight across
+                         the wordmark and the whole meta table.
+
+                         Capping both lets whichever axis binds first win, so
+                         a portrait still is held by its height and a
+                         panoramic one by its width, with no per-image
+                         numbers to keep.
+
+                         36vw rather than the 42 that .cs-brand's 58% cap
+                         leaves over: at 42 the two boxes abut exactly and
+                         a wide wordmark ends where the motif begins, with
+                         no air between them. */
+                      <img
+                        src={motif.src}
+                        alt=""
+                        className="block h-auto w-auto max-h-[52vh] max-w-[36vw]"
+                      />
                     )}
                   </div>
                 </div>
@@ -1398,6 +1466,20 @@ export default function CaseStudy({ study, reduceMotion = false }) {
                           fontWeight: brand.weight,
                           color: brand.color,
                           letterSpacing: brand.letterSpacing,
+                          /* Both optional. `size` is for wordmarks long
+                             enough that the shared clamp breaks them over
+                             two lines; `uppercase` is for the ones that
+                             are set in caps but stored in the title case
+                             the rest of the site reads them in. Tracking
+                             applies after the last letter too, so the
+                             trailing gap is pulled back off the box. */
+                          ...(brand.size ? { fontSize: brand.size } : null),
+                          ...(brand.uppercase
+                            ? {
+                                textTransform: 'uppercase',
+                                marginRight: `-${brand.letterSpacing || '0em'}`,
+                              }
+                            : null),
                         }
                       : { fontFamily: SCRIPT_FONT, filter: 'url(#name-chalk-texture)' }
                   }
