@@ -106,10 +106,10 @@ const WORKS = [
     discipline: 'Brand & Strategy',
     ink: 'var(--aqua-ink)',
     title: 'Emporium Thai Market',
-    note: 'Brand and growth strategy for the launch of a new restaurant in Los Angeles.',
+    note: 'Design, social and growth for a second restaurant on Sawtelle — built while the doors are open.',
     meta: 'Creative & Growth Lead',
     image: '/images/selected-work/emporium-thai-market.jpg',
-    href: null,
+    href: '/emporium-thai-market',
   },
   {
     numeral: '2',
