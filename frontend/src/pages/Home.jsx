@@ -60,7 +60,7 @@ const FONT = "'DM Sans', sans-serif"
    in particular is a GSAP selector, so changing it here without changing
    the hero-scene timeline silently drops the paragraph's stagger. ─── */
 const TLDR_COPY =
-  'I bridge tech and storytelling, from leading social growth at an AI startup to running creative for a family restaurant brand in LA. My work spans product design, growth marketing, and social media, and launch day is always my favorite: making something new feel impossible to miss.'
+  'I bridge tech and storytelling, from leading social growth at an AI startup to running creative for a 25+ year-old LA restaurant brand. My work spans product design, growth marketing, and social media, and launch day is always my favorite: making something new feel impossible to miss.'
 
 export default function Home() {
   const { pathname } = useLocation()
