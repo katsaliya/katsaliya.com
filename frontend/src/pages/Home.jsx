@@ -516,7 +516,7 @@ export default function Home() {
                         className="text-[16px] leading-[1.54] text-[var(--walnut-soft)]"
                         style={{ fontFamily: FONT, fontWeight: 400 }}
                       >
-                        (Kataliya Sungkamee)
+                        (TLDR)
                       </span>
                     </div>
                     {/* Split per word so the paragraph resolves in a stagger
