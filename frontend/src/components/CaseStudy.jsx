@@ -368,6 +368,107 @@ function LinkGrid({ kind, items }) {
   )
 }
 
+/* ── REELS — featured short-form clips ───────────────────────────────────
+   A row of 9:16 frames. `video` is the clip (in /public/video) with a
+   `poster` still; the accounts these came from are no longer public, so the
+   clip IS the exhibit rather than a preview of a link. `href` is optional
+   and makes the card link out when there is somewhere to go.
+
+   Each clip plays muted only while it is on screen and loads nothing until
+   it gets there — five of them autoplaying on page load would be ~25MB the
+   reader never asked for. A click turns the sound on for that one clip and
+   off for the rest. `fit: 'contain'` letterboxes a landscape clip inside the
+   portrait frame instead of cropping its type off. Reduced motion: poster
+   only, until clicked. */
+function Reel({ r, i, reduceMotion, active, onActivate }) {
+  const ref = useRef(null)
+  const Tag = r.href ? 'a' : 'figure'
+  const linkProps = r.href ? { href: r.href, target: '_blank', rel: 'noopener noreferrer' } : {}
+
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && (!reduceMotion || active)) v.play().catch(() => {})
+      else v.pause()
+    }, { threshold: 0.35 })
+    io.observe(v)
+    return () => io.disconnect()
+  }, [reduceMotion, active])
+
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    v.muted = !active
+    if (active) v.play().catch(() => {})
+  }, [active])
+
+  return (
+    <Tag {...linkProps} className={`cs-reel ${r.href ? 'is-link' : ''}`}>
+      <div className={`cs-reel-frame ${r.fit === 'contain' ? 'is-contain' : ''}`}>
+        {r.video ? (
+          <>
+            <video
+              ref={ref}
+              src={r.video}
+              poster={r.poster}
+              loop
+              muted
+              playsInline
+              preload="none"
+              aria-label={r.label}
+            />
+            {!r.href && (
+              <button
+                type="button"
+                className="cs-reel-sound"
+                aria-pressed={active}
+                aria-label={active ? `Mute ${r.label}` : `Play ${r.label} with sound`}
+                onClick={() => onActivate(active ? null : i)}
+              >
+                <span aria-hidden="true">{active ? 'Sound on' : 'Tap for sound'}</span>
+              </button>
+            )}
+          </>
+        ) : (
+          <span className="cs-reel-empty" aria-hidden="true">▶</span>
+        )}
+      </div>
+      <span className="cs-reel-caption">
+        <span className="cs-link-index" style={{ fontFamily: SCRIPT_FONT }}>
+          {String(i + 1).padStart(2, '0')}
+        </span>
+        <span className="cs-reel-label">{r.label}</span>
+        {r.href && <span className="cs-link-arrow" aria-hidden="true">↗</span>}
+      </span>
+    </Tag>
+  )
+}
+
+function Reels({ items, reduceMotion }) {
+  const [active, setActive] = useState(null)
+  return (
+    <div
+      className="cs-reels"
+      style={{
+        '--reel-cols-md': Math.min(items.length, 3),
+        '--reel-cols-lg': Math.min(items.length, 5),
+      }}
+    >
+      {items.map((r, i) => (
+        <Reel
+          key={r.video || r.href || i}
+          r={r}
+          i={i}
+          reduceMotion={reduceMotion}
+          active={active === i}
+          onActivate={setActive}
+        />
+      ))}
+    </div>
+  )
+}
+
 function Orb({ text }) {
   return (
     <div className="cs-feature">
@@ -1253,6 +1354,7 @@ function Block({ block, reduceMotion }) {
     case 'figure':    return <Figure {...block} />
     case 'strip':     return <Strip {...block} reduceMotion={reduceMotion} />
     case 'links':     return <LinkGrid {...block} />
+    case 'reels':     return <Reels {...block} reduceMotion={reduceMotion} />
     case 'slot':      return <Slot {...block} />
     case 'disclosure': return <Disclosure {...block} reduceMotion={reduceMotion} />
     case 'orb':       return <Orb {...block} />

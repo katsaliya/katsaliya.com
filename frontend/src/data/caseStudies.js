@@ -420,21 +420,6 @@ export const BLUECORE = {
   ],
 }
 
-/* ── Known ────────────────────────────────────────────────────────────── */
-
-const PRINT_ITEMS = [
-  '/known/print/flyer-car-show.png',
-  '/known/print/welcome-print.png',
-  ...Array.from({ length: 10 }, (_, i) => `/known/print/aps-${i + 1}.png`),
-  ...Array.from({ length: 3 }, (_, i) => `/known/print/blind-match-${i + 1}.png`),
-  ...Array.from({ length: 2 }, (_, i) => `/known/print/first-date-fund-${i + 1}.png`),
-  ...Array.from({ length: 4 }, (_, i) => `/known/print/match-mixer-${i + 1}.png`),
-  ...Array.from({ length: 2 }, (_, i) => `/known/print/sf-dating-${i + 1}.png`),
-  ...Array.from({ length: 4 }, (_, i) => `/known/print/summer-i-${i + 1}.png`),
-  ...Array.from({ length: 10 }, (_, i) => `/known/print/date-card-${i + 1}.png`),
-  ...Array.from({ length: 5 }, (_, i) => `/known/print/playing-card-${i + 1}.png`),
-]
-
 export const KNOWN = {
   slug: 'known',
   title: 'Known',
@@ -446,8 +431,7 @@ export const KNOWN = {
 
   tagline: 'Brand voice for a Series A startup, built from nothing.',
   description:
-    'Content, marketing materials and graphics for an AI-matchmaking startup — ' +
-    'building a voice from the ground up and shipping across social, pitch and product.',
+    'Content, marketing and graphics for an AI-matchmaking startup — a brand voice built from nothing, by testing until it worked.',
 
   /* The two profile links used to be a whole block of link cards. As a meta
      row they cost nothing and sit where a reader looks for the facts. */
@@ -471,15 +455,14 @@ export const KNOWN = {
     items: [
       { meta: 'TikTok', title: '@known', href: 'https://www.tiktok.com/@known' },
       { meta: 'TikTok', title: '@celesteamadon', href: 'https://www.tiktok.com/@celesteamadon' },
-      { meta: 'Instagram', title: '@known', href: 'https://www.instagram.com/known' },
-      { meta: 'Instagram', title: '@celesteamadon', href: 'https://www.instagram.com/celesteamadon' },
+      { meta: 'LinkedIn', title: 'Celeste Amadon', href: 'https://www.linkedin.com/in/celeste-amadon/' },
       { meta: 'Archive', title: 'More content & materials — full drive', href: 'https://drive.google.com/drive/u/0/folders/1H9y6vbSxJSMMf4cVOHMhbosSjQcYLcZx' },
     ],
   },
 
   movements: [
-    { id: 'overview', number: '01', script: 'The', sans: 'overview', sections: ['overview'] },
-    { id: 'approach', number: '02', script: 'My',  sans: 'approach', sections: ['system', 'work'] },
+    { id: 'overview', number: '01', script: 'The', sans: 'overview', sections: ['overview', 'work'] },
+    { id: 'approach', number: '02', script: 'My',  sans: 'approach', sections: ['system'] },
     { id: 'impact',   number: '03', script: 'The', sans: 'impact',   sections: ['outcome', 'takeaways'], tone: 'plum' },
   ],
 
@@ -498,9 +481,7 @@ export const KNOWN = {
                 {
                   type: 'prose',
                   items: [
-                    'Known had no social presence pre-launch and needed an audience before it had a product to sell.',
-                    /* PLACEHOLDER — what made that hard. */
-                    'At the start, we had nothing to work from — no audience, no structure, not even the accounts set up yet.',
+                    'Known needed an audience before it had a product to sell — and started with no followers, no playbook and no accounts set up.',
                   ],
                 },
                 {
@@ -524,7 +505,7 @@ export const KNOWN = {
                 {
                   type: 'prose',
                   items: [
-                    'I helped shape the brand voice across TikTok and Instagram as content creator, strategist and graphic designer - and planned and executed weekly activations and events to build traction with the community',
+                    'I took on the content, strategy and design: found the brand’s voice, tested formats until the numbers moved, built a weekly system the team could sustain — and learned the tools as I needed them.',
                   ],
                 },
               ],
@@ -537,35 +518,44 @@ export const KNOWN = {
     {
       id: 'system',
       label: 'System',
-      title: 'A weekly loop that made content repeatable.',
+      title: 'Testing until it worked.',
       blocks: [
         {
           type: 'journey',
-          title: 'PLACEHOLDER — a title for the loop, in the register of BlueCore\u2019s.',
-          label: 'The weekly content loop, from brief to iteration',
+          title: 'Test, measure, keep what works',
+          label: 'How the content loop was found: from daily posting to a sustainable weekly rhythm',
           phases: [
             {
-              phase: 'Set up',
+              phase: 'Test',
               tone: 'research',
               items: [
-                { label: ['Brief and', 'platform audit'] },
-                { label: ['Content pillar', 'definition'], key: true },
+                { label: ['Daily posting,', 'for as long as it held'] },
+                { label: ['Formats, hooks,', 'lengths & tone'], key: true },
+                { label: ['Editing styles', 'per series'] },
               ],
             },
             {
-              phase: 'Produce',
+              phase: 'Measure',
               tone: 'prototype',
               items: [
-                { label: ['Shoot and direct,', 'same-day turnaround'], key: true },
-                { label: ['Edit in CapCut —', 'music, captions, pacing'], key: true },
+                { label: ['Signups, RSVPs', '& follower growth'], key: true },
+                { label: ['Week to week,', 'event to event'] },
               ],
             },
             {
-              phase: 'Ship',
+              phase: 'Settle',
+              tone: 'reposition',
+              items: [
+                { label: ['DIML, founder series', '& events rotation'], key: true },
+                { label: ['Reuse footage', 'across accounts'] },
+              ],
+            },
+            {
+              phase: 'Scale',
               tone: 'build',
               items: [
-                { label: ['Post and', 'monitor'] },
-                { label: ['Iterate on', 'performance'], key: true },
+                { label: ['High-fidelity', 'campaigns when needed'], key: true },
+                { label: ['Trends handed', 'to the interns'] },
               ],
             },
           ],
@@ -575,73 +565,112 @@ export const KNOWN = {
           type: 'phases',
           items: [
             {
-              title: 'Finding the voice',
-              lead: 'The tone came from what the founder could actually do on camera. A written hook read as inauthentic from someone who is not a performer, so the script became the way she already talks. Two audiences turned up \u2014 people waiting for the app, and people there for the founder\u2019s life \u2014 so the content romanticised both, and led with an opinion rather than narrating what was already on screen.',
+              title: 'Test everything',
+              lead: 'With no playbook, I posted daily and kept changing the series, the edit, the hook, the length, and whether a piece played funny or serious — then kept what moved the numbers.',
+              details: [
+                {
+                  title: 'What I tested',
+                  subtitle: 'Formats, edits and tone',
+                  points: [
+                    'New founder series, like the dos and don’ts of a date',
+                    'Editing styles, hooks, lengths, funny against serious',
+                  ],
+                },
+                {
+                  title: 'What we watched',
+                  subtitle: 'Attention versus acquisition',
+                  points: [
+                    'Signups, RSVPs and follower growth, week to week and event to event',
+                    'Attention and signups came from different content — so each got its own job',
+                  ],
+                },
+              ],
+            },
+            {
+              title: 'Find the voice',
+              lead: 'The founder isn’t a performer, so the script became the way she already talks. Two audiences showed up — people waiting for the app, and people there for her life — and the content served both.',
               details: [
                 {
                   title: 'Day in my life',
                   subtitle: 'Humanise the founder',
                   points: [
-                    'Built parasocial trust \u2014 the audience followed the founder\u2019s life, not only the product behind it',
-                    'Reused footage rather than shooting fresh \u2014 only the script and the voiceover had to be specific to that day',
-                    'Shot one core moment per day and recut general clips (GRWM, routine, commute) underneath it',
+                    'One core moment a day, with recycled GRWM, routine and commute clips cut underneath',
+                    'It clicked when it created FOMO: quick chops, plus one lesson or opinion unique to that day',
                   ],
                 },
                 {
                   title: 'Founder series',
                   subtitle: 'Establish credibility',
                   points: [
-                    'Built credibility with users and potential partners for a pre-launch company',
-                    'Leaned into the founder being a 21-year-old woman rather than playing it down \u2014 the position was the angle, not a caveat',
-                    'Part of the audience came for the process, not the product \u2014 founder grind as motivation and guidance, especially in San Francisco',
+                    'A 21-year-old woman founder in San Francisco — the position was the angle, not a caveat',
+                    'It clicked as out of pocket and silly but real, amplified with CapCut sound effects, text and stickers',
                   ],
                 },
               ],
             },
             {
-              title: 'PLACEHOLDER — build the system',
-              lead: 'PLACEHOLDER — the move from one-off posts to a repeatable weekly cadence, and what that changed.',
+              title: 'Build a rhythm we could keep',
+              lead: 'Daily posting wasn’t sustainable. I replaced it with a rotation — day in my life, founder series, events — shared across every account, with interns covering trends.',
               details: [
                 {
                   title: 'Events',
                   subtitle: 'Drive in-person signups',
                   points: [
-                    'Turned online audience into community proof at real events',
-                    'PLACEHOLDER — signups or attendance driven',
+                    'Marketing and recaps made our events feel exclusive — like the whole city was going',
                   ],
                 },
                 {
-                  title: 'PLACEHOLDER — editing style',
-                  subtitle: 'PLACEHOLDER — what makes a cut read as Known',
+                  title: 'Reuse and recycle',
+                  subtitle: 'One shoot, many posts',
                   points: [
-                    'PLACEHOLDER — pacing, music, caption treatment',
-                    'PLACEHOLDER — what you standardised so it could scale',
+                    'Footage recut across all three series and every account',
+                    'The time saved went into high-fidelity campaigns',
                   ],
                 },
               ],
             },
-            {
-              title: 'PLACEHOLDER — scale what worked',
-              lead: 'PLACEHOLDER — what the data changed, and the brand system that grew out of it across print and digital.',
-              details: [
-                {
-                  title: 'PLACEHOLDER — what performed',
-                  subtitle: 'Reading the numbers',
-                  points: [
-                    'PLACEHOLDER — the format that outperformed and why',
-                    'PLACEHOLDER — what you stopped making',
-                  ],
-                },
-                {
-                  title: 'PLACEHOLDER — the brand grew',
-                  subtitle: 'From feed to print',
-                  points: [
-                    'Same voice carried into flyers, date cards, playing cards and magazine spreads',
-                    'PLACEHOLDER — how the system held up off-screen',
-                  ],
-                },
-              ],
-            },
+          ],
+        },
+
+        {
+          type: 'prose',
+          items: [
+            'Graphics for our events — flyers, date cards and playing cards.',
+          ],
+        },
+
+        /* A selection, not the inventory — three of each repeated kind. The
+           full drive is one click away in the outro. */
+        {
+          type: 'strip',
+          items: [
+            '/known/print/flyer-car-show.jpg',
+            '/known/print/welcome-print.jpg',
+            '/known/print/aps-4.jpg',
+            '/known/print/aps-8.jpg',
+            '/known/print/blind-match-1.jpg',
+            '/known/print/blind-match-2.jpg',
+            '/known/print/blind-match-3.jpg',
+            '/known/print/first-date-fund-1.jpg',
+            '/known/print/first-date-fund-2.jpg',
+            '/known/print/match-mixer-1.jpg',
+            '/known/print/match-mixer-2.jpg',
+            '/known/print/match-mixer-3.jpg',
+            '/known/print/match-mixer-4.jpg',
+            '/known/print/sf-dating-1.jpg',
+            '/known/print/sf-dating-2.jpg',
+            '/known/print/summer-i-1.jpg',
+            '/known/print/summer-i-2.jpg',
+            '/known/print/summer-i-3.jpg',
+            '/known/print/summer-i-4.jpg',
+            '/known/print/date-card-1.jpg',
+            '/known/print/date-card-5.jpg',
+            '/known/print/date-card-9.jpg',
+            '/known/print/playing-card-1.jpg',
+            '/known/print/playing-card-2.jpg',
+            '/known/print/playing-card-3.jpg',
+            '/known/print/playing-card-4.jpg',
+            '/known/print/playing-card-5.jpg',
           ],
         },
       ],
@@ -650,85 +679,20 @@ export const KNOWN = {
     {
       id: 'work',
       label: 'The work',
-      title: 'Forty-two pieces in four months.',
+      title: 'Featured work.',
       blocks: [
-        /* PLACEHOLDER — four short clips, autoplaying muted in a row, replace
-           these text links. That row is the point of the case study: it shows
-           the editing rather than describing it. Four cards all reading
-           "Featured" prove nothing, and are here only so the links survive
-           until the clips exist. */
+        /* One clip per pillar of the rotation in the System section:
+           founder, founder series, social, then an event from launch to
+           recap. Re-encoded from the originals to 540px H.264 (~25MB for all
+           five, from 107MB). No `href` — the accounts went private. */
         {
-          type: 'links',
-          kind: 'tiktok',
+          type: 'reels',
           items: [
-            { label: 'PLACEHOLDER — name the post', href: 'https://www.tiktok.com/video/7541552580887907615/' },
-            { label: 'PLACEHOLDER — name the post', href: 'https://www.tiktok.com/video/7548243888914353439/' },
-            { label: 'PLACEHOLDER — name the post', href: 'https://www.tiktok.com/video/7520841844310199582/' },
-            { label: 'PLACEHOLDER — name the post', href: 'https://www.tiktok.com/video/7532327613310831903/' },
-          ],
-        },
-
-        {
-          type: 'prose',
-          items: [
-            'Flyers, date cards, playing cards, event collateral and magazine spreads — the same voice carried off-screen.',
-          ],
-        },
-
-        /* Curated to 28 of 42. Ten near-identical `aps` and ten `date-card`
-           variations were half the run and crowded out the other eight kinds
-           of work; three of each shows the range without the inventory. The
-           full set is one click away in the outro. */
-        {
-          type: 'strip',
-          items: [
-            '/known/print/flyer-car-show.png',
-            '/known/print/welcome-print.png',
-            '/known/print/aps-1.png',
-            '/known/print/aps-4.png',
-            '/known/print/aps-8.png',
-            '/known/print/blind-match-1.png',
-            '/known/print/blind-match-2.png',
-            '/known/print/blind-match-3.png',
-            '/known/print/first-date-fund-1.png',
-            '/known/print/first-date-fund-2.png',
-            '/known/print/match-mixer-1.png',
-            '/known/print/match-mixer-2.png',
-            '/known/print/match-mixer-3.png',
-            '/known/print/match-mixer-4.png',
-            '/known/print/sf-dating-1.png',
-            '/known/print/sf-dating-2.png',
-            '/known/print/summer-i-1.png',
-            '/known/print/summer-i-2.png',
-            '/known/print/summer-i-3.png',
-            '/known/print/summer-i-4.png',
-            '/known/print/date-card-1.png',
-            '/known/print/date-card-5.png',
-            '/known/print/date-card-9.png',
-            '/known/print/playing-card-1.png',
-            '/known/print/playing-card-2.png',
-            '/known/print/playing-card-3.png',
-            '/known/print/playing-card-4.png',
-            '/known/print/playing-card-5.png',
-          ],
-        },
-
-        {
-          type: 'disclosure',
-          summary: 'Print files',
-          hint: 'five PDFs, as sent to the printer',
-          blocks: [
-            {
-              type: 'links',
-              kind: 'file',
-              items: [
-                { label: 'Blind Match', detail: 'PDF', href: '/known/print/blind-match.pdf' },
-                { label: 'Flyer prints', detail: 'PDF', href: '/known/print/flyer-prints.pdf' },
-                { label: 'Flyer variation', detail: 'PDF', href: '/known/print/flyer-variation.pdf' },
-                { label: 'Magazine print', detail: 'PDF', href: '/known/print/magazine-print.pdf' },
-                { label: 'Post', detail: 'PDF', href: '/known/print/post-2.pdf' },
-              ],
-            },
+            { label: 'Founder intro', video: '/video/known-founder-intro.mp4', poster: '/video/known-founder-intro-poster.jpg' },
+            { label: 'First Date Code, ep. 1', video: '/video/known-first-date-code-ep1.mp4', poster: '/video/known-first-date-code-ep1-poster.jpg' },
+            { label: 'Summer series', video: '/video/known-summer-series.mp4', poster: '/video/known-summer-series-poster.jpg' },
+            { label: '1000 Singles \u2014 soft launch', video: '/video/known-1000-singles-soft-launch.mp4', poster: '/video/known-1000-singles-soft-launch-poster.jpg', fit: 'contain' },
+            { label: '1000 Singles \u2014 party recap', video: '/video/known-1000-singles-recap.mp4', poster: '/video/known-1000-singles-recap-poster.jpg' },
           ],
         },
       ],
@@ -741,18 +705,14 @@ export const KNOWN = {
       noNumeral: false,
       blocks: [
         {
-          /* PLACEHOLDER — every row. This table is what a recruiter reads
-             first and it is the only part of the page that can carry a growth
-             claim. Even rough figures beat none. */
           type: 'ledger',
           wide: true,
           headers: ['Dimension', 'Outcome'],
           rows: [
-            ['Audience', 'PLACEHOLDER — followers gained across TikTok and Instagram, from zero'],
-            ['Reach', 'PLACEHOLDER — total views over four months, and the best-performing post'],
-            ['Community', 'PLACEHOLDER — event signups or attendance driven by content'],
-            ['Output', '42 pieces of print and graphic collateral in four months'],
-            ['Ownership', 'Sole content creator, strategist and graphic designer'],
+            ['Audience', '10K+ followers across TikTok and Instagram, from zero'],
+            ['Users', '5K+ user growth in four months'],
+            ['Reach', '3M+ impressions across social platforms'],
+            ['Ownership', 'Led day in my life, founder series and event content; promoted from intern to Growth Associate'],
           ],
         },
       ],
@@ -769,16 +729,16 @@ export const KNOWN = {
           noIndex: true,
           items: [
             {
-              title: 'PLACEHOLDER — on voice',
-              body: 'PLACEHOLDER — what you learned about finding a brand voice with no brand to start from.',
+              title: 'Test before you trust it',
+              body: 'No format worked on the first try. Treating every post as an experiment \u2014 and reading signups next to followers \u2014 is what found the ones that did.',
             },
             {
-              title: 'PLACEHOLDER — on cadence',
-              body: 'PLACEHOLDER — what a weekly loop bought you, and what it cost.',
+              title: 'Consistent beats constant',
+              body: 'Daily posting got attention but couldn\u2019t last. A rotation built on recycled footage kept us consistent and left room for bigger campaigns.',
             },
             {
-              title: 'PLACEHOLDER — on range',
-              body: 'PLACEHOLDER — carrying one voice across video, print and pitch, and what held it together.',
+              title: 'Learn it when the work needs it',
+              body: 'Every new format asked for a new skill \u2014 a new edit, a new sound, a new print piece. I learned each one as the work called for it.',
             },
           ],
         },
