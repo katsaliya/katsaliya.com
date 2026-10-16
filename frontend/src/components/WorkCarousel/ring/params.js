@@ -279,6 +279,7 @@ export function defaultParams() {
     // -- the cursor tag, drawn in the same shader pass --------------------
     tagFrom: 1024, // viewport width it needs; below that there is no cursor
     tagText: 'View',
+    tagSoonText: 'Coming soon', // over a card whose project has no href yet
     /* Its own font, not textFont. The tag used to borrow the heading's, which
        was harmless while both were DM Sans and wrong the moment the heading
        became a script — the label went script with it. This is a 14px UI

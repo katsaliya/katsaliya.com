@@ -10,10 +10,12 @@
 // `type` is a best-guess short discipline label for each, not pulled from a
 // canonical source — check these before treating them as final copy.
 //
-// `href` is the case study a card opens. Only the two that have one carry
-// it; everything else answers a click with the same "Coming soon" note the
-// Selected work cards use, rather than with silence. Add the route here
-// when a case study lands and the card starts working with no other change.
+// `href` is the case study a card opens. A card with `href: null` answers a
+// click with the same "Coming soon" note the Selected work cards use, and its
+// hover tag reads "Coming soon" instead of "View". Allied, AIdentity and
+// katsaliya.com are held back this way until their studies are written; put
+// the route back when one lands and the card starts working with no other
+// change.
 //
 // THE "COMING SOON" PLACEHOLDERS ARE GONE, and with them the one argument
 // for keeping them: they were flat colour interleaved between photographs
@@ -21,7 +23,7 @@
 // high-contrast fills than between two similar images. All six cards are
 // photographic now, so each seam melts between two mid-tone images and the
 // effect is quieter than it was. That is the cost of a ring with no filler
-// in it, and it is the right trade — every card goes somewhere.
+// in it, and it is the right trade.
 export const PROJECTS = [
   {
     /* The real market shot, not the flagged stand-in. The placeholder
@@ -46,7 +48,7 @@ export const PROJECTS = [
     name: 'Allied Global Marketing',
     type: 'Entertainment Marketing',
     year: '2025',
-    href: '/allied-global-marketing',
+    href: null, // TEMPORARY: '/allied-global-marketing' once the case study is written
   },
   {
     file: 'images/cards/demo-bluecore.webp',
@@ -60,14 +62,14 @@ export const PROJECTS = [
     name: 'AIdentity',
     type: 'Product Design',
     year: '2026',
-    href: '/aidentity',
+    href: null, // TEMPORARY: '/aidentity' once the case study is written
   },
   {
     file: 'images/selected-work/katsaliya.jpg',
     name: 'katsaliya.com',
     type: 'Front-End Development',
     year: '2026',
-    href: '/katsaliya',
+    href: null, // TEMPORARY: '/katsaliya' once the case study is written
   },
 ]
 
