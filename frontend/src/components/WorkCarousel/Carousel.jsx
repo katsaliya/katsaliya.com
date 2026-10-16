@@ -36,15 +36,26 @@ const blankTexture = () => {
   return t;
 };
 
+/* Where the ring was left, for the next visit in the same page session.
+   Module scope, so it outlives the component across route changes but not a
+   reload: the entry plays once per visit to the site, and coming back from
+   a case study lands on the card that was opened instead of starting over.
+   Only written once the entry has finished, so leaving mid-entry replays it. */
+let resumeAt = null;
+
 /* `onOpen` is called with the project when a card that is ALREADY at the
    front is clicked. The first click on any other card brings it forward —
    that is what the ring is for — and only the second, on the card the
    "View" tag is offering, opens it. */
-export default function Carousel({ onOpen }) {
+export default function Carousel({ onOpen, onReady }) {
   /* The click handler lives inside an effect that runs once, so a direct
      reference would freeze render zero's prop. Re-pointed every render. */
   const onOpenRef = useRef(null);
   onOpenRef.current = onOpen;
+  /* Called once the ring takes input: { resumed } says whether it was
+     restored from an earlier visit rather than played in. */
+  const onReadyRef = useRef(null);
+  onReadyRef.current = onReady;
 
   const containerRef = useRef(null);
   const listRef = useRef(null);
@@ -694,16 +705,50 @@ export default function Carousel({ onOpen }) {
       renderer.domElement.releasePointerCapture?.(e.pointerId);
     };
 
-    // A drag ends in a click too, so only a near-stationary press counts.
-    // `over` comes from the same hit test that decides the tag, so a click
-    // only ever lands on the card the tag was offering.
+    // Which plane is under a viewport point, against the boxes as drawn last
+    // frame. Same test as the probe in the loop: the plane's own frame, so it
+    // answers for the card turned, leaned and swollen.
+    const planeAt = (clientX, clientY) => {
+      const x = clientX - bounds.left - viewW * 0.5;
+      const y = viewH * 0.5 - (clientY - bounds.top);
+      for (let i = 0; i < hitCount; i++) {
+        const hb = hitBoxes[i];
+        const qx = x - hb.x;
+        const qy = y - hb.y;
+        const cr = Math.cos(hb.rot);
+        const sr = Math.sin(hb.rot);
+        if (
+          Math.abs(qx * cr + qy * sr) <= hb.hw &&
+          Math.abs(-qx * sr + qy * cr) <= hb.hh
+        ) {
+          return i;
+        }
+      }
+      return -1;
+    };
+
+    // A drag ends in a click too, so only a near-stationary press counts —
+    // with the touch slop for a finger, which wanders a few pixels on a tap
+    // where a mouse does not move at all.
+    //
+    // The card is found at the click's own position rather than read off
+    // `over`. With a mouse the two agree, since the tag has long since
+    // settled under the cursor. With a finger `over` is stale: the smoothed
+    // cursor is still travelling from the previous tap, and lifting the
+    // finger fires a pointerleave that clears it before the click arrives.
     const onClick = (e) => {
-      if (!interactive || pointerTravel >= 5 || over < 0) return;
+      const slop = coarse ? params.touchSlop : 5;
+      if (!interactive || pointerTravel >= slop) return;
+      const hit = planeAt(e.clientX, e.clientY);
+      if (hit < 0) return;
       /* pick() returns false when the card is already facing front, which
          is exactly the case where a click means "open this" rather than
          "bring this here". */
-      if (!pick(over)) {
-        const cell = cellOfPlane(over);
+      const atFront = hit === frontPlane;
+      // Finish the turn either way, so a card opened mid-settle still lands
+      // square; but a card already named as the front one opens now.
+      if (!pick(hit) || atFront) {
+        const cell = cellOfPlane(hit);
         const project = PROJECTS[cell];
         if (project) onOpenRef.current?.(project, e);
       }
@@ -822,6 +867,20 @@ export default function Carousel({ onOpen }) {
     let shown = -1;
     let announced = -1;
     let over = -1;
+    // Each plane's box as drawn last frame, for testing a press at its real
+    // position. The tag's `over` tests the SMOOTHED cursor, which is right for
+    // hover but trails a finger by several frames — a quick tap landed before
+    // it caught up and opened nothing, or the card the last tap was on.
+    const hitBoxes = Array.from({ length: MAX_PLANES }, () => ({
+      x: 0, y: 0, rot: 0, hw: 0, hh: 0,
+    }));
+    let hitCount = 0;
+    // The plane nearest the front as of last frame — the one whose name the
+    // column and meta are showing. Tapping it opens it even while the ring is
+    // still settling, rather than spending the tap on the last few degrees.
+    let frontPlane = -1;
+    // A project index waiting to be turned to the front; see restore().
+    let pendingResume = null;
     let tagUp = false;
 
     const paintList = () => {
@@ -882,6 +941,15 @@ export default function Carousel({ onOpen }) {
       // the screen line up. Before the stage move there is no front, so 3
       // o'clock stands in.
       frontAngle = cx !== 0 || cy !== 0 ? Math.atan2(-cy, -cx) : 0;
+
+      // A resumed ring is turned here rather than when it is restored: the
+      // front depends on the stage offset, which is not known until now.
+      if (pendingResume !== null) {
+        const slot = TAU / Math.round(params.count);
+        const i = planeForProject(pendingResume);
+        state.spin = frontAngle - params.seed * DEG - signedOffset(i) * slot;
+        pendingResume = null;
+      }
 
       // Anything measured in plane long edges — hover reach, thread reach,
       // side falloff — comes off W, so the narrow bump reaches them for free.
@@ -1059,6 +1127,13 @@ export default function Carousel({ onOpen }) {
           cell,
         );
 
+        const hb = hitBoxes[i];
+        hb.x = px + leanX[i] + pushX;
+        hb.y = py + leanY[i] + pushY;
+        hb.rot = uniforms.uRot.value[i];
+        hb.hw = W * 0.5 * sx * sw;
+        hb.hh = H * 0.5 * sy * sw;
+
         // Same box the shader draws, tested in the plane's own frame, so it
         // answers for the card as it actually is: turned, leaned and swollen.
         // Cards never overlap once formed, so the first hit is the only hit.
@@ -1087,6 +1162,8 @@ export default function Carousel({ onOpen }) {
         sideF[i] = 0;
       }
 
+      hitCount = count;
+      frontPlane = frontI;
       over = overI;
       // Both tests, not either: the width covers a small window on a mouse,
       // `coarse` covers a large tablet. Re-tested every frame so a window
@@ -1251,6 +1328,7 @@ export default function Carousel({ onOpen }) {
         delay: 0.25,
         onComplete: () => {
           interactive = true;
+          onReadyRef.current?.({ resumed: false });
         },
       });
 
@@ -1381,12 +1459,35 @@ export default function Carousel({ onOpen }) {
     // restarts the whole entry. On a warm cache fonts resolve in milliseconds
     // and that was invisible; on a cold one they arrive late and it reads as
     // the page going blank and starting over.
+    // Coming back: the finished state, set rather than played. Every value
+    // the entry timeline would have ended on, the ring turned to the card
+    // that was at the front, and a short fade so it does not pop in before
+    // its art. The art is in the browser cache by now, so the wait is short.
+    const restore = (project) => {
+      tl = gsap.timeline(); // marks the entry as handled for startEntry
+      Object.assign(state, { progress: 1, launch: 1, spread: 1, shift: 1 });
+      pendingResume = project;
+      splitText.chars.forEach((u) => (u.value = 1));
+      if (params.textOut) splitText.fades.forEach((u) => (u.value = 0));
+      if (listEl) gsap.set(listEl, { opacity: 1 });
+      if (loaderEl) gsap.set(loaderEl, { opacity: 0 });
+      const canvas = renderer.domElement;
+      gsap.set(canvas, { opacity: 0 });
+      atlas.ready.then(() => {
+        if (disposed) return;
+        interactive = true;
+        onReadyRef.current?.({ resumed: true });
+        gsap.to(canvas, { opacity: 1, duration: 0.35, ease: "power2.out" });
+      });
+    };
+
     const startEntry = () => {
       if (disposed || tl) return;
       splitText.build();
       tag.build();
       styleMeta();
-      replay();
+      if (resumeAt !== null) restore(resumeAt);
+      else replay();
     };
 
     // fonts.ready is reliable, but nothing here is worth a permanently blank
@@ -1534,6 +1635,7 @@ export default function Carousel({ onOpen }) {
     });
 
     return () => {
+      if (interactive && shown >= 0) resumeAt = shown;
       disposed = true;
       clearTimeout(holdTimer);
       clearTimeout(fontFallback);
