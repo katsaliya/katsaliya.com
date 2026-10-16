@@ -39,8 +39,8 @@ gsap.registerPlugin(ScrollTrigger)
 /* Home page (bio hero) + About (scrolled-into section of the same page) */
 import Home from './pages/Home'
 
-/* Play page (experiments/creative projects) */
-import Play from './pages/Play'
+/* Play page (experiments/creative projects) — held back, see the /play
+   route below: import Play from './pages/Play' */
 
 /* Contact page (email/contact form) */
 import Contact from './pages/Contact'
@@ -61,7 +61,7 @@ import WorkCarousel from './pages/WorkCarousel'
    these gets real content it can grow a wrapper like theirs if it needs
    page-level behaviour; until then the route IS the page. */
 import CaseStudy from './components/CaseStudy'
-import { EMPORIUM, ALLIED, AIDENTITY, KATSALIYA } from './data/caseStudies'
+import { EMPORIUM } from './data/caseStudies'
 
 /* The chalky-edge SVG filter, mounted once here rather than inside any one
    page: an SVG filter id is document-global, and the elements referencing it
@@ -190,12 +190,11 @@ export default function App() {
           of history, so Back does not bounce through the redirect. */}
       <Route path="/about" element={<Navigate to="/" replace />} />
 
-      {/* Play / Experiments page */}
-      {/* path="/play" = when URL is "katsaliya.com/play" */}
-      {/* element={<Play />} = render the Play component */}
-      {/* Used for creative/experimental projects */}
-      {/* TO CHANGE: Replace <Play /> with different component */}
-      <Route path="/play" element={<Play />} />
+      {/* Play / Experiments page — HELD BACK. The page is a "Coming Soon!"
+          sandbox and nothing links to it, so a typed or old URL goes home
+          instead. To bring it back: <Route path="/play" element={<Play />} />
+          and restore the Play import above. */}
+      <Route path="/play" element={<Navigate to="/" replace />} />
 
       {/* Contact page */}
       {/* path="/contact" = when URL is "katsaliya.com/contact" */}
@@ -218,15 +217,22 @@ export default function App() {
       {/* TO CHANGE: Replace <Known /> with different component */}
       <Route path="/known" element={<Known />} />
 
-      {/* The template studies. Every card on the ring has a destination;
-          these four land on the real page shape with the prose still to
-          write, rather than on a "coming soon". */}
       <Route path="/emporium-thai-market" element={<CaseStudy study={EMPORIUM} />} />
-      <Route path="/allied-global-marketing" element={<CaseStudy study={ALLIED} />} />
-      <Route path="/aidentity" element={<CaseStudy study={AIDENTITY} />} />
-      <Route path="/katsaliya" element={<CaseStudy study={KATSALIYA} />} />
 
-        {/* Note: Any URL not listed above (e.g., /invalid-page) will show nothing */}
+      {/* HELD BACK until written. Their template pages still exist in
+          data/caseStudies.js (ALLIED, AIDENTITY, KATSALIYA) but show
+          PLACEHOLDER text, so a typed URL goes to /work, where their cards
+          answer with "Coming soon". To publish one, swap its Navigate for
+          <CaseStudy study={ALLIED} /> (etc.), import it below, and give its
+          card an href in WorkCarousel/ring/projects.js. */}
+      <Route path="/allied-global-marketing" element={<Navigate to="/work" replace />} />
+      <Route path="/aidentity" element={<Navigate to="/work" replace />} />
+      <Route path="/katsaliya" element={<Navigate to="/work" replace />} />
+
+      {/* Anything else — a typo, an old link — goes home rather than
+          rendering an empty page. */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+
         {/* TO ADD A PAGE: */}
         {/* 1. Create new file in pages/ folder (e.g., pages/NewPage.jsx) */}
         {/* 2. Import it at top of this file: import NewPage from './pages/NewPage' */}
