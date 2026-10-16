@@ -518,7 +518,7 @@ export const KNOWN = {
     {
       id: 'system',
       label: 'System',
-      title: 'Testing until it worked.',
+      title: 'Testing until it worked',
       blocks: [
         {
           type: 'journey',
@@ -679,7 +679,7 @@ export const KNOWN = {
     {
       id: 'work',
       label: 'The work',
-      title: 'Featured work.',
+      title: 'Featured work',
       blocks: [
         /* One clip per pillar of the rotation in the System section:
            founder, founder series, social, then an event from launch to
