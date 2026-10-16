@@ -324,8 +324,14 @@ function Strip({ items, caption, reduceMotion }) {
 
    `label` is the shot; `note` is the direction for taking it. Every one is
    greppable as `type: 'slot'`, and swapping it for a figure/strip is a
-   one-line change in the data. */
-function Slot({ label, note, items, ratio = '16 / 9', count = 1, caption, wide }) {
+   one-line change in the data.
+
+   FILLED: give a cell a `src` and the photo takes the same frame, cropped
+   to the same ratio, with the label underneath as its caption — so the
+   page does not move when the real picture lands. `position` sets
+   object-position for the crop. `narrow` caps a lone portrait cell, which
+   at the full column would be a whole screen of one menu. */
+function Slot({ label, note, items, ratio = '16 / 9', count = 1, caption, wide, narrow }) {
   /* Two ways to ask for the same thing: `items` when each box is a
      different shot, `label` + `count` when they are N of one kind. */
   const cells = items ?? Array.from({ length: count }, (_, i) => ({
@@ -334,8 +340,23 @@ function Slot({ label, note, items, ratio = '16 / 9', count = 1, caption, wide }
   }))
   return (
     <div className={`cs-slots-wrap ${wide ? 'cs-bleed' : ''}`}>
-      <div className="cs-slots" style={{ '--slot-count': cells.length }}>
-        {cells.map((c, i) => (
+      <div
+        className={`cs-slots ${narrow ? 'cs-slots--narrow' : ''}`}
+        style={{ '--slot-count': cells.length, '--slot-cols-md': Math.min(cells.length, 2) }}
+      >
+        {cells.map((c, i) => c.src ? (
+          <figure key={i} className="cs-slot-photo">
+            <div className="cs-slot-photo-frame" style={{ aspectRatio: c.ratio || ratio }}>
+              <img
+                src={c.src}
+                alt={c.alt || c.label || ''}
+                loading="lazy"
+                style={c.position ? { objectPosition: c.position } : undefined}
+              />
+            </div>
+            {c.label && <figcaption className="cs-caption">{c.label}</figcaption>}
+          </figure>
+        ) : (
           <div key={i} className="cs-slot" style={{ aspectRatio: c.ratio || ratio }}>
             <span className="cs-slot-tag">Artwork</span>
             <span className="cs-slot-label">{c.label}</span>
