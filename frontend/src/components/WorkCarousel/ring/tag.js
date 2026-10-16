@@ -7,7 +7,7 @@ export const TAG_W = 104;
 export const TAG_H = 40;
 
 /**
- * The "View" tag that rides the cursor over a card. Drawn in the ring's own
+ * The "View" (or "Coming soon") tag that rides the cursor over a card. Drawn in the ring's own
  * shader pass rather than as an element over the canvas — that is what lets
  * its label invert against whatever pixels it lands on, and lets its glass
  * refract the ring the same way the lip does.
@@ -22,9 +22,16 @@ export function createTag(params, uniforms) {
   const box = { sx: 0.5, sy: 0 };
   const arrow = new Image();
   let arrowReady = false;
-  let tex = null;
 
-  const build = () => {
+  // Two labels, both rasterised up front: "View" with its arrow for a card
+  // that opens something, and the bare "Coming soon" for one that does not
+  // yet. label() swaps between them without touching the canvas, so a cursor
+  // crossing from one card to the next costs nothing.
+  let texView = null;
+  let texSoon = null;
+  let soon = false;
+
+  const raster = (text, withArrow) => {
     // Above display resolution: small type over busy artwork.
     const dpr = Math.min(window.devicePixelRatio, 2) * 2;
     const canvas = document.createElement("canvas");
@@ -37,27 +44,36 @@ export function createTag(params, uniforms) {
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#fff";
 
-    const w = ctx.measureText(params.tagText).width;
-    const run = params.tagArrow + params.tagGap + w;
-    const x0 = (TAG_W - run) * 0.5;
+    const arrowRun = withArrow ? params.tagArrow + params.tagGap : 0;
+    const w = ctx.measureText(text).width;
+    const x0 = (TAG_W - (arrowRun + w)) * 0.5;
 
-    ctx.fillText(
-      params.tagText,
-      x0 + params.tagArrow + params.tagGap,
-      TAG_H * 0.5,
-    );
-    if (arrowReady) {
+    ctx.fillText(text, x0 + arrowRun, TAG_H * 0.5);
+    if (withArrow && arrowReady) {
       const y = (TAG_H - params.tagArrow) * 0.5;
       ctx.drawImage(arrow, x0, y, params.tagArrow, params.tagArrow);
     }
 
-    tex?.dispose();
-    tex = new THREE.CanvasTexture(canvas);
-    tex.colorSpace = THREE.NoColorSpace;
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    tex.generateMipmaps = false;
-    uniforms.uTagTex.value = tex;
+    const t = new THREE.CanvasTexture(canvas);
+    t.colorSpace = THREE.NoColorSpace;
+    t.minFilter = THREE.LinearFilter;
+    t.magFilter = THREE.LinearFilter;
+    t.generateMipmaps = false;
+    return t;
+  };
+
+  const build = () => {
+    texView?.dispose();
+    texSoon?.dispose();
+    texView = raster(params.tagText, true);
+    texSoon = raster(params.tagSoonText, false);
+    uniforms.uTagTex.value = soon ? texSoon : texView;
+  };
+
+  const label = (isSoon) => {
+    if (isSoon === soon) return;
+    soon = isSoon;
+    if (texView) uniforms.uTagTex.value = soon ? texSoon : texView;
   };
 
   const show = (on) => {
@@ -83,8 +99,9 @@ export function createTag(params, uniforms) {
 
   const dispose = () => {
     gsap.killTweensOf(box);
-    tex?.dispose();
+    texView?.dispose();
+    texSoon?.dispose();
   };
 
-  return { box, build, show, load, dispose };
+  return { box, build, label, show, load, dispose };
 }

@@ -1096,6 +1096,9 @@ export default function Carousel({ onOpen }) {
         tagUp = wantTag;
         tag.show(wantTag);
       }
+      // A card with nowhere to go yet says so on hover, rather than offering
+      // a "View" its click cannot honour.
+      if (over >= 0) tag.label(!PROJECTS[cellOfPlane(over)]?.href);
       // Off the resting centre, so a card being pushed cannot chase its own
       // shadow next frame.
       if (over >= 0) focusPos.copy(rest[over]);
