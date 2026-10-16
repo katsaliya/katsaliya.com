@@ -572,7 +572,7 @@ export default function Home() {
               <div className="-ml-4 flex items-center mb-4">
                 <span aria-hidden="true" className="w-4 shrink-0 text-sm text-[var(--walnut-soft)]" style={{ fontFamily: FONT }}>+</span>
                 <span className="text-sm text-[var(--walnut-soft)]" style={{ fontFamily: FONT, fontWeight: 400 }}>
-                  (Liya)
+                  (TLDR)
                 </span>
               </div>
               <p
