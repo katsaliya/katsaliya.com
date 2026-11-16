@@ -23,3 +23,6 @@ frontend/dist/
 # frontend/public/video/bluecore-orb-loop.mp4, but out of public/ so vite
 # stops copying it into every build. Too large for GitHub either way.
 _media-source/
+
+# Installed packages — Vercel runs npm install itself.
+node_modules/

@@ -39,12 +39,6 @@ gsap.registerPlugin(ScrollTrigger)
 /* Home page (bio hero) + About (scrolled-into section of the same page) */
 import Home from './pages/Home'
 
-/* Play page (experiments/creative projects) — held back, see the /play
-   route below: import Play from './pages/Play' */
-
-/* Contact page (email/contact form) */
-import Contact from './pages/Contact'
-
 /* Bluecore case study page */
 import Bluecore from './pages/Bluecore'
 
@@ -54,12 +48,8 @@ import Known from './pages/Known'
 /* Work carousel page — the ring, ported from the Viscose-carousel reference */
 import WorkCarousel from './pages/WorkCarousel'
 
-/* The four studies that are not written yet. They render straight from
-   their data through CaseStudy, with no page file of their own — Bluecore
-   and Known each have an eight-line wrapper that does exactly this, and
-   four more of those would be four more files saying nothing. When one of
-   these gets real content it can grow a wrapper like theirs if it needs
-   page-level behaviour; until then the route IS the page. */
+/* Emporium renders straight from its data through CaseStudy, with no page
+   file of its own. */
 import CaseStudy from './components/CaseStudy'
 import { EMPORIUM } from './data/caseStudies'
 
@@ -180,29 +170,6 @@ export default function App() {
       {/* path="/work" = when URL is "katsaliya.com/work" */}
       <Route path="/work" element={<WorkCarousel />} />
 
-      {/* /about is an alias for /, not a second page. It used to render Home
-          and scroll into an About section; that section was removed, so the
-          two URLs had become byte-identical — same component, same scroll
-          position, two addresses. It redirects rather than being deleted
-          because /about is the kind of link that ends up in a CV or an email
-          signature, and there is no catch-all route here, so dropping it
-          would render a blank page instead of a 404. `replace` keeps it out
-          of history, so Back does not bounce through the redirect. */}
-      <Route path="/about" element={<Navigate to="/" replace />} />
-
-      {/* Play / Experiments page — HELD BACK. The page is a "Coming Soon!"
-          sandbox and nothing links to it, so a typed or old URL goes home
-          instead. To bring it back: <Route path="/play" element={<Play />} />
-          and restore the Play import above. */}
-      <Route path="/play" element={<Navigate to="/" replace />} />
-
-      {/* Contact page */}
-      {/* path="/contact" = when URL is "katsaliya.com/contact" */}
-      {/* element={<Contact />} = render the Contact component */}
-      {/* Contains contact form or email info */}
-      {/* TO CHANGE: Replace <Contact /> with different component */}
-      <Route path="/contact" element={<Contact />} />
-
       {/* BlueCore case study page */}
       {/* path="/bluecore" = when URL is "katsaliya.com/bluecore" */}
       {/* element={<Bluecore />} = render the Bluecore case study */}
@@ -219,18 +186,9 @@ export default function App() {
 
       <Route path="/emporium-thai-market" element={<CaseStudy study={EMPORIUM} />} />
 
-      {/* HELD BACK until written. Their template pages still exist in
-          data/caseStudies.js (ALLIED, AIDENTITY, KATSALIYA) but show
-          PLACEHOLDER text, so a typed URL goes to /work, where their cards
-          answer with "Coming soon". To publish one, swap its Navigate for
-          <CaseStudy study={ALLIED} /> (etc.), import it below, and give its
-          card an href in WorkCarousel/ring/projects.js. */}
-      <Route path="/allied-global-marketing" element={<Navigate to="/work" replace />} />
-      <Route path="/aidentity" element={<Navigate to="/work" replace />} />
-      <Route path="/katsaliya" element={<Navigate to="/work" replace />} />
-
-      {/* Anything else — a typo, an old link — goes home rather than
-          rendering an empty page. */}
+      {/* Anything else — /about, a typo, an old link — goes home rather
+          than rendering an empty page. `replace` keeps the bad URL out of
+          history, so Back does not bounce through the redirect. */}
       <Route path="*" element={<Navigate to="/" replace />} />
 
         {/* TO ADD A PAGE: */}
